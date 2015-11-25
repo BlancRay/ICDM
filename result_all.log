@@ -1,0 +1,574 @@
+processing: Adiac
+nbPrototypes=1
+0.959079283887468
+
+nbPrototypes=2
+0.979539641943734
+
+processing: ArrowHead
+nbPrototypes=1
+0.5885714285714285
+
+nbPrototypes=2
+0.42857142857142855
+
+processing: Beef
+nbPrototypes=1
+0.7666666666666667
+
+nbPrototypes=2
+0.5333333333333333
+
+processing: BeetleFly
+nbPrototypes=1
+0.5
+
+nbPrototypes=2
+0.5
+
+processing: BirdChicken
+nbPrototypes=1
+0.5
+
+nbPrototypes=2
+0.4
+
+processing: Car
+nbPrototypes=1
+0.85
+
+nbPrototypes=2
+0.7166666666666667
+
+processing: CBF
+nbPrototypes=1
+0.6666666666666666
+
+nbPrototypes=2
+0.6666666666666666
+
+processing: ChlorineConcentration
+nbPrototypes=1
+0.4674479166666667
+
+nbPrototypes=2
+0.4674479166666667
+
+processing: CinC_ECG_torso
+nbPrototypes=1
+0.7514492753623189
+
+nbPrototypes=2
+0.758695652173913
+
+processing: Coffee
+nbPrototypes=1
+0.10714285714285714
+
+nbPrototypes=2
+0.17857142857142858
+
+processing: Computers
+nbPrototypes=1
+0.5
+
+nbPrototypes=2
+0.5
+
+processing: Cricket_X
+nbPrototypes=1
+0.9205128205128205
+
+nbPrototypes=2
+0.9205128205128205
+
+processing: Cricket_Y
+nbPrototypes=1
+0.9205128205128205
+
+nbPrototypes=2
+0.9282051282051282
+
+processing: Cricket_Z
+nbPrototypes=1
+0.9282051282051282
+
+nbPrototypes=2
+0.8897435897435897
+
+processing: DistalPhalanxOutlineAgeGroup
+nbPrototypes=1
+0.925
+
+nbPrototypes=2
+0.3875
+
+processing: DistalPhalanxOutlineCorrect
+nbPrototypes=1
+0.37
+
+nbPrototypes=2
+0.45166666666666666
+
+processing: DistalPhalanxTW
+nbPrototypes=1
+0.795
+
+nbPrototypes=2
+0.8225
+
+processing: Earthquakes
+nbPrototypes=1
+0.18012422360248448
+
+nbPrototypes=2
+0.18012422360248448
+
+processing: ECG200
+nbPrototypes=1
+0.36
+
+nbPrototypes=2
+0.36
+
+processing: ECG5000
+nbPrototypes=1
+0.9811111111111112
+
+nbPrototypes=2
+0.9573333333333334
+
+processing: ECGFiveDays
+nbPrototypes=1
+0.502903600464576
+
+nbPrototypes=2
+0.49709639953542395
+
+processing: ElectricDevices
+nbPrototypes=1
+0.7463364025418233
+
+nbPrototypes=2
+0.8489171313707691
+
+processing: FaceAll
+nbPrototypes=1
+0.9573964497041421
+
+nbPrototypes=2
+0.9437869822485208
+
+processing: FaceFour
+nbPrototypes=1
+0.7045454545454546
+
+nbPrototypes=2
+0.8409090909090909
+
+processing: FacesUCR
+nbPrototypes=1
+0.9214634146341464
+
+nbPrototypes=2
+0.9931707317073171
+
+processing: FISH
+nbPrototypes=1
+0.8114285714285714
+
+nbPrototypes=2
+0.8514285714285714
+
+processing: FordA
+nbPrototypes=1
+0.5126353790613718
+
+nbPrototypes=2
+0.5126353790613718
+
+processing: FordB
+nbPrototypes=1
+0.5115511551155115
+
+nbPrototypes=2
+0.5115511551155115
+
+processing: Gun_Point
+nbPrototypes=1
+0.5066666666666667
+
+nbPrototypes=2
+0.58
+
+processing: Ham
+nbPrototypes=1
+0.4857142857142857
+
+nbPrototypes=2
+0.5142857142857142
+
+processing: HandOutlines
+nbPrototypes=1
+0.647
+
+nbPrototypes=2
+0.695
+
+processing: Haptics
+nbPrototypes=1
+0.8084415584415584
+
+nbPrototypes=2
+0.8051948051948052
+
+processing: Herring
+nbPrototypes=1
+0.59375
+
+nbPrototypes=2
+0.578125
+
+processing: InlineSkate
+nbPrototypes=1
+0.9090909090909091
+
+nbPrototypes=2
+0.8472727272727273
+
+processing: InsectWingbeatSound
+nbPrototypes=1
+0.9090909090909091
+
+nbPrototypes=2
+0.9161616161616162
+
+processing: ItalyPowerDemand
+nbPrototypes=1
+0.49854227405247814
+
+nbPrototypes=2
+0.5714285714285714
+
+processing: LargeKitchenAppliances
+nbPrototypes=1
+0.6666666666666666
+
+nbPrototypes=2
+0.6666666666666666
+
+processing: Lighting2
+nbPrototypes=1
+0.5409836065573771
+
+nbPrototypes=2
+0.5409836065573771
+
+processing: Lighting7
+nbPrototypes=1
+0.8356164383561644
+
+nbPrototypes=2
+0.8493150684931506
+
+processing: MALLAT
+nbPrototypes=1
+0.6336886993603411
+
+nbPrototypes=2
+0.9782515991471216
+
+processing: Meat
+nbPrototypes=1
+0.1
+
+nbPrototypes=2
+0.05
+
+processing: MedicalImages
+nbPrototypes=1
+0.968421052631579
+
+nbPrototypes=2
+0.9657894736842105
+
+processing: MiddlePhalanxOutlineAgeGroup
+nbPrototypes=1
+0.4075
+
+nbPrototypes=2
+0.91
+
+processing: MiddlePhalanxOutlineCorrect
+nbPrototypes=1
+0.35333333333333333
+
+nbPrototypes=2
+0.35333333333333333
+
+processing: MiddlePhalanxTW
+nbPrototypes=1
+0.38847117794486213
+
+nbPrototypes=2
+0.5012531328320802
+
+processing: MoteStrain
+nbPrototypes=1
+0.46086261980830673
+
+nbPrototypes=2
+0.5391373801916933
+
+processing: NonInvasiveFatalECG_Thorax1
+nbPrototypes=1
+0.9704834605597964
+
+nbPrototypes=2
+0.9653944020356234
+
+processing: NonInvasiveFatalECG_Thorax2
+nbPrototypes=1
+0.9694656488549618
+
+nbPrototypes=2
+0.9669211195928753
+
+processing: OliveOil
+nbPrototypes=1
+0.4666666666666667
+
+nbPrototypes=2
+0.3333333333333333
+
+processing: OSULeaf
+nbPrototypes=1
+0.8099173553719008
+
+nbPrototypes=2
+0.8057851239669421
+
+processing: PhalangesOutlinesCorrect
+nbPrototypes=1
+0.6130536130536131
+
+nbPrototypes=2
+0.38694638694638694
+
+processing: Plane
+nbPrototypes=1
+0.7904761904761904
+
+nbPrototypes=2
+0.7238095238095238
+
+processing: ProximalPhalanxOutlineAgeGroup
+nbPrototypes=1
+0.5707317073170731
+
+nbPrototypes=2
+0.5707317073170731
+
+processing: ProximalPhalanxOutlineCorrect
+nbPrototypes=1
+0.6838487972508591
+
+nbPrototypes=2
+0.6838487972508591
+
+processing: ProximalPhalanxTW
+nbPrototypes=1
+0.9625
+
+nbPrototypes=2
+1.0
+
+processing: RefrigerationDevices
+nbPrototypes=1
+0.6666666666666666
+
+nbPrototypes=2
+0.6666666666666666
+
+processing: ScreenType
+nbPrototypes=1
+0.6666666666666666
+
+nbPrototypes=2
+0.6666666666666666
+
+processing: ShapeletSim
+nbPrototypes=1
+0.5
+
+nbPrototypes=2
+0.5
+
+processing: ShapesAll
+nbPrototypes=1
+0.64
+
+nbPrototypes=2
+0.4866666666666667
+
+processing: SmallKitchenAppliances
+nbPrototypes=1
+0.6666666666666666
+
+nbPrototypes=2
+0.6666666666666666
+
+processing: SonyAIBORobotSurface
+nbPrototypes=1
+0.4292845257903494
+
+nbPrototypes=2
+0.46921797004991683
+
+processing: SonyAIBORobotSurfaceII
+nbPrototypes=1
+0.6169989506820567
+
+nbPrototypes=2
+0.3830010493179433
+
+processing: StarLightCurves
+nbPrototypes=1
+0.42277804759592036
+
+nbPrototypes=2
+0.16160757649344343
+
+processing: Strawberry
+nbPrototypes=1
+0.3572593800978793
+
+nbPrototypes=2
+0.401305057096248
+
+processing: SwedishLeaf
+nbPrototypes=1
+0.8304
+
+nbPrototypes=2
+0.8544
+
+processing: Symbols
+nbPrototypes=1
+0.8703517587939699
+
+nbPrototypes=2
+0.9809045226130654
+
+processing: synthetic_control
+nbPrototypes=1
+0.8333333333333334
+
+nbPrototypes=2
+0.6733333333333333
+
+processing: ToeSegmentation1
+nbPrototypes=1
+0.47368421052631576
+
+nbPrototypes=2
+0.47368421052631576
+
+processing: ToeSegmentation2
+nbPrototypes=1
+0.18461538461538463
+
+nbPrototypes=2
+0.18461538461538463
+
+processing: Trace
+nbPrototypes=1
+0.81
+
+nbPrototypes=2
+1.0
+
+processing: Two_Patterns
+nbPrototypes=1
+0.74725
+
+nbPrototypes=2
+0.74725
+
+processing: TwoLeadECG
+nbPrototypes=1
+0.4925373134328358
+
+nbPrototypes=2
+0.3476733977172959
+
+processing: uWaveGestureLibrary_X
+nbPrototypes=1
+0.8743718592964824
+
+nbPrototypes=2
+0.8914014517029593
+
+processing: uWaveGestureLibrary_Y
+nbPrototypes=1
+0.878001116694584
+
+nbPrototypes=2
+0.878001116694584
+
+processing: uWaveGestureLibrary_Z
+nbPrototypes=1
+0.8738135120044668
+
+nbPrototypes=2
+0.8263539921831379
+
+processing: UWaveGestureLibraryAll
+nbPrototypes=1
+0.8738135120044668
+
+nbPrototypes=2
+0.8738135120044668
+
+processing: wafer
+nbPrototypes=1
+0.8921155094094744
+
+nbPrototypes=2
+0.8921155094094744
+
+processing: Wine
+nbPrototypes=1
+0.5
+
+nbPrototypes=2
+0.5185185185185185
+
+processing: WordsSynonyms
+nbPrototypes=1
+0.9905956112852664
+
+nbPrototypes=2
+0.9608150470219435
+
+processing: Worms
+nbPrototypes=1
+0.8232044198895028
+
+nbPrototypes=2
+0.9060773480662984
+
+processing: WormsTwoClass
+nbPrototypes=1
+0.580110497237569
+
+nbPrototypes=2
+0.580110497237569
+
+processing: yoga
+nbPrototypes=1
+0.5356666666666666
+
+nbPrototypes=2
+0.4643333333333333
+
