@@ -191,8 +191,6 @@ public class DTWKNNClassifierGmm extends Classifier{
 				}
 
 				// sigma
-				// sigmasPerClass = new
-				// double[classes.size()][nClustersPerClass];
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
 					sigmasPerClass[c][k] = 0;
 					for (i = 0; i < classedData.get(clas).size(); i++) {
