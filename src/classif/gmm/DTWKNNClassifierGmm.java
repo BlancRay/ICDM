@@ -174,8 +174,8 @@ public class DTWKNNClassifierGmm extends Classifier{
 					MonoDoubleItemSet[] sequencepx = new MonoDoubleItemSet[data.numAttributes() - 1];
 					// new MonoDoubleItemSet
 					for (int t = 0; t < sequence.length; t++) {
-						sequencetmp[t] = new MonoDoubleItemSet(0);//
-						sequencepx[t] = new MonoDoubleItemSet(0);//
+						sequencetmp[t] = new MonoDoubleItemSet(0);
+						sequencepx[t] = new MonoDoubleItemSet(0);
 					}
 
 					for (i = 0; i < classedData.get(clas).size(); i++) {
