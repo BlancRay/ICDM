@@ -25,7 +25,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class DTWProbabilisticClassifierKMeans extends Classifier {
+public class EUCProbabilisticClassifierKMeans extends Classifier {
 
 	private static final long serialVersionUID = 1717176683182910935L;
 
@@ -43,7 +43,7 @@ public class DTWProbabilisticClassifierKMeans extends Classifier {
 
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
 
-	public DTWProbabilisticClassifierKMeans() {
+	public EUCProbabilisticClassifierKMeans() {
 		super();
 	}
 
@@ -96,7 +96,7 @@ public class DTWProbabilisticClassifierKMeans extends Classifier {
 			// if the class is empty, continue
 			if (classedData.get(clas).isEmpty())
 				continue;
-			KMeansSymbolicSequence kmeans = new KMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
+			EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
 
 			kmeans.cluster();
 			for (int k = 0; k < kmeans.centers.length; k++) {
@@ -109,7 +109,7 @@ public class DTWProbabilisticClassifierKMeans extends Classifier {
 					int nObjectsInCluster = kmeans.affectation[k].size();
 					
 					// compute sigma
-					double sumOfSquares = kmeans.centers[k].sumOfSquares(kmeans.affectation[k]);
+					double sumOfSquares = kmeans.centers[k].EUCsumOfSquares(kmeans.affectation[k]);
 					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
 //					System.out.println(sigmasPerClass[c][k]);
 					// compute p(k)
@@ -146,7 +146,7 @@ public class DTWProbabilisticClassifierKMeans extends Classifier {
 			double prob = 0.0;
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				// compute P(Q|k_c)
-				double dist = seq.distance(centroidsPerClass[c][k]);
+				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 				prob += p * prior[c][k];
 				// System.out.println(probabilities[c]);

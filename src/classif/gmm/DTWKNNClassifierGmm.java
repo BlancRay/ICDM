@@ -1,20 +1,17 @@
 package classif.gmm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.sun.swing.internal.plaf.basic.resources.basic_ko;
-import com.sun.xml.internal.ws.db.glassfish.BridgeWrapper;
-
-import classif.kmeans.KMeansSymbolicSequence;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import weka.classifiers.Classifier;
-import weka.clusterers.EM;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
+import classif.kmeans.EUCKMeansSymbolicSequence;
 
 public class DTWKNNClassifierGmm extends Classifier{
 
@@ -83,18 +80,18 @@ public class DTWKNNClassifierGmm extends Classifier{
 		nck = new double[classedData.keySet().size()][nClustersPerClass];
 		double sumpk[]=new double[classedData.keySet().size()];
 		
-		double sumoflog=0;
 		double Lprev=-(Math.exp(308));
 
 		for (String clas : classes) {
+			double sumoflog=0;
 			int c = trainingData.classAttribute().indexOfValue(clas);
-			double[][][] pik = new double[classedData.get(clas).size()][classes.size()][nClustersPerClass];
+			double[][] pik = new double[classedData.get(clas).size()][nClustersPerClass];
 
 			// System.out.println("clas "+clas+" -> "+c);
 			// if the class is empty, continue
 			if (classedData.get(clas).isEmpty())
 				continue;
-			KMeansSymbolicSequence kmeans = new KMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
+			EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
 
 			kmeans.cluster();
 			for (int k = 0; k < kmeans.centers.length; k++) {
@@ -104,7 +101,7 @@ public class DTWKNNClassifierGmm extends Classifier{
 					int nObjectsInCluster = kmeans.affectation[k].size();
 
 					// compute sigma
-					double sumOfSquares = kmeans.centers[k].sumOfSquares(kmeans.affectation[k]);
+					double sumOfSquares = kmeans.centers[k].EUCsumOfSquares(kmeans.affectation[k]);
 					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
 					System.out.println(sigmasPerClass[c][k]);
 					// compute p(k)
@@ -115,54 +112,53 @@ public class DTWKNNClassifierGmm extends Classifier{
 				}
 			}
 
+			//computing initial likelihood
 			for (Sequence ss : classedData.get(clas)) {
 				double prob = 0.0;
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					double dist = ss.distance(centroidsPerClass[c][k]);
+					double dist = ss.distanceEuc(centroidsPerClass[c][k]);
 					double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 					prob += p * prior[c][k];// xi点由k个聚类生成的概率
 				}
 				sumoflog += Math.log(prob);
 			}
 
+			double[][] gamma = new double[classedData.get(clas).size()][nClustersPerClass];
 			while (Math.abs(sumoflog - Lprev) > Math.exp(-6)) {
 				// System.out.println("sumoflog="+sumoflog);
 				// p(i,k)
 				Lprev = sumoflog;
-				double[][][] pck = new double[classedData.get(clas).size()][classedData.keySet()
-						.size()][nClustersPerClass];
 				// get p(i,k)
-				int i = 0;
-				for (Sequence s : classedData.get(clas)) {
-
-					double[] pro = new double[classedData.get(clas).size()];
+				ArrayList<Sequence> sequencesForClass = classedData.get(clas);
+				for (int i=0; i<sequencesForClass.size();i++) {
+				    Sequence s = sequencesForClass.get(i);
+					double[] sumofgamma = new double[classedData.get(clas).size()];
 					// for each p(k)
 
 					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						double dist = s.distance(centroidsPerClass[c][k]);
+						double dist = s.distanceEuc(centroidsPerClass[c][k]);
 						double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-						pck[i][c][k] = p * nck[c][k] / sumpk[c];
+						gamma[i][k] = p * nck[c][k] / sumpk[c];
 					}
 
 					// sum of p(k)
-					for (int k = 0; k < pck[i][c].length; k++) {
-						pro[i] += pck[i][c][k];
+					for (int k = 0; k < gamma[i].length; k++) {
+						sumofgamma[i] += gamma[i][k];
 					}
 					// p(i,k)
 					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						pik[i][c][k] = pck[i][c][k] / pro[i];
+						pik[i][k] = gamma[i][k] / sumofgamma[i];
 					}
-					i++;
 				}
 
 				// Nk
 
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					double sumpik = 0;
-					for (i = 0; i < classedData.get(clas).size(); i++) {
-						sumpik += pik[i][c][k];
+					double sumofpik = 0;
+					for (int i = 0; i < classedData.get(clas).size(); i++) {
+						sumofpik += pik[i][k];
 					}
-					nck[c][k] = sumpik;
+					nck[c][k] = sumofpik;
 				}
 
 				// centroidsPerClass
@@ -178,11 +174,11 @@ public class DTWKNNClassifierGmm extends Classifier{
 						sequencepx[t] = new MonoDoubleItemSet(0);
 					}
 
-					for (i = 0; i < classedData.get(clas).size(); i++) {
+					for (int i = 0; i < classedData.get(clas).size(); i++) {
 						sequence = (MonoDoubleItemSet[]) classedData.get(clas).get(i).getSequence();
 						for (int t = 0; t < sequence.length; t++) {
 							sequencetmp[t] = new MonoDoubleItemSet(
-									pik[i][c][k] * sequence[t].getValue() / nck[c][k] + sequencepx[t].getValue());
+									pik[i][k] * sequence[t].getValue() / nck[c][k] + sequencepx[t].getValue());
 						}
 						sequencepx = sequencetmp;
 					}
@@ -191,18 +187,20 @@ public class DTWKNNClassifierGmm extends Classifier{
 				}
 
 				// sigma
+				// sigmasPerClass = new
+				// double[classes.size()][nClustersPerClass];
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
 					sigmasPerClass[c][k] = 0;
-					for (i = 0; i < classedData.get(clas).size(); i++) {
-						sigmasPerClass[c][k] += pik[i][c][k]
-								* classedData.get(clas).get(i).distance(centroidsPerClass[c][k]) / nck[c][k];
+					for (int i = 0; i < classedData.get(clas).size(); i++) {
+						sigmasPerClass[c][k] += pik[i][k]
+								* classedData.get(clas).get(i).distanceEuc(centroidsPerClass[c][k]) / nck[c][k];
 					}
 				}
 				sumoflog = 0;
 				for (Sequence ss : classedData.get(clas)) {
 					double prob = 0.0;
 					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						double dist = ss.distance(centroidsPerClass[c][k]);
+						double dist = ss.distanceEuc(centroidsPerClass[c][k]);
 						double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 						prob += p * nck[c][k] / sumpk[c];
 					}
@@ -242,7 +240,7 @@ public class DTWKNNClassifierGmm extends Classifier{
 				double prob = 0.0;
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
 					// compute P(Q|k_c)
-					double dist = seq.distance(centroidsPerClass[c][k]);
+					double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 					double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 					prob += p * prior[c][k];
 					// System.out.println(probabilities[c]);

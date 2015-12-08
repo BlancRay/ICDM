@@ -163,5 +163,17 @@ public class Sequence implements java.io.Serializable {
 		return inertia;
 
 	}
+	
+	public final double EUCsumOfSquares(ArrayList<Sequence> tabSequence) {
+		double inertia = 0.0;
+		for (Sequence seq : tabSequence) {
+			double dist = this.distanceEuc(seq);
+			// the distance in Itemset should be squared
+			inertia += dist * dist; // inertia = sum of the squared distances
+		}
+
+		return inertia;
+
+	}
 
 }

@@ -534,8 +534,8 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals("FaceAll"))
-				continue;
+//			if(!dataRep.getName().equals("ToeSegmentation2"))
+//				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
@@ -543,8 +543,8 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmm();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmm();
 		}
 	}
 
