@@ -47,8 +47,11 @@ import classif.dropx.DTWKNNClassifierDropTwo;
 import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
 import classif.gmm.DTWKNNClassifierGmm;
+import classif.gmm.EUCKNNClassifierGmm;
 import classif.kmeans.DTWKNNClassifierKMeans;
 import classif.kmeans.DTWProbabilisticClassifierKMeans;
+import classif.kmeans.EUCKNNClassifierKMeans;
+import classif.kmeans.EUCProbabilisticClassifierKMeans;
 import classif.kmedoid.DTWKNNClassifierKMedoids;
 import classif.random.DTWKNNClassifierRandom;
 
@@ -209,26 +212,72 @@ public class ExperimentsLauncher {
 			for (int j = 1; j <= nbPrototypesMax; j++) {
 				System.out.println("nbPrototypes=" + j);
 				for (int n = 0; n < nbExp; n++) {
-					DTWKNNClassifierKMeans classifier = new DTWKNNClassifierKMeans();
-					classifier.setNbPrototypesPerClass(j);
-					classifier.setFillPrototypes(true);
+					DTWKNNClassifierKMeans classifierKMeans = new DTWKNNClassifierKMeans();
+					classifierKMeans.setNbPrototypesPerClass(j);
+					classifierKMeans.setFillPrototypes(true);
 
 					startTime = System.currentTimeMillis();
-					classifier.buildClassifier(train);
+					classifierKMeans.buildClassifier(train);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
 
-					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifier.prototypes, train);
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.prototypes, train);
 
 					Evaluation eval = new Evaluation(train);
-					eval.evaluateModel(classifier, test);
+					eval.evaluateModel(classifierKMeans, test);
 
 					double testError = eval.errorRate();
 					double trainError = Double.NaN;
 
-					PrototyperUtil.savePrototypes(classifier.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
+					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
 					out.format("%s;%s;%d;%d;%.4f;%.4f;%s\n", dataName, algo, (j * train.numClasses()), duration, trainError, testError, Arrays.toString(classDistrib));
+					out.flush();
+				}
+
+			}
+			outProto.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void launchKMeansEUC() {
+		try {
+			out = new PrintStream(new FileOutputStream(rep + "/KEUC_All_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;execTime;trainErrorRate;testErrorRate;prototypesPerClassDistribution");
+			String algo = "KMEANSEUC";
+
+			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
+
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			if(nbPrototypesMax>2)
+			nbPrototypesMax=5;
+
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					EUCKNNClassifierKMeans classifierKMeansEUC = new EUCKNNClassifierKMeans();
+					classifierKMeansEUC.setNbPrototypesPerClass(j);
+					classifierKMeansEUC.setFillPrototypes(true);
+
+					startTime = System.currentTimeMillis();
+					classifierKMeansEUC.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeansEUC.prototypes, train);
+
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierKMeansEUC, test);
+
+					double testError = eval.errorRate();
+					double trainError = Double.NaN;
+
+					PrototyperUtil.savePrototypes(classifierKMeansEUC.prototypes, rep + "/" + dataName + "_KMEANSEUC[" + j + "]_XP" + n + ".proto");
+
+					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
 					out.flush();
 				}
 
@@ -260,25 +309,73 @@ public class ExperimentsLauncher {
 				System.out.println("nbPrototypes=" + j);
 				for (int n = 0; n < nbExp; n++) {
 					System.out.println("This is the "+n+" time.");
-					DTWProbabilisticClassifierKMeans classifierKMeans = new DTWProbabilisticClassifierKMeans();
-					classifierKMeans.setNClustersPerClass(j);
+					DTWProbabilisticClassifierKMeans classifierKMeansPro = new DTWProbabilisticClassifierKMeans();
+					classifierKMeansPro.setNClustersPerClass(j);
 
 					startTime = System.currentTimeMillis();
-					classifierKMeans.buildClassifier(train);
+					classifierKMeansPro.buildClassifier(train);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
 					
-					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.getPrototypes(), train);
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeansPro.getPrototypes(), train);
 					
 					Evaluation eval = new Evaluation(train);
-					eval.evaluateModel(classifierKMeans, test);
+					eval.evaluateModel(classifierKMeansPro, test);
 					double testError = eval.errorRate();
 					double trainError = Double.NaN;
 					
 					System.out.println(testError+"\n");
-					PrototyperUtil.savePrototypes(classifierKMeans.getPrototypes(), rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
+					PrototyperUtil.savePrototypes(classifierKMeansPro.getPrototypes(), rep + "/" + dataName + "_KMEANSPro[" + j + "]_XP" + n + ".proto");
 
 					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.flush();
+				}
+			}
+		}catch(	Exception e){
+		e.printStackTrace();
+		}
+	}
+	
+	public void launchKMeansProbabilisticEUC() {
+		try {
+			out = new PrintStream(new FileOutputStream(rep + "/KPEUC_All_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
+			String algo = "KMEANSProbabilisticEUC";
+
+
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			if(nbPrototypesMax>2)
+			nbPrototypesMax=5;
+			int tmp;
+			tmp = nbExp;
+
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					EUCProbabilisticClassifierKMeans classifierKMeansProEUC = new EUCProbabilisticClassifierKMeans();
+					classifierKMeansProEUC.setNClustersPerClass(j);
+
+					startTime = System.currentTimeMillis();
+					classifierKMeansProEUC.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+					
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeansProEUC.getPrototypes(), train);
+					
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierKMeansProEUC, test);
+					double testError = eval.errorRate();
+					double trainError = Double.NaN;
+					
+					System.out.println(testError+"\n");
+					PrototyperUtil.savePrototypes(classifierKMeansProEUC.getPrototypes(), rep + "/" + dataName + "_KMEANSProEUC[" + j + "]_XP" + n + ".proto");
+
+					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
 					out.flush();
 				}
 			}
@@ -291,7 +388,7 @@ public class ExperimentsLauncher {
 		try {
 			out = new PrintStream(new FileOutputStream(rep + "/All_results.csv", true));
 //			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
-			String algo = "KMEANS";
+			String algo = "GMM";
 
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
@@ -324,9 +421,57 @@ public class ExperimentsLauncher {
 					double trainError = Double.NaN;
 					
 					System.out.println(testError+"\n");
-					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
+					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
 
 					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.flush();
+				}
+			}
+		}catch(	Exception e){
+		e.printStackTrace();
+		}
+	}
+	
+	public void launchGmmEUC() {
+		try {
+			out = new PrintStream(new FileOutputStream(rep + "/GMMEUC_All_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
+			String algo = "GMMEUC";
+
+
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			if(nbPrototypesMax>2)
+			nbPrototypesMax=5;
+			int tmp;
+			tmp = nbExp;
+
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					EUCKNNClassifierGmm classifierGmmEUC = new EUCKNNClassifierGmm();
+					classifierGmmEUC.setNClustersPerClass(j);
+
+					startTime = System.currentTimeMillis();
+					classifierGmmEUC.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+					
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierGmmEUC.getPrototypes(), train);
+					
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierGmmEUC, test);
+					double testError = eval.errorRate();
+					double trainError = Double.NaN;
+					
+					System.out.println(testError+"\n");
+					PrototyperUtil.savePrototypes(classifierGmmEUC.getPrototypes(), rep + "/" + dataName + "_GMMEUC[" + j + "]_XP" + n + ".proto");
+
+					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
 					out.flush();
 				}
 			}
@@ -509,7 +654,7 @@ public class ExperimentsLauncher {
 
 	public static void main(String[] args) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-		File repSave = new File("C:\\Users\\leix\\workspace\\ICDM2014\\save\\"+df.format(new Date()));
+		File repSave = new File("F:\\workspace\\ICDM\\save\\"+df.format(new Date()));
 		File[] repSavelist;
 		if (!repSave.exists()) {
 			repSave.mkdirs();
@@ -521,7 +666,7 @@ public class ExperimentsLauncher {
 		}
 
 		// datasets folder
-		File rep = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\");
+		File rep = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\");
 		File[] listData = rep.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
@@ -543,18 +688,21 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmm();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmmEUC();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchKMeansEUC();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchKMeansProbabilisticEUC();
 		}
 	}
 
 	public static Instances[] readTrainAndTest(String name) {
-		File trainFile = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TRAIN");
+		File trainFile = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TRAIN");
 		if (!new File(trainFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(trainFile, new File(trainFile.getAbsolutePath() + ".csv"));
 		}
 		trainFile = new File(trainFile.getAbsolutePath() + ".csv");
-		File testFile = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TEST");
+		File testFile = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TEST");
 		if (!new File(testFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(testFile, new File(testFile.getAbsolutePath() + ".csv"));
 		}

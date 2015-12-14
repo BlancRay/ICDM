@@ -104,7 +104,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 					// compute sigma
 					double sumOfSquares = kmeans.centers[k].EUCsumOfSquares(kmeans.affectation[k]);
 					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
-					System.out.println(sigmasPerClass[c][k]);
+//					System.out.println(sigmasPerClass[c][k]);
 					// compute p(k)
 					// the P(K) of k
 					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
@@ -257,7 +257,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 		private double computeProbaForQueryAndCluster(double sigma, double d) {
 			double pqk;
 			if ( Double.isNaN(sigma)) {
-				System.err.println("alert");
+//				System.err.println("alert");
 				pqk = 0.0;
 			}
 			else
