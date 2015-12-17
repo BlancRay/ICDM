@@ -93,6 +93,23 @@ public class Sequences {
 		return res;
 
 	}
+	
+	public static final Sequence meanEUC(final Sequence... tabSequence) {
+	    Sequence oneSample = tabSequence[0];
+	    int lengthMean = Integer.MAX_VALUE;
+	    for(Sequence sample: tabSequence){
+		lengthMean = Math.min(lengthMean, sample.getNbTuples());
+	    }
+	    final Itemset[] mean = new Itemset[lengthMean];
+	    Itemset[] elements = new Itemset[tabSequence.length];
+	    for (int i = 0; i < mean.length; i++) {
+		for (int s = 0; s < tabSequence.length; s++) {
+		    elements[s]=tabSequence[s].getItem(i);
+		}
+		mean[i] = oneSample.sequence[0].mean(elements);
+	    }
+	    return new Sequence(mean);
+	}
 
 	private synchronized static final Sequence DBAMean(final Sequence oldCenter, final Sequence[] tabSequence) {
 		@SuppressWarnings("unchecked")

@@ -31,8 +31,6 @@ public class EUCKMeansSymbolicSequence {
 		centers = new Sequence[nbClusters];
 		affectation = new ArrayList[nbClusters];
 
-		
-
 		// pickup centers
 		int[] selected = randGen.nextPermutation(data.size(), nbClusters);
 		for (int i = 0; i < selected.length; i++) {
@@ -68,7 +66,7 @@ public class EUCKMeansSymbolicSequence {
 				if (affectation[j].size() == 0) {
 					centers[j]=null;
 				}else{
-					centers[j] = Sequences.mean(affectation[j].toArray(new Sequence[0]));
+					centers[j] = Sequences.meanEUC(affectation[j].toArray(new Sequence[0]));
 				}
 			}
 		}

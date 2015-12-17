@@ -1,13 +1,12 @@
 package classif.kmeans;
 
-import items.ClassedSequence;
-
 import java.util.ArrayList;
 
-import classif.Prototyper;
+import classif.PrototyperEUC;
+import items.ClassedSequence;
 import weka.core.Instances;
 
-public class EUCKNNClassifierKMeans extends Prototyper {
+public class EUCKNNClassifierKMeans extends PrototyperEUC {
 
 	private static final long serialVersionUID = 1717176683182910935L;
 	
