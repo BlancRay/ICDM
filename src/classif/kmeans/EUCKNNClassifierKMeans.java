@@ -29,6 +29,7 @@ public class EUCKNNClassifierKMeans extends PrototyperEUC {
 				if(kmeans.centers[i]!=null){ //~ if empty cluster
 					ClassedSequence s = new ClassedSequence(kmeans.centers[i], clas);
 					prototypes.add(s);
+					System.out.println("Gaussian #"+clas+":mu="+s.sequence.toString());
 				}
 			}
 		}

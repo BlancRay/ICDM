@@ -231,7 +231,7 @@ public class ExperimentsLauncher {
 
 					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%d;%.4f;%.4f;%s\n", dataName, algo, (j * train.numClasses()), duration, trainError, testError, Arrays.toString(classDistrib));
+					out.format("%s;%s;%d;%d;%.4f;%s\n", dataName, algo, (j * train.numClasses()), duration, testError, Arrays.toString(classDistrib));
 					out.flush();
 				}
 
@@ -253,7 +253,7 @@ public class ExperimentsLauncher {
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 			if(nbPrototypesMax>2)
-			nbPrototypesMax=5;
+			nbPrototypesMax=2;
 
 			for (int j = 1; j <= nbPrototypesMax; j++) {
 				System.out.println("nbPrototypes=" + j);
@@ -274,10 +274,11 @@ public class ExperimentsLauncher {
 
 					double testError = eval.errorRate();
 					double trainError = Double.NaN;
-
+					System.out.println(testError+"\n");
+					
 					PrototyperUtil.savePrototypes(classifierKMeansEUC.prototypes, rep + "/" + dataName + "_KMEANSEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
 					out.flush();
 				}
 
@@ -327,7 +328,7 @@ public class ExperimentsLauncher {
 					System.out.println(testError+"\n");
 					PrototyperUtil.savePrototypes(classifierKMeansPro.getPrototypes(), rep + "/" + dataName + "_KMEANSPro[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.format("%s;%s;%d;%.4f\n", dataName, algo, (j * train.numClasses()), testError);
 					out.flush();
 				}
 			}
@@ -345,7 +346,7 @@ public class ExperimentsLauncher {
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 			if(nbPrototypesMax>2)
-			nbPrototypesMax=5;
+			nbPrototypesMax=2;
 			int tmp;
 			tmp = nbExp;
 
@@ -375,7 +376,7 @@ public class ExperimentsLauncher {
 					System.out.println(testError+"\n");
 					PrototyperUtil.savePrototypes(classifierKMeansProEUC.getPrototypes(), rep + "/" + dataName + "_KMEANSProEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
 					out.flush();
 				}
 			}
@@ -423,7 +424,7 @@ public class ExperimentsLauncher {
 					System.out.println(testError+"\n");
 					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.format("%s;%s;%d;%.4f\n", dataName, algo, (j * train.numClasses()), testError);
 					out.flush();
 				}
 			}
@@ -441,7 +442,7 @@ public class ExperimentsLauncher {
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 			if(nbPrototypesMax>2)
-			nbPrototypesMax=5;
+			nbPrototypesMax=2;
 			int tmp;
 			tmp = nbExp;
 
@@ -471,7 +472,7 @@ public class ExperimentsLauncher {
 					System.out.println(testError+"\n");
 					PrototyperUtil.savePrototypes(classifierGmmEUC.getPrototypes(), rep + "/" + dataName + "_GMMEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()),  trainError, testError);
+					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
 					out.flush();
 				}
 			}
@@ -654,7 +655,7 @@ public class ExperimentsLauncher {
 
 	public static void main(String[] args) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-		File repSave = new File("F:\\workspace\\ICDM\\save\\"+df.format(new Date()));
+		File repSave = new File("C:\\Users\\leix\\ICDM\\ICDM-master\\save\\"+df.format(new Date()));
 		File[] repSavelist;
 		if (!repSave.exists()) {
 			repSave.mkdirs();
@@ -666,7 +667,7 @@ public class ExperimentsLauncher {
 		}
 
 		// datasets folder
-		File rep = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\");
+		File rep = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015 - Copy\\");
 		File[] listData = rep.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
@@ -679,8 +680,8 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-//			if(!dataRep.getName().equals("ToeSegmentation2"))
-//				continue;
+			if(!dataRep.getName().equals("GMM"))
+				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
@@ -697,12 +698,12 @@ public class ExperimentsLauncher {
 	}
 
 	public static Instances[] readTrainAndTest(String name) {
-		File trainFile = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TRAIN");
+		File trainFile = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015 - Copy\\" + name + "/" + name + "_TRAIN");
 		if (!new File(trainFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(trainFile, new File(trainFile.getAbsolutePath() + ".csv"));
 		}
 		trainFile = new File(trainFile.getAbsolutePath() + ".csv");
-		File testFile = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\" + name + "/" + name + "_TEST");
+		File testFile = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015 - Copy\\" + name + "/" + name + "_TEST");
 		if (!new File(testFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(testFile, new File(testFile.getAbsolutePath() + ".csv"));
 		}

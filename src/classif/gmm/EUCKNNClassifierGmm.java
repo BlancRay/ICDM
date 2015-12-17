@@ -1,10 +1,16 @@
 package classif.gmm;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
+import classif.ExperimentsLauncher;
 import classif.kmeans.EUCKMeansSymbolicSequence;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
@@ -196,6 +202,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 						sigmasPerClass[c][k] += pik[i][k]
 								* classedData.get(clas).get(i).distanceEuc(centroidsPerClass[c][k]) / nck[c][k];
 					}
+					
 				}
 				sumoflog = 0;
 				for (Sequence ss : classedData.get(clas)) {
@@ -213,6 +220,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = nck[c][k] / data.numInstances();
+				System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
 	}
@@ -289,65 +297,5 @@ public class EUCKNNClassifierGmm extends Classifier{
 		public void setPrototypes(ArrayList<ClassedSequence> prototypes) {
 			this.prototypes = prototypes;
 		}
-	
-		
-		public static void main(String...args){
-		    //testing GMM with a mimxture of normal
-		    int nDataPoints = 10000;
-		    int nGaussians = 4;
-		    int nDims = 2;
-		    Random r = new Random(3071980);
-		    
-		    double[][]mus = new double[nGaussians][nDims];
-		    double[][]sigmas = new double[nGaussians][nDims];
-		    
-		    double []pMixtures = new double[nGaussians];
-		    double sum = 0.0;
-		    for (int i = 0; i < pMixtures.length; i++) {
-			pMixtures[i]=r.nextDouble();
-			sum+=pMixtures[i];
-		    }
-		    for (int i = 0; i < pMixtures.length; i++) {//normalize
-			pMixtures[i]/=sum;
-		    }
-		    System.out.println("priors for mixtures="+Arrays.toString(pMixtures));
-		    
-		    //generate some randome mixture parameters
-		    for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
-			for(int dim=0; dim<nDims;dim++){
-			    mus[gaussian][dim] = r.nextDouble()*10.0; //generating 'dim'-coordinate of the 'gaussian' center
-			    sigmas[gaussian][dim] = r.nextDouble();
-			}
-			System.out.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
-		    }
-		    
-		    MonoDoubleItemSet[]sampleCoordinates = new MonoDoubleItemSet[nDims];
-		    Sequence[] data = new Sequence[nDataPoints];
-		    for (int instance = 0; instance < nDataPoints; instance++) {
-			
-			//choosing which mixture it's coming from
-			int chosenGaussian = 0;
-			double sumProba = pMixtures[chosenGaussian];
-			double rand = r.nextDouble();
-			while (rand > sumProba) {
-				chosenGaussian++;
-				sumProba += pMixtures[chosenGaussian];
-			}
-			
-			//now I know I want to sample from gaussian number 'chosenGaussian'
-			for (int dim = 0; dim < nDims; dim++) {
-			    sampleCoordinates[dim]=new MonoDoubleItemSet(r.nextGaussian()*sigmas[chosenGaussian][dim]+mus[chosenGaussian][dim]);
-			}
-			data[instance]=new Sequence(sampleCoordinates);
-			
-			System.out.println(Arrays.toString(sampleCoordinates));
-		    }
-		    
-		    //here to launch GMM
-		    
-		    
-		    
-		}
-		
 		
 	}

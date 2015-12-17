@@ -46,7 +46,8 @@ public class UCR2CSV {
 						while (line.charAt(k) == ' ')
 							k++;
 						line = line.substring(k);
-						temp = line.split("\\s+");
+//						temp = line.split("\\s+");
+						temp = line.split(",");
 						out.print("class");
 						for (int j = 1; j < temp.length; j++) {
 							out.print(",t"+(j-1));
@@ -58,7 +59,8 @@ public class UCR2CSV {
 					while (line.charAt(k) == ' ')
 						k++;
 					line = line.substring(k);
-					temp = line.split("\\s+");
+//					temp = line.split("\\s+");
+					temp = line.split(",");
 					out.print("'"+((int)Math.round(Double.valueOf(temp[0])))+"'");
 					for (int j = 1; j < temp.length; j++) {
 						out.print(","+temp[j] );

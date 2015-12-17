@@ -107,6 +107,7 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 					// the P(K) of k
 					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
 //					System.out.println("There "+nObjectsInCluster+" objects in this cluster.");
+					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 				}
 			}
 		}
