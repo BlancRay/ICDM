@@ -18,7 +18,7 @@ public class GMMin2D {
 	public static void main(String...args) throws Exception{
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
 		String time =df.format(new Date());
-		File repSave = new File("C:\\Users\\leix\\Downloads\\GMM");
+		File repSave = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM");
 		File[] repSavelist;
 		if (!repSave.exists()) {
 			repSave.mkdirs();
@@ -29,9 +29,9 @@ public class GMMin2D {
 			}
 		}
 		PrintStream outtrain,outGaussian,outtest;
-		outtrain = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\GMM\\GMM_TRAIN", true));
-		outtest = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\GMM\\GMM_TEST", true));
-		outGaussian = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\GMM\\Gaussian", true));
+		outtrain = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TRAIN", true));
+		outtest = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TEST", true));
+		outGaussian = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
 	    //testing GMM with a mimxture of normal
 	    int nDataPoints = 10000;
 	    int nGaussians = 4;
@@ -56,7 +56,7 @@ public class GMMin2D {
 	    for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
 		for(int dim=0; dim<nDims;dim++){
 		    mus[gaussian][dim] = r.nextDouble()*10.0; //generating 'dim'-coordinate of the 'gaussian' center
-		    sigmas[gaussian][dim] = r.nextDouble()*0.5;
+		    sigmas[gaussian][dim] = r.nextDouble();
 		}
 		
 		outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
@@ -95,12 +95,10 @@ public class GMMin2D {
 	    }
 	    
 	    //here to launch GMM
-//	    File dataRep = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015 - Copy\\");
-//	    Instances[] datas = ExperimentsLauncher.readTrainAndTest(dataRep.getName());
-//	    new ExperimentsLauncher(repSave, datas[0], datas[1], dataRep.getName(), 5, datas[0].numInstances()).launchGmmEUC();
 	    
 	    
 	    outtrain.close();
+	    outtest.close();
 	    outGaussian.close();
 	}
 }
