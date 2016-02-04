@@ -29,7 +29,11 @@ public class EUCKNNClassifierKMeans extends PrototyperEUC {
 				if(kmeans.centers[i]!=null){ //~ if empty cluster
 					ClassedSequence s = new ClassedSequence(kmeans.centers[i], clas);
 					prototypes.add(s);
-					System.out.println("Gaussian #"+clas+":mu="+s.sequence.toString());
+					int nObjectsInCluster = kmeans.affectation[i].size();
+					double prior = 1.0 * nObjectsInCluster / data.numInstances();
+					double sumOfSquares = s.sequence.EUCsumOfSquares(kmeans.affectation[i]);
+					double sigmasPerClass = Math.sqrt(sumOfSquares / nObjectsInCluster);
+//					System.out.println("priors is "+prior+" Gaussian #"+clas+":mu="+s.sequence.toString()+"\t "+sigmasPerClass);
 				}
 			}
 		}

@@ -41,6 +41,10 @@ public class MonoDoubleItemSet extends Itemset implements java.io.Serializable {
 		MonoDoubleItemSet o1 = (MonoDoubleItemSet)o;
 		return abs(o1.value-value);
 	}
+	
+	public Itemset pow2() {
+		return new MonoDoubleItemSet(value*value);
+	}
 
 	@Override
 	public Itemset mean(Itemset[] tab) {

@@ -25,6 +25,7 @@ package items;
 public abstract class Itemset  {
 	public abstract Itemset clone();
 	public abstract double distance(Itemset o);
+	public abstract Itemset pow2();
 	public abstract Itemset mean(Itemset[]tab);
 	public abstract String toString();
 	public double squaredDistance(Itemset o){

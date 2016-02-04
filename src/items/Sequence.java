@@ -82,7 +82,7 @@ public class Sequence implements java.io.Serializable {
 		final int length = this.getNbTuples();
 
 		double res = 0;
-		for (int i = 1; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			res += this.sequence[i].squaredDistance(a.sequence[i]);
 		}
 		return sqrt(res);
@@ -174,6 +174,30 @@ public class Sequence implements java.io.Serializable {
 
 		return inertia;
 
+	}
+
+	public final double EUCvar(ArrayList<Sequence> tabSequence) {
+		final int length = this.getNbTuples();
+		double dist = 0.0;
+		Sequence[] pow2seq = new Sequence[tabSequence.size()];
+		Sequence s = (Sequence) this.clone();
+		Sequence eofx2 = null;
+		int j = 0;
+		for (Sequence seq : tabSequence) {
+			Itemset[] item = new Itemset[length];
+			Sequence tmp =new Sequence(item);
+			for (int i = 0; i < length; i++) {
+				tmp.sequence[i] = seq.sequence[i].pow2();
+			}
+			pow2seq[j] = tmp;
+			j++;
+		}
+		eofx2 = Sequences.meanEUC(pow2seq);
+		for (int i = 0; i < this.getNbTuples(); i++) {
+			s.sequence[i] = s.sequence[i].pow2();
+		}
+		dist = s.distanceEuc(eofx2);
+		return sqrt(dist);
 	}
 
 }

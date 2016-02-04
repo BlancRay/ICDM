@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import classif.ExperimentsLauncher;
+import classif.PrototyperEUC;
 import classif.kmeans.EUCKMeansSymbolicSequence;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
@@ -30,14 +31,15 @@ public class EUCKNNClassifierGmm extends Classifier{
 	protected HashMap<String, ArrayList<Sequence>> classedData;
 	HashMap<String, ArrayList<Integer>> indexClassedDataInFullData;
 	protected int nClustersPerClass;
-
+	public int[] clusterMap;
 	Sequence[] sequences;
 	String[] classMap;
 	Instances trainingData = null;
 	double[][] prior = null;
-	double[][] nck = null;
+	double[] nck = null;
 
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
+	private static final double threshold = Math.pow(10, -11);
 
 	public EUCKNNClassifierGmm() {
 		super();
@@ -84,142 +86,26 @@ public class EUCKNNClassifierGmm extends Classifier{
 		centroidsPerClass = new Sequence[classes.size()][nClustersPerClass];
 		sigmasPerClass = new double[classes.size()][nClustersPerClass];
 		prior = new double[classes.size()][nClustersPerClass];
-		nck = new double[classedData.keySet().size()][nClustersPerClass];
-		double sumpk[]=new double[classedData.keySet().size()];
-		
-		double sumoflog=0;
-		double Lprev=-(Math.exp(308));
+		nck = new double[nClustersPerClass];
+		int dataAttributes=data.numAttributes() - 1;
 
 		for (String clas : classes) {
 			int c = trainingData.classAttribute().indexOfValue(clas);
-			double[][] pik = new double[classedData.get(clas).size()][nClustersPerClass];
 
 			// System.out.println("clas "+clas+" -> "+c);
 			// if the class is empty, continue
 			if (classedData.get(clas).isEmpty())
 				continue;
-			EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
+			EUCGMMSymbolicSequence gmmclusterer = new EUCGMMSymbolicSequence(nClustersPerClass, classedData.get(clas),dataAttributes);
+			gmmclusterer.cluster();
 
-			kmeans.cluster();
-			for (int k = 0; k < kmeans.centers.length; k++) {
-				if (kmeans.centers[k] != null) { // ~ if empty cluster
-					// find the center
-					centroidsPerClass[c][k] = kmeans.centers[k];
-					int nObjectsInCluster = kmeans.affectation[k].size();
-
-					// compute sigma
-					double sumOfSquares = kmeans.centers[k].EUCsumOfSquares(kmeans.affectation[k]);
-					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
-//					System.out.println(sigmasPerClass[c][k]);
-					// compute p(k)
-					// the P(K) of k
-					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
-					nck[c][k] = nObjectsInCluster;
-					sumpk[c] += nObjectsInCluster;
-				}
-			}
-
-			//computing initial likelihood
-			for (Sequence ss : classedData.get(clas)) {
-				double prob = 0.0;
-				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					double dist = ss.distanceEuc(centroidsPerClass[c][k]);
-					double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-					prob += p * prior[c][k];// xi点由k个聚类生成的概率
-				}
-				sumoflog += Math.log(prob);
-			}
-
-			double[][] gamma = new double[classedData.get(clas).size()][nClustersPerClass];
-			while (Math.abs(sumoflog - Lprev) > Math.exp(-6)) {
-				// System.out.println("sumoflog="+sumoflog);
-				// p(i,k)
-				Lprev = sumoflog;
-				// get p(i,k)
-				ArrayList<Sequence> sequencesForClass = classedData.get(clas);
-				for (int i=0; i<sequencesForClass.size();i++) {
-				    Sequence s = sequencesForClass.get(i);
-					double[] sumofgamma = new double[classedData.get(clas).size()];
-					// for each p(k)
-
-					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						double dist = s.distanceEuc(centroidsPerClass[c][k]);
-						double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-						gamma[i][k] = p * nck[c][k] / sumpk[c];
-					}
-
-					// sum of p(k)
-					for (int k = 0; k < gamma[i].length; k++) {
-						sumofgamma[i] += gamma[i][k];
-					}
-					// p(i,k)
-					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						pik[i][k] = gamma[i][k] / sumofgamma[i];
-					}
-				}
-
-				// Nk
-
-				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					double sumofpik = 0;
-					for (int i = 0; i < classedData.get(clas).size(); i++) {
-						sumofpik += pik[i][k];
-					}
-					nck[c][k] = sumofpik;
-				}
-
-				// centroidsPerClass
-				MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[data.numAttributes() - 1];
-
-				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					Sequence px = null;
-					MonoDoubleItemSet[] sequencetmp = new MonoDoubleItemSet[data.numAttributes() - 1];
-					MonoDoubleItemSet[] sequencepx = new MonoDoubleItemSet[data.numAttributes() - 1];
-					// new MonoDoubleItemSet
-					for (int t = 0; t < sequence.length; t++) {
-						sequencetmp[t] = new MonoDoubleItemSet(0);
-						sequencepx[t] = new MonoDoubleItemSet(0);
-					}
-
-					for (int i = 0; i < classedData.get(clas).size(); i++) {
-						sequence = (MonoDoubleItemSet[]) classedData.get(clas).get(i).getSequence();
-						for (int t = 0; t < sequence.length; t++) {
-							sequencetmp[t] = new MonoDoubleItemSet(
-									pik[i][k] * sequence[t].getValue() / nck[c][k] + sequencepx[t].getValue());
-						}
-						sequencepx = sequencetmp;
-					}
-					px = new Sequence(sequencepx);
-					centroidsPerClass[c][k] = px;
-				}
-
-				// sigma
-				// sigmasPerClass = new
-				// double[classes.size()][nClustersPerClass];
-				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					sigmasPerClass[c][k] = 0;
-					for (int i = 0; i < classedData.get(clas).size(); i++) {
-						sigmasPerClass[c][k] += pik[i][k]
-								* classedData.get(clas).get(i).distanceEuc(centroidsPerClass[c][k]) / nck[c][k];
-					}
-					
-				}
-				sumoflog = 0;
-				for (Sequence ss : classedData.get(clas)) {
-					double prob = 0.0;
-					for (int k = 0; k < centroidsPerClass[c].length; k++) {
-						double dist = ss.distanceEuc(centroidsPerClass[c][k]);
-						double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-						prob += p * nck[c][k] / sumpk[c];
-					}
-					sumoflog += Math.log(prob);
-				}
-			}
+			centroidsPerClass[c] = gmmclusterer.getMus();
+			sigmasPerClass[c] = gmmclusterer.getSigmas();
 
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
-				prior[c][k] = nck[c][k] / data.numInstances();
+				prior[c][k] = gmmclusterer.nck[k] / data.numInstances();
 				System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
@@ -246,13 +132,12 @@ public class EUCKNNClassifierGmm extends Classifier{
 			double maxProb = 0.0;
 			for (String clas : classedData.keySet()) {
 				int c = trainingData.classAttribute().indexOfValue(clas);
-				double prob = 0.0;
+				double prob = 1.0;
 				for (int k = 0; k < centroidsPerClass[c].length; k++) {
 					// compute P(Q|k_c)
 					double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 					double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-					prob += p * prior[c][k];
-					// System.out.println(probabilities[c]);
+					prob += p*prior[c][k];
 				}
 				if (prob > maxProb) {
 					maxProb = prob;
@@ -297,5 +182,4 @@ public class EUCKNNClassifierGmm extends Classifier{
 		public void setPrototypes(ArrayList<ClassedSequence> prototypes) {
 			this.prototypes = prototypes;
 		}
-		
 	}

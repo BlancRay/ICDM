@@ -7,17 +7,17 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 
 import classif.ExperimentsLauncher;
 import items.MonoDoubleItemSet;
-import items.Sequence;
-import weka.core.Instances;
+import weka.experiment.Experiment;
 
 public class GMMin2D {
-	
-	public static void main(String...args) throws Exception{
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-		String time =df.format(new Date());
+
+	public static void main(String... args) throws Exception {
 		File repSave = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM");
 		File[] repSavelist;
 		if (!repSave.exists()) {
@@ -28,77 +28,79 @@ public class GMMin2D {
 				repSavelist[i].delete();
 			}
 		}
-		PrintStream outtrain,outGaussian,outtest;
-		outtrain = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TRAIN", true));
-		outtest = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TEST", true));
-		outGaussian = new PrintStream(new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
-	    //testing GMM with a mimxture of normal
-	    int nDataPoints = 10000;
-	    int nGaussians = 4;
-	    int nDims = 2;
-	    Random r = new Random(3071980);
-	    
-	    double[][]mus = new double[nGaussians][nDims];
-	    double[][]sigmas = new double[nGaussians][nDims];
-	    
-	    double []pMixtures = new double[nGaussians];
-	    double sum = 0.0;
-	    for (int i = 0; i < pMixtures.length; i++) {
-		pMixtures[i]=r.nextDouble();
-		sum+=pMixtures[i];
-	    }
-	    for (int i = 0; i < pMixtures.length; i++) {//normalize
-		pMixtures[i]/=sum;
-	    }
-	    outGaussian.println("priors for mixtures="+Arrays.toString(pMixtures));
-	    
-	    //generate some randome mixture parameters
-	    for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
-		for(int dim=0; dim<nDims;dim++){
-		    mus[gaussian][dim] = r.nextDouble()*10.0; //generating 'dim'-coordinate of the 'gaussian' center
-		    sigmas[gaussian][dim] = r.nextDouble();
+		PrintStream outtrain,outtest, outGaussian;
+		outtrain = new PrintStream(
+				new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TRAIN", true));
+		outtest = new PrintStream(
+				new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\GMM_TEST", true));
+		outGaussian = new PrintStream(
+				new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
+		// testing GMM with a mimxture of normal
+		int nDataPoints = 100;
+		int nGaussians = 1;
+		int nDims = 3;
+		RandomGenerator rg = new MersenneTwister();
+        RandomDataGenerator r = new RandomDataGenerator(rg);
+        Random p = new Random();
+
+		double[][] mus = new double[nGaussians][nDims];
+		double[][] sigmas = new double[nGaussians][nDims];
+
+		double[] pMixtures = new double[nGaussians];
+		double sum = 0.0;
+		for (int i = 0; i < pMixtures.length; i++) {
+			pMixtures[i] = p.nextDouble();
+			sum += pMixtures[i];
 		}
-		
-		outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
-	    }
-	    
-	    MonoDoubleItemSet[]sampleCoordinates_train = new MonoDoubleItemSet[nDims];
-	    MonoDoubleItemSet[]sampleCoordinates_test = new MonoDoubleItemSet[nDims];
-//	    Sequence[] train = new Sequence[nDataPoints];
-//	    Sequence[] test = new Sequence[nDataPoints];
-	    for (int instance = 0; instance < nDataPoints; instance++) {
-		
-		//choosing which mixture it's coming from
-		int chosenGaussian = 0;
-		double sumProba = pMixtures[chosenGaussian];
-		double rand = r.nextDouble();
-		while (rand > sumProba) {
-			chosenGaussian++;
-			sumProba += pMixtures[chosenGaussian];
+		for (int i = 0; i < pMixtures.length; i++) {// normalize
+			pMixtures[i] /= sum;
 		}
-		
-		//now I know I want to sample from gaussian number 'chosenGaussian'
-		for (int dim = 0; dim < nDims; dim++) {
-		    sampleCoordinates_train[dim]=new MonoDoubleItemSet(Double.parseDouble(String.format("%.5f",(r.nextGaussian()*sigmas[chosenGaussian][dim]+mus[chosenGaussian][dim]))));
+		outGaussian.println("priors for mixtures=" + Arrays.toString(pMixtures));
+
+		// generate some randome mixture parameters
+		for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
+			for (int dim = 0; dim < nDims; dim++) {
+				mus[gaussian][dim] = p.nextDouble()+10.0; //generating 'dim'-coordinate of the 'gaussian' center
+				sigmas[gaussian][dim] = p.nextDouble();
+			}
+			 outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
+			 System.out.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
 		}
-//		train[instance]=new Sequence(sampleCoordinates_train);
-		
-		outtrain.println(chosenGaussian+","+sampleCoordinates_train[0]+","+sampleCoordinates_train[1]);
-//		System.out.println(Arrays.toString(sampleCoordinates));
-		
-		for (int dim = 0; dim < nDims; dim++) {
-			sampleCoordinates_test[dim]=new MonoDoubleItemSet(Double.parseDouble(String.format("%.5f",(r.nextGaussian()*sigmas[chosenGaussian][dim]+mus[chosenGaussian][dim]))));
+
+		MonoDoubleItemSet[] sampleCoordinates_train = new MonoDoubleItemSet[nDims];
+		for (int instance = 0; instance < nDataPoints; instance++) {
+
+			// choosing which mixture it's coming from
+			int chosenGaussian = 0;
+			double sumProba = pMixtures[chosenGaussian];
+			double rand = p.nextDouble();
+			while (rand > sumProba) {
+				chosenGaussian++;
+				sumProba += pMixtures[chosenGaussian];
+			}
+			
+			 //now I know I want to sample from gaussian number 'chosenGaussian' 
+			for (int dim = 0; dim < nDims; dim++) {
+				sampleCoordinates_train[dim] = new MonoDoubleItemSet(Double.parseDouble(String.format("%.5f",
+						(r.nextGaussian(mus[chosenGaussian][dim],sigmas[chosenGaussian][0])))));
+			}
+			outtrain.print("1");
+			for (int i = 0; i < sampleCoordinates_train.length; i++) {
+				outtrain.print("," + sampleCoordinates_train[i]);
+			}
+			outtrain.println();
+			
+			outtest.print("1");
+			for (int i = 0; i < sampleCoordinates_train.length; i++) {
+				outtest.print("," + sampleCoordinates_train[i]);
+			}
+			outtest.println();
 		}
-//		test[instance]=new Sequence(sampleCoordinates_train);
-		
-		outtest.println(chosenGaussian+","+sampleCoordinates_test[0]+","+sampleCoordinates_test[1]);
-	    }
-	    
-	    //here to launch GMM
-	    
-	    
-	    outtrain.close();
-	    outtest.close();
-	    outGaussian.close();
+
+		outtrain.close();
+		outtest.close();
+		outGaussian.close();
+		// here to launch GMM
+//		ExperimentsLauncher.main(null);
 	}
 }

@@ -107,7 +107,7 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 					// the P(K) of k
 					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
 //					System.out.println("There "+nObjectsInCluster+" objects in this cluster.");
-					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+//					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 				}
 			}
 		}
@@ -138,10 +138,12 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 			double prob = 0.0;
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				// compute P(Q|k_c)
+				if (centroidsPerClass[c][k]!=null) {
 				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 				prob += p * prior[c][k];
 				// System.out.println(probabilities[c]);
+				}
 			}
 			if (prob > maxProb) {
 				maxProb = prob;
