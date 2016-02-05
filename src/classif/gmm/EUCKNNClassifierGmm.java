@@ -31,15 +31,13 @@ public class EUCKNNClassifierGmm extends Classifier{
 	protected HashMap<String, ArrayList<Sequence>> classedData;
 	HashMap<String, ArrayList<Integer>> indexClassedDataInFullData;
 	protected int nClustersPerClass;
-	public int[] clusterMap;
 	Sequence[] sequences;
 	String[] classMap;
 	Instances trainingData = null;
-	double[][] prior = null;
-	double[] nck = null;
+	protected double[][] prior = null;
+	protected double[] nck = null;
 
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
-	private static final double threshold = Math.pow(10, -11);
 
 	public EUCKNNClassifierGmm() {
 		super();
@@ -105,7 +103,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
-				prior[c][k] = gmmclusterer.nck[k] / data.numInstances();
+				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
 				System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
