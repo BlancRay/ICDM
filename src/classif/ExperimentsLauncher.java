@@ -458,13 +458,13 @@ public class ExperimentsLauncher {
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if(nbPrototypesMax>2)
-			nbPrototypesMax=3;
+			nbPrototypesMax=2;
 //			if (nbPrototypesMax > 100)
 //				nbPrototypesMax = 100;
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 2; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -713,9 +713,9 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmm();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmmEUC();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansProbabilisticEUC();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmmEUC();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansProbabilisticEUC();
 		}
 	}
 

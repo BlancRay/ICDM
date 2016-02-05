@@ -18,16 +18,16 @@ import weka.experiment.Experiment;
 public class GMMin2D {
 
 	public static void main(String... args) throws Exception {
-//		File repSave = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM");
-//		File[] repSavelist;
-//		if (!repSave.exists()) {
-//			repSave.mkdirs();
-//		} else {
-//			repSavelist = repSave.listFiles();
-//			for (int i = 0; i < repSavelist.length; i++) {
-//				repSavelist[i].delete();
-//			}
-//		}
+		File repSave = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM");
+		File[] repSavelist;
+		if (!repSave.exists()) {
+			repSave.mkdirs();
+		} else {
+			repSavelist = repSave.listFiles();
+			for (int i = 0; i < repSavelist.length; i++) {
+				repSavelist[i].delete();
+			}
+		}
 		PrintStream outtrain,outtest, outGaussian;
 		outtrain = new PrintStream(
 				new FileOutputStream("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM\\GMM_TRAIN", true));
@@ -36,15 +36,16 @@ public class GMMin2D {
 		outGaussian = new PrintStream(
 				new FileOutputStream("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
 		// testing GMM with a mimxture of normal
-		int nDataPoints = 100;
-		int nGaussians = 2;
-		int nDims = 3;
+		int nDataPoints = 1000000;
+		int nGaussians = 1;
+		int nDims = 1;
 		RandomGenerator rg = new MersenneTwister();
         RandomDataGenerator r = new RandomDataGenerator(rg);
         Random p = new Random();
 
 		double[][] mus = new double[nGaussians][nDims];
-		double[][] sigmas = new double[nGaussians][nDims];
+//		double[][] sigmas = new double[nGaussians][nDims];
+		double sigmas = 4;
 
 		double[] pMixtures = new double[nGaussians];
 		double sum = 0.0;
@@ -60,11 +61,11 @@ public class GMMin2D {
 		// generate some randome mixture parameters
 		for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
 			for (int dim = 0; dim < nDims; dim++) {
-				mus[gaussian][dim] = p.nextDouble(); //generating 'dim'-coordinate of the 'gaussian' center
-				sigmas[gaussian][dim] = p.nextDouble()*10.0;
+				mus[gaussian][dim] = p.nextDouble()+10.0; //generating 'dim'-coordinate of the 'gaussian' center
+//				sigmas[gaussian][dim] = p.nextDouble();
 			}
-			 outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
-			 System.out.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+Arrays.toString(sigmas[gaussian]));
+			 outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+sigmas);
+			 System.out.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+sigmas);
 		}
 
 		MonoDoubleItemSet[] sampleCoordinates_train = new MonoDoubleItemSet[nDims];
@@ -82,15 +83,16 @@ public class GMMin2D {
 			 //now I know I want to sample from gaussian number 'chosenGaussian' 
 			for (int dim = 0; dim < nDims; dim++) {
 				sampleCoordinates_train[dim] = new MonoDoubleItemSet(Double.parseDouble(String.format("%.5f",
-						(r.nextGaussian(mus[chosenGaussian][dim],sigmas[chosenGaussian][0])))));
+						(r.nextGaussian(mus[chosenGaussian][dim],sigmas)))));
 			}
-			outtrain.print("1");
+			
+			outtrain.print("1");//give class label
 			for (int i = 0; i < sampleCoordinates_train.length; i++) {
 				outtrain.print("," + sampleCoordinates_train[i]);
 			}
 			outtrain.println();
 			
-			outtest.print("1");
+			outtest.print("1");//give class label
 			for (int i = 0; i < sampleCoordinates_train.length; i++) {
 				outtest.print("," + sampleCoordinates_train[i]);
 			}
