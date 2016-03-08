@@ -26,6 +26,8 @@ import items.MonoDoubleItemSet;
 import items.Sequence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -40,7 +42,7 @@ public class EUCGMMSymbolicSequence {
 	protected double[] sigmasPerCluster = null;
 	protected int dataAttributes;
 
-	private static final double threshold = Math.pow(10, -11);
+	private static final double minObj = 20;
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
 	private double[] nck = null;
 	private int sumnck;
@@ -58,10 +60,25 @@ public class EUCGMMSymbolicSequence {
 
 	public void cluster() {
 		// init
-		EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nbClusters, data);
-		kmeans.cluster();
-		centroidsPerCluster = kmeans.centers;
-		ArrayList<Sequence>[] affectation = kmeans.affectation;
+		boolean isBig;
+		ArrayList<Sequence>[] affectation=new ArrayList[nbClusters];
+		int runtime=0;
+		do {
+			if(runtime>10)
+				nbClusters-=1;
+			isBig = true;
+			EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nbClusters, data);
+			kmeans.cluster();
+			centroidsPerCluster = kmeans.centers;
+			affectation = kmeans.affectation;
+			for (ArrayList<Sequence> Eachaffectation : affectation) {
+				if (Eachaffectation.size() < minObj) {
+					isBig = false;
+					break;
+				}
+			}
+			runtime++;
+		} while (isBig == false);
 
 		sigmasPerCluster = new double[nbClusters];
 		nck = new double[nbClusters];
@@ -70,18 +87,11 @@ public class EUCGMMSymbolicSequence {
 			if (centroidsPerCluster[k] != null) { // ~ if empty cluster
 				// find the center
 				nck[k] = affectation[k].size();
-
 				// compute sigma
 				double sumOfSquares = centroidsPerCluster[k].EUCsumOfSquares(affectation[k]);
-				sigmasPerCluster[k] = Math.sqrt(sumOfSquares / (nck[k] - 1));
-				// System.out.println(sigmasPerClass[c][k]);
-				// compute p(k)
-				// the P(K) of k
-				System.out.println(centroidsPerCluster[k] + "\t" + sigmasPerCluster[k]);
-			} else {// if empty cluster
-				sigmasPerCluster[k] = Double.NaN;
-				nck[k] = 0.0;
-			}
+				sigmasPerCluster[k] = Math.sqrt(sumOfSquares / nck[k]);
+			} else
+				System.err.println("ERROR");
 		}
 
 		double sumoflog = 0.0;
@@ -90,9 +100,12 @@ public class EUCGMMSymbolicSequence {
 		// computing initial likelihood
 		sumoflog = loglikelihood(centroidsPerCluster, sigmasPerCluster, nck);
 
-		while (Math.abs(sumoflog - prevsumoflog) > threshold) {
+		/*while (Math.abs(sumoflog - prevsumoflog) > threshold) {
 			prevsumoflog = sumoflog;
 			sumoflog = gmmprocess();
+		}*/
+		for (int i = 0; i < 10; i++) {
+			gmmprocess();
 		}
 	}
 
@@ -102,7 +115,6 @@ public class EUCGMMSymbolicSequence {
 		double[][] gammak = new double[sumnck][nbClusters];
 		double[] sumofgammak = new double[sumnck];
 		double[][] gamma = new double[sumnck][nbClusters];
-		// System.out.println("sumoflog="+sumoflog);
 		// p(i,k)
 		// get p(i,k)
 		ArrayList<Sequence> sequencesForClass = data;
@@ -111,10 +123,9 @@ public class EUCGMMSymbolicSequence {
 			Sequence s = sequencesForClass.get(i);
 			// for each p(k)
 			for (int k = 0; k < centroidsPerCluster.length; k++) {
-				// nck[k] = affect[k].size();
 				double dist = s.distanceEuc(centroidsPerCluster[k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerCluster[k], dist);
-				gammak[i][k] = p * nck[k] / sumnck;
+				gammak[i][k] = p * (nck[k] / sumnck);
 			}
 
 			// sum of p(k)
@@ -126,7 +137,7 @@ public class EUCGMMSymbolicSequence {
 				gamma[i][k] = gammak[i][k] / sumofgammak[i];
 			}
 		}
-
+		
 		// Nk = sum of gamma
 		for (int k = 0; k < centroidsPerCluster.length; k++) {
 			// for each cluster
@@ -134,7 +145,13 @@ public class EUCGMMSymbolicSequence {
 			for (int i = 0; i < sumnck; i++) {
 				sumofgammai += gamma[i][k];
 			}
+//			System.out.println(sumofgammai);
 			nck[k] = sumofgammai;
+			if (nck[k] < minObj) {
+				delcluster(k);
+				double log=gmmprocess();
+				return log;
+			}
 		}
 
 		// centroidsPerClass
@@ -153,6 +170,7 @@ public class EUCGMMSymbolicSequence {
 				sequence = (MonoDoubleItemSet[]) data.get(i).getSequence();
 				// gamma(i)*x(i)[t]
 				for (int t = 0; t < sequence.length; t++) {
+//					System.out.println("gamma"+gamma[i][k]);
 					sequencetmp[t] = new MonoDoubleItemSet(gamma[i][k] * sequence[t].getValue());
 				}
 				// sum of gamma(i)*x(i)
@@ -173,11 +191,10 @@ public class EUCGMMSymbolicSequence {
 			double sumOfSquares = 0.0;
 			for (int i = 0; i < sumnck; i++) {
 				double dist = data.get(i).distanceEuc(centroidsPerCluster[k]);
-				// double dist =
-				// affect[k].get(i).distanceEuc(centroidsPerClass[c][k]);
 				sumOfSquares += (gamma[i][k] * dist * dist);
 			}
-			sigmasPerCluster[k] = Math.sqrt(sumOfSquares / (nck[k] - 1));
+//			sigmasPerCluster[k] = Math.sqrt(sumOfSquares / (nck[k] - 1));
+			sigmasPerCluster[k] = Math.sqrt(sumOfSquares / nck[k]);
 		}
 
 		// computer log-likelihood
@@ -192,9 +209,7 @@ public class EUCGMMSymbolicSequence {
 			for (int k = 0; k < mu.length; k++) {
 				double dist = ss.distanceEuc(centroidsPerCluster[k]);
 				double p = computeProbaForQueryAndCluster(sigma[k], dist);
-				prob += p * (nbObjects[k] / sumnck);// probability of every
-				// point
-				// generated by each cluster
+				prob += p * (nbObjects[k] / sumnck);// probability of every point generated by each cluster
 			}
 			loglikelihood += Math.log(prob);
 		}
@@ -202,16 +217,62 @@ public class EUCGMMSymbolicSequence {
 	}
 
 	private double computeProbaForQueryAndCluster(double sigma, double d) {
-		double pqk;
-		if (Double.isNaN(sigma)) {
-			// System.err.println("alert");
-			pqk = 0.0;
+		double pqk = 0.0;
+		if (sigma==0) {
+			if (d == 0) {
+				pqk = 1;
+			} else
+				pqk = 0;
 		} else
 			pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
-
 		return pqk;
 	}
 
+	private void delcluster(int k) {
+		centroidsPerCluster[k] = null;
+		sigmasPerCluster[k] = Double.NaN;
+		Sequence[] newcenter = new Sequence[nbClusters - 1];
+		double[] newsigma = new double[nbClusters - 1];
+		nbClusters = nbClusters - 1;
+		int flag =0;
+		for (int i = 0; i < centroidsPerCluster.length; i++) {
+			if (centroidsPerCluster[i] != null) {
+				newcenter[i - flag] = centroidsPerCluster[i];
+				newsigma[i - flag] = sigmasPerCluster[i];
+			} else
+				flag++;
+		}
+		centroidsPerCluster=newcenter;
+		sigmasPerCluster=newsigma;
+		ArrayList<Sequence>[] affectation = new ArrayList[nbClusters];
+		int[] clusterMap=new int[data.size()];
+		for (int i = 0; i < affectation.length; i++) {
+			affectation[i] = new ArrayList<Sequence>();
+		}
+		
+		for (int j = 0; j < data.size(); j++) {
+
+			double minDist = Double.MAX_VALUE;
+			// for each cluster k
+			for (int i = 0; i < centroidsPerCluster.length; i++) {
+				// distance between cluster k and data point j
+				if (centroidsPerCluster[i] != null) {
+					double currentDist = centroidsPerCluster[i].distanceEuc(data.get(j));
+					if (currentDist < minDist) {
+						clusterMap[j] = i;
+						minDist = currentDist;
+					}
+				}
+			}
+
+			// affect data point j to cluster affected to j
+			affectation[clusterMap[j]].add(data.get(j));
+		}
+		for (int i = 0; i < nbClusters; i++) {
+			nck[i] = affectation[i].size();
+		}
+	}
+	
 	public Sequence[] getMus() {
 		return centroidsPerCluster;
 	}

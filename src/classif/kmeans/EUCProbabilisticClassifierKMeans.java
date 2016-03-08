@@ -87,27 +87,35 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 			// if the class is empty, continue
 			if (classedData.get(clas).isEmpty())
 				continue;
-			EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
+			boolean flg = false;
+			ArrayList<Sequence>[] affectation=new ArrayList[nClustersPerClass];
+			do {
+				EUCKMeansSymbolicSequence kmeans = new EUCKMeansSymbolicSequence(nClustersPerClass, classedData.get(clas));
+				kmeans.cluster();
+				centroidsPerClass[c] = kmeans.centers;
+				affectation = kmeans.affectation;
+				for (ArrayList<Sequence> seq : affectation) {
+					if (seq.size() < 2) {
+						flg = false;
+						break;
+					}
+				}
+			} while (flg == false);
+			for (int k = 0; k < centroidsPerClass[c].length; k++) {
+				if (centroidsPerClass[c][k] != null) { // ~ if empty cluster
 
-			kmeans.cluster();
-			for (int k = 0; k < kmeans.centers.length; k++) {
-				if (kmeans.centers[k] != null) { // ~ if empty cluster
-
-					ClassedSequence s = new ClassedSequence(kmeans.centers[k], clas);
+					ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 					prototypes.add(s);
 					// find the center
-					centroidsPerClass[c][k] = kmeans.centers[k];
-					int nObjectsInCluster = kmeans.affectation[k].size();
+					int nObjectsInCluster = affectation[k].size();
 					
+					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
 					// compute sigma
-					double sumOfSquares = kmeans.centers[k].EUCsumOfSquares(kmeans.affectation[k]);
+					double sumOfSquares =  s.sequence.EUCsumOfSquares(affectation[k]);
 					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
-//					System.out.println(sigmasPerClass[c][k]);
 					// compute p(k)
 					// the P(K) of k
-					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
-//					System.out.println("There "+nObjectsInCluster+" objects in this cluster.");
-//					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 				}
 			}
 		}
@@ -154,12 +162,12 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 	}
 
 	private double computeProbaForQueryAndCluster(double sigma, double d) {
-		double pqk;
-		if ( Double.isNaN(sigma)) {
-//			System.err.println("alert");
-			pqk = 1.0;
-		}
-		else
+		double pqk = 0.0;
+		if (Double.isNaN(sigma)) {
+			// System.err.println("alert");
+			if (d == 0.0)
+				pqk = 1.0;
+		} else
 			pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
 
 		return pqk;

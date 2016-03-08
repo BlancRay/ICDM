@@ -1,6 +1,7 @@
 package classif.kmeans;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -50,10 +51,12 @@ public class EUCKMeansSymbolicSequence {
 				// for each cluster k
 				for (int k = 0; k < centers.length; k++) {
 					// distance between cluster k and data point j
-					double currentDist = centers[k].distanceEuc(data.get(j));
-					if (currentDist < minDist) {
-						clusterMap[j] = k;
-						minDist = currentDist;
+					if (centers[k] != null) {
+						double currentDist = centers[k].distanceEuc(data.get(j));
+						if (currentDist < minDist) {
+							clusterMap[j] = k;
+							minDist = currentDist;
+						}
 					}
 				}
 

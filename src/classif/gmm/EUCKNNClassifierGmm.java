@@ -16,6 +16,7 @@ import classif.kmeans.EUCKMeansSymbolicSequence;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
+import tools.Normalization;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instance;
@@ -83,6 +84,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 		ArrayList<String> classes = new ArrayList<String>(classedData.keySet());
 		centroidsPerClass = new Sequence[classes.size()][nClustersPerClass];
 		sigmasPerClass = new double[classes.size()][nClustersPerClass];
+		
 		prior = new double[classes.size()][nClustersPerClass];
 		nck = new double[nClustersPerClass];
 		int dataAttributes=data.numAttributes() - 1;
@@ -90,21 +92,19 @@ public class EUCKNNClassifierGmm extends Classifier{
 		for (String clas : classes) {
 			int c = trainingData.classAttribute().indexOfValue(clas);
 
-			// System.out.println("clas "+clas+" -> "+c);
-			// if the class is empty, continue
-			if (classedData.get(clas).isEmpty())
-				continue;
 			EUCGMMSymbolicSequence gmmclusterer = new EUCGMMSymbolicSequence(nClustersPerClass, classedData.get(clas),dataAttributes);
 			gmmclusterer.cluster();
 
 			centroidsPerClass[c] = gmmclusterer.getMus();
 			sigmasPerClass[c] = gmmclusterer.getSigmas();
-
+			
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
+				if (sigmasPerClass[c][k] == Double.NaN)
+					continue;
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
-				System.out.println("priors is "+prior[c][k]+" Gaussian #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
 	}
@@ -116,68 +116,120 @@ public class EUCKNNClassifierGmm extends Classifier{
 		 * @return p(y|sample) forall y
 		 * @throws Exception
 		 */
-		public double classifyInstance(Instance sample) throws Exception {
-			// transform instance to sequence
-			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
-			int shift = (sample.classIndex() == 0) ? 1 : 0;
-			for (int t = 0; t < sequence.length; t++) {
-				sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+  	public double classifyInstance(Instance sample) throws Exception {
+		// transform instance to sequence
+		MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
+		int shift = (sample.classIndex() == 0) ? 1 : 0;
+		for (int t = 0; t < sequence.length; t++) {
+			sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+		}
+		Sequence seq = new Sequence(sequence);
+
+		// for each class
+		String classValue = null;
+		double maxProb = 0.0;
+		double[] pr= new double[classedData.keySet().size()];
+		for (String clas : classedData.keySet()) {
+			int c = trainingData.classAttribute().indexOfValue(clas);
+			double prob = 0.0;
+			for (int k = 0; k < centroidsPerClass[c].length; k++) {
+				// compute P(Q|k_c)
+				if (sigmasPerClass[c][k] == Double.NaN)
+					continue;
+				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
+				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
+//				System.out.println(p);
+				prob += p;
+//				if (p > maxProb) {
+//					maxProb = p;
+//					classValue = clas;
+//				}
 			}
-			Sequence seq = new Sequence(sequence);
-
-			// for each class
-			String classValue = null;
-			double maxProb = 0.0;
-			for (String clas : classedData.keySet()) {
-				int c = trainingData.classAttribute().indexOfValue(clas);
-				double prob = 1.0;
-				for (int k = 0; k < centroidsPerClass[c].length; k++) {
-					// compute P(Q|k_c)
-					double dist = seq.distanceEuc(centroidsPerClass[c][k]);
-					double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-					prob += p*prior[c][k];
-				}
-				if (prob > maxProb) {
-					maxProb = prob;
-					classValue = clas;
-				}
+			if (prob > maxProb) {
+				maxProb = prob;
+				classValue = clas;
 			}
-			return sample.classAttribute().indexOfValue(classValue);
+			pr[c] = Math.pow((1 - prob), 2);
 		}
-
-		private double computeProbaForQueryAndCluster(double sigma, double d) {
-			double pqk;
-			if ( Double.isNaN(sigma)) {
-//				System.err.println("alert");
-				pqk = 0.0;
-			}
-			else
-				pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
-
-			return pqk;
+		double sum = 0;
+		for (double arr : pr) {
+			sum += arr;
 		}
-		
-		public int getNClustersPerClass() {
-			return nClustersPerClass;
+		for (int i = 0; i < pr.length; i++) {
+			pr[i] = pr[i] / sum;
 		}
-
-		public void setNClustersPerClass(int nbPrototypesPerClass) {
-			this.nClustersPerClass = nbPrototypesPerClass;
-		}
-
-		public Sequence[][] getCentroidsPerClass() {
-			return centroidsPerClass;
-		}
-
-		public void setCentroidsPerClass(Sequence[][] centroidsPerClass) {
-			this.centroidsPerClass = centroidsPerClass;
-		}
-
-		public ArrayList<ClassedSequence> getPrototypes() {
-			return prototypes;
-		}
-
-		public void setPrototypes(ArrayList<ClassedSequence> prototypes) {
-			this.prototypes = prototypes;
-		}
+//		System.out.println(Arrays.toString(pr));
+//		System.out.println(classValue);
+		return sample.classAttribute().indexOfValue(classValue);
 	}
+	
+/*	public double classifyInstance(Instance sample) throws Exception {
+		// transform instance to sequence
+		MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
+		int shift = (sample.classIndex() == 0) ? 1 : 0;
+		for (int t = 0; t < sequence.length; t++) {
+			sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+		}
+		Sequence seq = new Sequence(sequence);
+
+		// for each class
+		String classValue = null;
+		double maxProb = 1;
+		for (String clas : classedData.keySet()) {
+			int c = trainingData.classAttribute().indexOfValue(clas);
+			double prob = 0.0;
+			for (int k = 0; k < centroidsPerClass[c].length; k++) {
+				// compute P(Q|k_c)
+				if (sigmasPerClass[c][k] == Double.NaN)
+					continue;
+				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
+				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
+				prob += p * prior[c][k];
+			}
+//			System.out.println(prob);
+//			System.out.println(1-Math.pow(prob,2));
+			if (Math.pow(1-prob,2)< maxProb) {
+				maxProb = Math.pow(1-prob,2);
+				classValue = clas;
+			}
+		}
+//		System.out.println(classValue);
+		return sample.classAttribute().indexOfValue(classValue);
+	}
+*/
+	private double computeProbaForQueryAndCluster(double sigma, double d) {
+		double pqk = 0.0;
+		if (sigma==0) {
+			if (d == 0) {
+				pqk = 1;
+			} else
+				pqk = 0;
+		} else
+			pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
+		return pqk;
+	}
+		
+	public int getNClustersPerClass() {
+		return nClustersPerClass;
+	}
+
+	public void setNClustersPerClass(int nbPrototypesPerClass) {
+		this.nClustersPerClass = nbPrototypesPerClass;
+	}
+
+	public Sequence[][] getCentroidsPerClass() {
+		return centroidsPerClass;
+	}
+
+	public void setCentroidsPerClass(Sequence[][] centroidsPerClass) {
+		this.centroidsPerClass = centroidsPerClass;
+	}
+
+	public ArrayList<ClassedSequence> getPrototypes() {
+		return prototypes;
+	}
+
+	public void setPrototypes(ArrayList<ClassedSequence> prototypes) {
+		this.prototypes = prototypes;
+	}
+}
