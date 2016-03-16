@@ -62,7 +62,7 @@ public abstract class PrototyperEUC extends Prototyper {
 			}
 		}
 		// System.out.println(prototypes.size());
-		System.out.println(classValue);
+//		System.out.println(classValue);
 		return sample.classAttribute().indexOfValue(classValue);
 	}
 	
