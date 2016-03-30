@@ -117,10 +117,10 @@ public class DTWKNNClassifierGmm extends Classifier{
 		// for each class
 		String classValue = null;
 		double maxProb = 0.0;
-		double[] pr= new double[classedData.keySet().size()];
+//		double[] pr= new double[classedData.keySet().size()];
 		for (String clas : classedData.keySet()) {
 			int c = trainingData.classAttribute().indexOfValue(clas);
-			double prob = 0.0;
+//			double prob = 0.0;
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				// compute P(Q|k_c)
 				if (sigmasPerClass[c][k] == Double.NaN||sigmasPerClass[c][k] ==0){
@@ -130,7 +130,7 @@ public class DTWKNNClassifierGmm extends Classifier{
 				double dist = seq.distance(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 //				System.out.println(p);
-				prob += p/centroidsPerClass[c].length;
+//				prob += p/centroidsPerClass[c].length;
 //				prob += p*prior[c][k];
 				if (p > maxProb) {
 					maxProb = p;
