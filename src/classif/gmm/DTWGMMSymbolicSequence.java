@@ -106,13 +106,13 @@ public class DTWGMMSymbolicSequence {
 			sumoflog = gmmprocess();
 		}*/
 		for (int i = 0; i < 10; i++) {
-			gmmprocess();
+			gmmprocess(i);
 		}
 	}
 
 
 	
-	private double gmmprocess() {
+	private double gmmprocess(int iteration) {
 		double[][] gammak = new double[sumnck][nbClusters];
 		double[] sumofgammak = new double[sumnck];
 		double[][] gamma = new double[sumnck][nbClusters];
@@ -150,14 +150,14 @@ public class DTWGMMSymbolicSequence {
 			nck[k] = sumofgammai;
 			if (nck[k] <= minObj) {
 				delcluster(k);
-				double log=gmmprocess();
+				double log=gmmprocess(iteration);
 				return log;
 			}
 		}
 
 		// centroidsPerClass
 		for (int k = 0; k < centroidsPerCluster.length; k++) {
-			centroidsPerCluster[k]= Sequences.weightMean(data.toArray(new Sequence[0]), gamma,k,nck[k]);
+			centroidsPerCluster[k]= Sequences.weightMean(centroidsPerCluster[k],data.toArray(new Sequence[0]), gamma,k,iteration);
 		}
 		
 		// sigma

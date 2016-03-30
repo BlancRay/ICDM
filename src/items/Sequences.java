@@ -94,12 +94,10 @@ public class Sequences {
 
 	}
 	
-	public static final Sequence weightMean(final Sequence[] tabSequence,final double[][] gamma,final int k,final double nck) {
-		// ~ look for the medoid to initialise the averaging process
-		Sequence medoid = new Sequence(medoid(tabSequence).getSequence());
-		Sequence res = weightDBAMean(medoid, tabSequence,gamma,k,nck);
-		for (int i = 0; i < Sequence.NB_ITERATIONS; i++) {
-			res = weightDBAMean(res, tabSequence,gamma,k,nck);
+	public static final Sequence weightMean(final Sequence muInit ,final Sequence[] tabSequence,final double[][] gamma,final int k,int iterationNumber) {
+		Sequence res = weightDBAMean(muInit, tabSequence,gamma,k);
+		for (int i = 0; i < Sequence.NB_ITERATIONS-iterationNumber; i++) {
+			res = weightDBAMean(res, tabSequence,gamma,k);
 		}
 		return res;
 
@@ -208,21 +206,19 @@ public class Sequences {
 
 	}
 	
-	private synchronized static final Sequence weightDBAMean(final Sequence oldCenter, final Sequence[] tabSequence, final double[][] gamma,final int k,final double nck) {
+	private synchronized static final Sequence weightDBAMean(final Sequence oldCenter, final Sequence[] tabSequence, final double[][] gamma,final int k) {
 		@SuppressWarnings("unchecked")
 		final ArrayList<Itemset>[] tupleAssociation = new ArrayList[oldCenter.getNbTuples()];
-//		final ArrayList<Double>[] sumgamma = new ArrayList[oldCenter.getNbTuples()];
 		final double[] sumgamma = new double[oldCenter.getNbTuples()];
 		for (int i = 0; i < tupleAssociation.length; i++) {
 			tupleAssociation[i] = new ArrayList<Itemset>(tabSequence.length);
-//			sumgamma[i] = new ArrayList<Double>(tabSequence.length);
 		}
 		int nbTuplesAverageSeq, i, j, indiceRes;
 		double res = 0.0;
 		final int tailleCenter = oldCenter.getNbTuples();
 		int tailleT;
-		int sequencenb=0;
-		for (Sequence S : tabSequence) {
+		for (int s = 0; s < tabSequence.length; s++) {
+			Sequence S = tabSequence[s];
 
 			tailleT = S.getNbTuples();
 
@@ -270,9 +266,9 @@ public class Sequences {
 			j = tailleT - 1;
 			for (int t = nbTuplesAverageSeq - 1; t >= 0; t--) {
 				MonoDoubleItemSet m = (MonoDoubleItemSet) S.sequence[j].clone();
-				m = new MonoDoubleItemSet(m.getValue() * gamma[sequencenb][k]);
+				m = new MonoDoubleItemSet(m.getValue() * gamma[s][k]);
 				tupleAssociation[i].add(m);
-				sumgamma[i] += gamma[sequencenb][k];
+				sumgamma[i] += gamma[s][k];
 				switch (Sequence.matriceChoix[i][j]) {
 				case Sequence.DIAGONAL:
 					i = i - 1;
@@ -286,7 +282,6 @@ public class Sequences {
 					break;
 				}
 			}
-			sequencenb++;
 		}
 		final Itemset[] tuplesAverageSeq = new Itemset[tailleCenter];
 
