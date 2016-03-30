@@ -28,7 +28,6 @@ import items.ClassedSequence;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -40,11 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import classif.dropx.DTWKNNClassifierDropThree;
-import tools.UCR2CSV;
-import weka.classifiers.Evaluation;
 import weka.core.Instances;
-import weka.core.converters.CSVLoader;
 
 public class PrototyperUtil {
 		
