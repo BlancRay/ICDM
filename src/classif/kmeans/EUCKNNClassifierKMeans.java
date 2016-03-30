@@ -33,7 +33,7 @@ public class EUCKNNClassifierKMeans extends PrototyperEUC {
 					double prior = 1.0 * nObjectsInCluster / data.numInstances();
 					double sumOfSquares = s.sequence.EUCsumOfSquares(kmeans.affectation[i]);
 					double sigmasPerClass = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
-					System.out.println("priors is "+prior+" Gaussian #"+clas+":mu="+s.sequence.toString()+"\t "+sigmasPerClass);
+//					System.out.println(nObjectsInCluster+" priors is "+prior+" Gaussian "+clas+" #"+i+":mu="+s.sequence.toString()+"\t "+sigmasPerClass);
 				}
 			}
 		}

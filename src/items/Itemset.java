@@ -27,6 +27,7 @@ public abstract class Itemset  {
 	public abstract double distance(Itemset o);
 	public abstract Itemset pow2();
 	public abstract Itemset mean(Itemset[]tab);
+	public abstract Itemset weightmean(Itemset[] tab,double weight);
 	public abstract String toString();
 	public double squaredDistance(Itemset o){
 		double dist = this.distance(o);

@@ -58,6 +58,19 @@ public class MonoDoubleItemSet extends Itemset implements java.io.Serializable {
 		}
 		return new MonoDoubleItemSet(sum / tab.length);
 	}
+	
+	@Override
+	public Itemset weightmean(Itemset[] tab,double sumgamma) {
+		if (tab.length < 1) {
+			throw new RuntimeException("Empty tab");
+		}
+		double sum = 0.0;
+		for (Itemset itemset : tab) {
+			MonoDoubleItemSet item = (MonoDoubleItemSet)itemset;
+			sum += item.value;
+		}
+		return new MonoDoubleItemSet(sum / sumgamma);
+	}
 
 	@Override
 	public String toString() {
