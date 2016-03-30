@@ -36,7 +36,7 @@ import classif.kmeans.KMeansSymbolicSequence;
 
 public class DTWGMMSymbolicSequence {
 	public int nbClusters;
-	public ArrayList<Sequence> data;
+	final ArrayList<Sequence> data;
 	public RandomDataGenerator randGen;
 
 	protected Sequence[] centroidsPerCluster = null;
@@ -122,18 +122,18 @@ public class DTWGMMSymbolicSequence {
 		// for each data point computer gamma
 		for (int i = 0; i < sequencesForClass.size(); i++) {
 			Sequence s = sequencesForClass.get(i);
-			// for each p(k)
+			// sequence i for each cluster
 			for (int k = 0; k < centroidsPerCluster.length; k++) {
 				double dist = s.distance(centroidsPerCluster[k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerCluster[k], dist);
 				gammak[i][k] = p * (nck[k] / sumnck);
 			}
 
-			// sum of p(k)
+			// sum of gamma(k)
 			for (int k = 0; k < gammak[i].length; k++) {
 				sumofgammak[i] += gammak[i][k];
 			}
-			// p(i,k)
+			// gamma(i,k)
 			for (int k = 0; k < centroidsPerCluster.length; k++) {
 				gamma[i][k] = gammak[i][k] / sumofgammak[i];
 			}
@@ -157,9 +157,9 @@ public class DTWGMMSymbolicSequence {
 
 		// centroidsPerClass
 		for (int k = 0; k < centroidsPerCluster.length; k++) {
-			centroidsPerCluster[k]= Sequences.weightMean(centroidsPerCluster, gamma[k]);
+			centroidsPerCluster[k]= Sequences.weightMean(data.toArray(new Sequence[0]), gamma,k,nck[k]);
 		}
-
+		
 		// sigma
 		for (int k = 0; k < centroidsPerCluster.length; k++) {
 			sigmasPerCluster[k] = 0;

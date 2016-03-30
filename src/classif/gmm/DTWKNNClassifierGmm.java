@@ -1,20 +1,11 @@
 package classif.gmm;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
 
-import classif.ExperimentsLauncher;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
-import tools.Normalization;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.Instance;
@@ -139,25 +130,17 @@ public class DTWKNNClassifierGmm extends Classifier{
 				double dist = seq.distance(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 //				System.out.println(p);
-//				prob += p/centroidsPerClass[c].length;
-				prob += p*prior[c][k];
+				prob += p/centroidsPerClass[c].length;
+//				prob += p*prior[c][k];
 				if (p > maxProb) {
 					maxProb = p;
 					classValue = clas;
-				}
+//				}
 			}
 //			if (prob > maxProb) {
 //				maxProb = prob;
 //				classValue = clas;
-//			}
-			pr[c] = Math.pow((1 - prob), 2);
-		}
-		double sum = 0;
-		for (double arr : pr) {
-			sum += arr;
-		}
-		for (int i = 0; i < pr.length; i++) {
-			pr[i] = pr[i] / sum;
+			}
 		}
 //		System.out.println(Arrays.toString(pr));
 //		System.out.println(classValue);

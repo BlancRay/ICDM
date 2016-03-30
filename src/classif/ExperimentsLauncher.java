@@ -200,23 +200,31 @@ public class ExperimentsLauncher {
 	 */
 	public void launchKMeans() {
 		try {
-			File f = new File(rep + "/" + dataName + "_results.csv");
-			// if somebody is processing it
-			if (f.exists()) {
-				return;
-			}
-
-			out = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_results.csv", append));
-			out.println("dataset;algorithm;nbPrototypes;execTime;trainErrorRate;testErrorRate;prototypesPerClassDistribution");
+//			File f = new File(rep + "/" + dataName + "_results.csv");
+//			// if somebody is processing it
+//			if (f.exists()) {
+//				return;
+//			}
+//
+//			out = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_results.csv", append));
+//			out.println("dataset;algorithm;nbPrototypes;execTime;trainErrorRate;testErrorRate;prototypesPerClassDistribution");
 			String algo = "KMEANS";
+			System.out.println(algo);
+//			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
-			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
-
-			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			nbPrototypesMax = 10;
+			int tmp;
+			tmp = nbExp;
 
 			for (int j = 1; j <= nbPrototypesMax; j++) {
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
 				System.out.println("nbPrototypes=" + j);
 				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
 					DTWKNNClassifierKMeans classifierKMeans = new DTWKNNClassifierKMeans();
 					classifierKMeans.setNbPrototypesPerClass(j);
 					classifierKMeans.setFillPrototypes(true);
@@ -233,15 +241,16 @@ public class ExperimentsLauncher {
 					
 					double testError = eval.errorRate();
 					double trainError = Double.NaN;
+					System.out.println("TestError:"+testError+"\n");
 
-					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
+//					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%d;%.4f;%s\n", dataName, algo, (j * train.numClasses()), duration, testError, Arrays.toString(classDistrib));
-					out.flush();
+//					out.format("%s;%s;%d;%d;%.4f;%s\n", dataName, algo, (j * train.numClasses()), duration, testError, Arrays.toString(classDistrib));
+//					out.flush();
 				}
 
 			}
-			outProto.close();
+//			outProto.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -413,7 +422,7 @@ public class ExperimentsLauncher {
 //			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
 //			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
 			String algo = "GMM";
-
+			System.out.println(algo);
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if(nbPrototypesMax>2)
@@ -444,7 +453,7 @@ public class ExperimentsLauncher {
 					double testError = eval.errorRate();
 					double trainError = Double.NaN;
 					
-					System.out.println(testError+"\n");
+					System.out.println("TestError:"+testError+"\n");
 //					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
 
 //					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
@@ -458,13 +467,13 @@ public class ExperimentsLauncher {
 	
 	public void launchGmmEUC() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/GMMEUC_"+dataName+"_results.csv", true));
+//			out = new PrintStream(new FileOutputStream(rep + "/GMMEUC_"+dataName+"_results.csv", true));
 //			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
 			String algo = "GMMEUC";
 			System.out.println(algo);
 //			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if (nbPrototypesMax > 10)
-				nbPrototypesMax = 10;
+				nbPrototypesMax = 3;
 //			if (nbPrototypesMax > 100)
 //				nbPrototypesMax = 100;
 			int tmp;
@@ -489,26 +498,18 @@ public class ExperimentsLauncher {
 					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierGmmEUC.getPrototypes(), train);
 					
 					Evaluation eval = new Evaluation(train);
-					double[] pred=eval.evaluateModel(classifierGmmEUC, test);
-					Random randGen = new Random();
-					StringBuffer aBuffer=new StringBuffer();
-					Range bRange = new Range("1");
-//					eval.crossValidateModel(classifierGmmEUC, train, 10, randGen,aBuffer,bRange,true);
-//					System.out.println(eval.toSummaryString());
-//					System.out.println(aBuffer.toString());
+					eval.evaluateModel(classifierGmmEUC, test);
 //					Evaluation evaltrain = new Evaluation(train);
 //					evaltrain.evaluateModel(classifierGmmEUC, train);
 					
 					double testError = eval.errorRate();
 //					double trainError = evaltrain.errorRate();
-					double rMSE=eval.rootMeanSquaredError();
-//					System.out.println(rMSE);
 //					System.out.println("TrainError:"+trainError+"\n");
 					System.out.println("TestError:"+testError+"\n");
 //					PrototyperUtil.savePrototypes(classifierGmmEUC.getPrototypes(), rep + "/" + dataName + "_GMMEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
-					out.flush();
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
 				}
 			}
 		} catch (Exception e) {
@@ -691,15 +692,15 @@ public class ExperimentsLauncher {
 	public static void main(String[] args) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		File repSave = new File("C:\\Users\\leix\\workspace\\ICDM2014\\save\\" + df.format(new Date()));
-		File[] repSavelist;
-		if (!repSave.exists()) {
-			repSave.mkdirs();
-		} else {
-			repSavelist = repSave.listFiles();
-			for (int i = 0; i < repSavelist.length; i++) {
-				repSavelist[i].delete();
-			}
-		}
+//		File[] repSavelist;
+//		if (!repSave.exists()) {
+//			repSave.mkdirs();
+//		} else {
+//			repSavelist = repSave.listFiles();
+//			for (int i = 0; i < repSavelist.length; i++) {
+//				repSavelist[i].delete();
+//			}
+//		}
 
 		// datasets folder
 		File rep = new File("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\");
@@ -715,12 +716,12 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals("Gun_Point"))
+			if(!dataRep.getName().equals("NonInvasiveFatalECG_Thorax1"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeans();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();

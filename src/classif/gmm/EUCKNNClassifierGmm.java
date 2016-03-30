@@ -104,7 +104,8 @@ public class EUCKNNClassifierGmm extends Classifier{
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
-//				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+//				System.out.println(clas+","+k+","+centroidsPerClass[c][k]+","+sigmasPerClass[c][k]);
 			}
 		}
 	}
@@ -140,26 +141,17 @@ public class EUCKNNClassifierGmm extends Classifier{
 				}
 				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-//				System.out.println(p);
-//				prob += p/centroidsPerClass[c].length;
-				prob += p*prior[c][k];
-//				if (p > maxProb) {
-//					maxProb = p;
-//					classValue = clas;
-//				}
+				prob += p/centroidsPerClass[c].length;
+//				prob += p*prior[c][k];
+				if (p > maxProb) {
+					maxProb = p;
+					classValue = clas;
+				}
 			}
-			if (prob > maxProb) {
-				maxProb = prob;
-				classValue = clas;
-			}
-			pr[c] = Math.pow((1 - prob), 2);
-		}
-		double sum = 0;
-		for (double arr : pr) {
-			sum += arr;
-		}
-		for (int i = 0; i < pr.length; i++) {
-			pr[i] = pr[i] / sum;
+//			if (prob > maxProb) {
+//				maxProb = prob;
+//				classValue = clas;
+//			}
 		}
 //		System.out.println(Arrays.toString(pr));
 //		System.out.println(classValue);

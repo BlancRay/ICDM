@@ -42,7 +42,7 @@ public class EUCGMMSymbolicSequence {
 	protected double[] sigmasPerCluster = null;
 	protected int dataAttributes;
 
-	private static final double minObj = 2;
+	private static final double minObj = 1;
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
 	private double[] nck = null;
 	private int sumnck;
@@ -94,11 +94,11 @@ public class EUCGMMSymbolicSequence {
 				System.err.println("ERROR");
 		}
 
-		double sumoflog = 0.0;
-		double prevsumoflog = -(Math.exp(308));
+//		double sumoflog = 0.0;
+//		double prevsumoflog = -(Math.exp(308));
 
 		// computing initial likelihood
-		sumoflog = loglikelihood(centroidsPerCluster, sigmasPerCluster, nck);
+//		sumoflog = loglikelihood(centroidsPerCluster, sigmasPerCluster, nck);
 
 		/*while (Math.abs(sumoflog - prevsumoflog) > threshold) {
 			prevsumoflog = sumoflog;
@@ -147,7 +147,7 @@ public class EUCGMMSymbolicSequence {
 			}
 //			System.out.println(sumofgammai);
 			nck[k] = sumofgammai;
-			if (nck[k] < minObj) {
+			if (nck[k] <= minObj) {
 				delcluster(k);
 				double log=gmmprocess();
 				return log;
