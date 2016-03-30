@@ -62,7 +62,7 @@ public class GMMin2D {
 		// generate some randome mixture parameters
 		for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
 			for (int dim = 0; dim < nDims; dim++) {
-				mus[gaussian][dim] = p.nextDouble(); //generating 'dim'-coordinate of the 'gaussian' center
+				mus[gaussian][dim] = 8; //generating 'dim'-coordinate of the 'gaussian' center
 //				sigmas[gaussian][dim] = p.nextDouble();
 			}
 			 outGaussian.println("Gaussian #"+gaussian+":mu="+mu+"\tsigma="+sigmas);

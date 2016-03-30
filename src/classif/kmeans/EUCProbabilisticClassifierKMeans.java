@@ -103,6 +103,7 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 			} while (flg == false);
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				if (centroidsPerClass[c][k] != null) { // ~ if empty cluster
+
 					ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 					prototypes.add(s);
 					// find the center
@@ -114,7 +115,6 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 					sigmasPerClass[c][k] = Math.sqrt(sumOfSquares / (nObjectsInCluster - 1));
 					// compute p(k)
 					// the P(K) of k
-					prior[c][k] = 1.0 * nObjectsInCluster / data.numInstances();
 					System.out.println("priors is "+prior[c][k]+" Gaussian #"+clas+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 				}
 			}
@@ -150,6 +150,7 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
 				prob += p * prior[c][k];
+				// System.out.println(probabilities[c]);
 				}
 			}
 			if (prob > maxProb) {
@@ -161,13 +162,12 @@ public class EUCProbabilisticClassifierKMeans extends Classifier {
 	}
 
 	private double computeProbaForQueryAndCluster(double sigma, double d) {
-		double pqk=0.0;
-		if ( Double.isNaN(sigma)) {
-//			System.err.println("alert");
-			if(d==0)
-			pqk = 1.0;
-		}
-		else
+		double pqk = 0.0;
+		if (Double.isNaN(sigma)) {
+			// System.err.println("alert");
+			if (d == 0.0)
+				pqk = 1.0;
+		} else
 			pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
 
 		return pqk;

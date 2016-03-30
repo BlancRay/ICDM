@@ -42,11 +42,7 @@ public class EUCGMMSymbolicSequence {
 	protected double[] sigmasPerCluster = null;
 	protected int dataAttributes;
 
-<<<<<<< HEAD
-	private static final double threshold = Math.pow(10, -6);
-=======
 	private static final double minObj = 1;
->>>>>>> branch 'master' of https://github.com/xuleiboy1234/ICDM.git
 	private static final double sqrt2Pi = Math.sqrt(2 * Math.PI);
 	private double[] nck = null;
 	private int sumnck;
@@ -88,20 +84,14 @@ public class EUCGMMSymbolicSequence {
 		nck = new double[nbClusters];
 		sumnck = data.size();
 		for (int k = 0; k < nbClusters; k++) {
-			if (centroidsPerCluster[k] != null && affectation[k].size()>1) { // ~ if empty cluster
-			// find the center
+			if (centroidsPerCluster[k] != null) { // ~ if empty cluster
+				// find the center
 				nck[k] = affectation[k].size();
 				// compute sigma
 				double sumOfSquares = centroidsPerCluster[k].EUCsumOfSquares(affectation[k]);
-				sigmasPerCluster[k] = Math.sqrt(sumOfSquares / (nck[k] - 1));
-				// System.out.println(sigmasPerClass[c][k]);
-				// compute p(k)
-				// the P(K) of k
-//				System.out.println(centroidsPerCluster[k] + "\t" + sigmasPerCluster[k]);
-			} else {// if empty cluster
-				sigmasPerCluster[k] = Double.NaN;
-				nck[k] = 1.0;
-			}
+				sigmasPerCluster[k] = Math.sqrt(sumOfSquares / nck[k]);
+			} else
+				System.err.println("ERROR");
 		}
 
 //		double sumoflog = 0.0;
@@ -131,15 +121,14 @@ public class EUCGMMSymbolicSequence {
 		// for each data point computer gamma
 		for (int i = 0; i < sequencesForClass.size(); i++) {
 			Sequence s = sequencesForClass.get(i);
-			// for each cluster gammak = N(xi|mu,sigma)*p(k)
+			// for each p(k)
 			for (int k = 0; k < centroidsPerCluster.length; k++) {
 				double dist = s.distanceEuc(centroidsPerCluster[k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerCluster[k], dist);
 				gammak[i][k] = p * (nck[k] / sumnck);
-				System.out.println(gammak[i][k]);
 			}
 
-			// sum of gammak
+			// sum of p(k)
 			for (int k = 0; k < gammak[i].length; k++) {
 				sumofgammak[i] += gammak[i][k];
 			}
@@ -229,10 +218,11 @@ public class EUCGMMSymbolicSequence {
 
 	private double computeProbaForQueryAndCluster(double sigma, double d) {
 		double pqk = 0.0;
-		if (Double.isNaN(sigma)) {
-			// System.err.println("alert");
-			if (d == 0)
-				pqk = 1.0;
+		if (sigma==0) {
+			if (d == 0) {
+				pqk = 1;
+			} else
+				pqk = 0;
 		} else
 			pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
 		return pqk;
