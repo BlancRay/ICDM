@@ -246,21 +246,21 @@ public class ExperimentsLauncher {
 	
 	public void launchKMeansEUC() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/KEUC_All_results.csv", true));
-			out.println("dataset;algorithm;nbPrototypes;execTime;trainErrorRate;testErrorRate;prototypesPerClassDistribution");
+//			out = new PrintStream(new FileOutputStream(rep + "/KEUC_All_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;execTime;trainErrorRate;testErrorRate;prototypesPerClassDistribution");
 			String algo = "KMEANSEUC";
 
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if(nbPrototypesMax>2)
-			nbPrototypesMax=3;
+			nbPrototypesMax=2;
 //			if (nbPrototypesMax > 100)
 //				nbPrototypesMax = 100;
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 2; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -290,8 +290,8 @@ public class ExperimentsLauncher {
 					
 //					PrototyperUtil.savePrototypes(classifierKMeansEUC.prototypes, rep + "/" + dataName + "_KMEANSEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()), trainError,testError);
-					out.flush();
+//					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()), trainError,testError);
+//					out.flush();
 				}
 
 			}
@@ -351,19 +351,19 @@ public class ExperimentsLauncher {
 	
 	public void launchKMeansProbabilisticEUC() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/KPEUC_All_results.csv", true));
-			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
+//			out = new PrintStream(new FileOutputStream(rep + "/KPEUC_All_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;trainErrorRate_Now;testErrorRate_Now;trainErrorRate_Before;testErrorRate_Before");
 			String algo = "KMEANSProbabilisticEUC";
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if(nbPrototypesMax>2)
-			nbPrototypesMax=3;
+			nbPrototypesMax=2;
 //			if (nbPrototypesMax > 100)
 //				nbPrototypesMax = 100;
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 2; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -393,8 +393,8 @@ public class ExperimentsLauncher {
 					System.out.println("TestError:"+testError+"\n");
 //					PrototyperUtil.savePrototypes(classifierKMeansProEUC.getPrototypes(), rep + "/" + dataName + "_KMEANSProEUC[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()), trainError,testError);
-					out.flush();
+//					out.format("%s;%s;%d;%.4f;%.4f\n", dataName, algo, (j * train.numClasses()), trainError,testError);
+//					out.flush();
 				}
 			}
 		}catch(	Exception e){
@@ -702,7 +702,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals("GMM"))
+			if(!dataRep.getName().equals("synthetic_control"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
@@ -713,7 +713,7 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmm();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmmEUC();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchGmmEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansProbabilisticEUC();
 		}

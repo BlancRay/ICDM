@@ -18,16 +18,16 @@ import weka.experiment.Experiment;
 public class GMMin2D {
 
 	public static void main(String... args) throws Exception {
-		File repSave = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM");
-		File[] repSavelist;
-		if (!repSave.exists()) {
-			repSave.mkdirs();
-		} else {
-			repSavelist = repSave.listFiles();
-			for (int i = 0; i < repSavelist.length; i++) {
-				repSavelist[i].delete();
-			}
-		}
+//		File repSave = new File("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM");
+//		File[] repSavelist;
+//		if (!repSave.exists()) {
+//			repSave.mkdirs();
+//		} else {
+//			repSavelist = repSave.listFiles();
+//			for (int i = 0; i < repSavelist.length; i++) {
+//				repSavelist[i].delete();
+//			}
+//		}
 		PrintStream outtrain,outtest, outGaussian;
 		outtrain = new PrintStream(
 				new FileOutputStream("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM\\GMM_TRAIN", true));
@@ -36,7 +36,7 @@ public class GMMin2D {
 		outGaussian = new PrintStream(
 				new FileOutputStream("F:\\workspace\\ICDM\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
 		// testing GMM with a mimxture of normal
-		int nDataPoints = 1000000;
+		int nDataPoints = 100000;
 		int nGaussians = 1;
 		int nDims = 1;
 		RandomGenerator rg = new MersenneTwister();
@@ -61,7 +61,7 @@ public class GMMin2D {
 		// generate some randome mixture parameters
 		for (int gaussian = 0; gaussian < nGaussians; gaussian++) {
 			for (int dim = 0; dim < nDims; dim++) {
-				mus[gaussian][dim] = p.nextDouble()+10.0; //generating 'dim'-coordinate of the 'gaussian' center
+				mus[gaussian][dim] = p.nextDouble(); //generating 'dim'-coordinate of the 'gaussian' center
 //				sigmas[gaussian][dim] = p.nextDouble();
 			}
 			 outGaussian.println("Gaussian #"+gaussian+":mu="+Arrays.toString(mus[gaussian])+"\tsigma="+sigmas);

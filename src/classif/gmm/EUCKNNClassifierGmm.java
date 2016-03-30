@@ -104,7 +104,7 @@ public class EUCKNNClassifierGmm extends Classifier{
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
-				System.out.println("priors is "+prior[c][k]+" Gaussian #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+				System.out.println("priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
 	}
@@ -146,10 +146,11 @@ public class EUCKNNClassifierGmm extends Classifier{
 		}
 
 		private double computeProbaForQueryAndCluster(double sigma, double d) {
-			double pqk;
-			if ( Double.isNaN(sigma)) {
-//				System.err.println("alert");
-				pqk = 0.0;
+			double pqk = 0.0;
+			if (Double.isNaN(sigma)) {
+				// System.err.println("alert");
+				if (d == 0)
+					pqk = 1.0;
 			}
 			else
 				pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
