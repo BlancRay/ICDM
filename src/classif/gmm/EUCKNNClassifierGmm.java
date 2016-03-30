@@ -104,7 +104,12 @@ public class EUCKNNClassifierGmm extends Classifier{
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
+<<<<<<< HEAD
 				System.out.println("priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+=======
+				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+//				System.out.println(clas+","+k+","+centroidsPerClass[c][k]+","+sigmasPerClass[c][k]);
+>>>>>>> branch 'master' of https://github.com/xuleiboy1234/ICDM.git
 			}
 		}
 	}
@@ -140,14 +145,14 @@ public class EUCKNNClassifierGmm extends Classifier{
 				}
 				double dist = seq.distanceEuc(centroidsPerClass[c][k]);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-//				System.out.println(p);
-//				prob += p/centroidsPerClass[c].length;
-				prob += p*prior[c][k];
-//				if (p > maxProb) {
-//					maxProb = p;
-//					classValue = clas;
-//				}
+				prob += p/centroidsPerClass[c].length;
+//				prob += p*prior[c][k];
+				if (p > maxProb) {
+					maxProb = p;
+					classValue = clas;
+				}
 			}
+<<<<<<< HEAD
 			if (prob > maxProb) {
 				maxProb = prob;
 				classValue = clas;
@@ -170,6 +175,12 @@ public class EUCKNNClassifierGmm extends Classifier{
 				pqk = Math.exp(-(d * d) / (2 * sigma * sigma)) / (sigma * sqrt2Pi);
 
 			return pqk;
+=======
+//			if (prob > maxProb) {
+//				maxProb = prob;
+//				classValue = clas;
+//			}
+>>>>>>> branch 'master' of https://github.com/xuleiboy1234/ICDM.git
 		}
 //		System.out.println(Arrays.toString(pr));
 //		System.out.println(classValue);

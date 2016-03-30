@@ -36,7 +36,7 @@ public class GMMin2D {
 		outGaussian = new PrintStream(
 				new FileOutputStream("C:\\Users\\leix\\Downloads\\UCR_TS_Archive_2015\\GMM\\Gaussian", true));
 		// testing GMM with a mimxture of normal
-		int nDataPoints = 100000;
+		int nDataPoints = 50;
 		int nGaussians = 1;
 		int nDims = 1;
 		RandomGenerator rg = new MersenneTwister();
