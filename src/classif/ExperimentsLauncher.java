@@ -691,7 +691,7 @@ public class ExperimentsLauncher {
 
 	public static void main(String[] args) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-		File repSave = new File("./save/" + df.format(new Date()));
+		File repSave = new File("./save/");
 		File[] repSavelist;
 		if (!repSave.exists()) {
 			repSave.mkdirs();
