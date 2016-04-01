@@ -61,7 +61,7 @@ import classif.kmedoid.DTWKNNClassifierKMedoids;
 import classif.random.DTWKNNClassifierRandom;
 
 public class ExperimentsLauncher {
-	public static String username = "forestier";
+	public static String username = "xulei";
 	private File rep;
 	private int nbExp;
 	private int nbPrototypesMax;
@@ -206,7 +206,7 @@ public class ExperimentsLauncher {
 //				return;
 //			}
 //
-			out = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_results.csv", append));
+			out = new PrintStream(new FileOutputStream(rep + "/KMeansDTW_" + dataName + "_results.csv", true));
 			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
 			String algo = "KMEANS";
 			System.out.println(algo);
