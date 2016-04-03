@@ -212,7 +212,8 @@ public class ExperimentsLauncher {
 			System.out.println(algo);
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
-//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			if (nbPrototypesMax>10)
 			nbPrototypesMax = 10;
 			int tmp;
 			tmp = nbExp;
@@ -425,7 +426,7 @@ public class ExperimentsLauncher {
 			System.out.println(algo);
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
-//			if(nbPrototypesMax>2)
+			if(nbPrototypesMax>10)
 			nbPrototypesMax=10;
 			int tmp;
 			tmp = nbExp;
