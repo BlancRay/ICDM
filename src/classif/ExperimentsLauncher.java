@@ -72,6 +72,8 @@ public class ExperimentsLauncher {
 	long endTime;
 	long duration;
 	private static boolean append = false;
+	private static String datasetsDir = "C:/Users/leix/Downloads/UCR_TS_Archive_2015/";
+	private static String saveoutputDir = "C:/Users/leix/workspace/ICDM2014/save/";
 
 	public ExperimentsLauncher(File rep, Instances train, Instances test, String dataName, int nbExp,
 			int nbPrototypesMax) {
@@ -420,8 +422,8 @@ public class ExperimentsLauncher {
 	
 	public void launchGmm() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
-			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
+//			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
 			String algo = "GMM";
 			System.out.println(algo);
 
@@ -431,7 +433,7 @@ public class ExperimentsLauncher {
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 10; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -457,8 +459,8 @@ public class ExperimentsLauncher {
 					System.out.println("TestError:"+testError+"\n");
 //					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
-					out.flush();
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
 				}
 			}
 		}catch(	Exception e){
@@ -691,7 +693,7 @@ public class ExperimentsLauncher {
 	}
 
 	public static void main(String[] args) {
-		File repSave = new File("./save/");
+		File repSave = new File(saveoutputDir);
 		File[] repSavelist;
 		if (!repSave.exists()) {
 			repSave.mkdirs();
@@ -703,7 +705,7 @@ public class ExperimentsLauncher {
 		}
 
 		// datasets folder
-		File rep = new File("./UCR_TS_Archive_2015/");
+		File rep = new File(datasetsDir);
 		File[] listData = rep.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
@@ -716,12 +718,12 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals(args[0]))
+			if(!dataRep.getName().equals("BeetleFly"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
@@ -734,12 +736,12 @@ public class ExperimentsLauncher {
 	}
 
 	public static Instances[] readTrainAndTest(String name) {
-		File trainFile = new File("./UCR_TS_Archive_2015/" + name + "/" + name + "_TRAIN");
+		File trainFile = new File(datasetsDir + name + "/" + name + "_TRAIN");
 		if (!new File(trainFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(trainFile, new File(trainFile.getAbsolutePath() + ".csv"));
 		}
 		trainFile = new File(trainFile.getAbsolutePath() + ".csv");
-		File testFile = new File("./UCR_TS_Archive_2015/" + name + "/" + name + "_TEST");
+		File testFile = new File(datasetsDir + name + "/" + name + "_TEST");
 		if (!new File(testFile.getAbsolutePath() + ".csv").exists()) {
 			UCR2CSV.run(testFile, new File(testFile.getAbsolutePath() + ".csv"));
 		}

@@ -146,7 +146,7 @@ public class DTWGMMSymbolicSequence {
 			for (int i = 0; i < sumnck; i++) {
 				sumofgammai += gamma[i][k];
 			}
-//			System.out.println(sumofgammai);
+//			System.out.println("sumofgammai "+sumofgammai);
 			nck[k] = sumofgammai;
 			if (nck[k] <= minObj) {
 				delcluster(k);
@@ -244,7 +244,14 @@ public class DTWGMMSymbolicSequence {
 			affectation[clusterMap[j]].add(data.get(j));
 		}
 		for (int i = 0; i < nbClusters; i++) {
-			nck[i] = affectation[i].size();
+			if (centroidsPerCluster[i] != null) { // ~ if empty cluster
+				// find the center
+				nck[i] = affectation[i].size();
+				// compute sigma
+				double sumOfSquares = centroidsPerCluster[i].sumOfSquares(affectation[i]);
+				sigmasPerCluster[i] = Math.sqrt(sumOfSquares / nck[i]);
+			} else
+				System.err.println("ERROR");
 		}
 	}
 	
