@@ -8,8 +8,11 @@ module load java/1.8.0_77
 for dataset in `ls $dir`;do
 	echo "creating $dataset.sh"
 	echo "#!/bin/sh" >> ./run/run-$dataset.sh
-	echo "#SBATCH --job-name=time_sequences_classify" >> ./run/run-$dataset.sh
+	echo "#SBATCH --job-name=$dataset" >> ./run/run-$dataset.sh
 	echo "#SBATCH --mem=4000" >> ./run/run-$dataset.sh
+	echo "#SBATCH --time=100:00:00" >> ./run/run-$dataset.sh
+	echo "#SBATCH --mail-type=FAIL" >> ./run/run-$dataset.sh
+	echo "#SBATCH --mail-user=lei.xu@monash.edu" >> ./run/run-$dataset.sh
 	echo "#SBATCH --output=./out/$dataset.out" >> ./run/run-$dataset.sh
 	echo "module load java/1.8.0_77" >> ./run/run-$dataset.sh
 	echo "java -Xmx2g -Dfile.encoding=UTF-8 -classpath /home/lxu/ICDM/bin:/home/lxu/ICDM/lib/weka.jar:/home/lxu/ICDM/lib/commons-math3-3.2.jar classif.ExperimentsLauncher $dataset">> ./run/run-$dataset.sh

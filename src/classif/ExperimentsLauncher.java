@@ -214,13 +214,13 @@ public class ExperimentsLauncher {
 			System.out.println(algo);
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
-			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
-			if (nbPrototypesMax>10)
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			if (nbPrototypesMax>10)
 			nbPrototypesMax = 10;
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 10; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -427,8 +427,8 @@ public class ExperimentsLauncher {
 			String algo = "GMM";
 			System.out.println(algo);
 
-			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
-			if(nbPrototypesMax>10)
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			if(nbPrototypesMax>10)
 			nbPrototypesMax=10;
 			int tmp;
 			tmp = nbExp;
@@ -694,15 +694,15 @@ public class ExperimentsLauncher {
 
 	public static void main(String[] args) {
 		File repSave = new File(saveoutputDir);
-		File[] repSavelist;
-		if (!repSave.exists()) {
-			repSave.mkdirs();
-		} else {
-			repSavelist = repSave.listFiles();
-			for (int i = 0; i < repSavelist.length; i++) {
-				repSavelist[i].delete();
-			}
-		}
+//		File[] repSavelist;
+//		if (!repSave.exists()) {
+//			repSave.mkdirs();
+//		} else {
+//			repSavelist = repSave.listFiles();
+//			for (int i = 0; i < repSavelist.length; i++) {
+//				repSavelist[i].delete();
+//			}
+//		}
 
 		// datasets folder
 		File rep = new File(datasetsDir);
