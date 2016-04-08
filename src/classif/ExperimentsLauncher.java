@@ -22,35 +22,20 @@
  ******************************************************************************/
 package classif;
 
-import items.ClassedSequence;
-import items.Sequence;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
 
-import org.apache.commons.math3.random.RandomDataGenerator;
-
-import tools.UCR2CSV;
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.core.Attribute;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.Range;
-import weka.core.converters.CSVLoader;
 import classif.ahc.DTWKNNClassifierAHC;
 import classif.dropx.DTWKNNClassifierDropOne;
 import classif.dropx.DTWKNNClassifierDropThree;
 import classif.dropx.DTWKNNClassifierDropTwo;
 import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
+import classif.fuzzycmeans.DTWKNNClassifierFCM;
 import classif.gmm.DTWKNNClassifierGmm;
 import classif.gmm.EUCKNNClassifierGmm;
 import classif.kmeans.DTWKNNClassifierKMeans;
@@ -58,7 +43,13 @@ import classif.kmeans.DTWProbabilisticClassifierKMeans;
 import classif.kmeans.EUCKNNClassifierKMeans;
 import classif.kmeans.EUCProbabilisticClassifierKMeans;
 import classif.kmedoid.DTWKNNClassifierKMedoids;
+import classif.newkmeans.DTWKNNClassifierNK;
 import classif.random.DTWKNNClassifierRandom;
+import items.ClassedSequence;
+import tools.UCR2CSV;
+import weka.classifiers.Evaluation;
+import weka.core.Instances;
+import weka.core.converters.CSVLoader;
 
 public class ExperimentsLauncher {
 	public static String username = "xulei";
@@ -220,7 +211,7 @@ public class ExperimentsLauncher {
 			int tmp;
 			tmp = nbExp;
 
-			for (int j = 10; j <= nbPrototypesMax; j++) {
+			for (int j = 1; j <= nbPrototypesMax; j++) {
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -420,10 +411,58 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	public void launchNewKMeans() {
+		try {
+//			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
+			String algo = "GMM";
+			System.out.println(algo);
+
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			if(nbPrototypesMax>10)
+			nbPrototypesMax=10;
+			int tmp;
+			tmp = nbExp;
+
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					DTWKNNClassifierNK classifierGmm = new DTWKNNClassifierNK();
+					classifierGmm.setNClustersPerClass(j);
+
+					startTime = System.currentTimeMillis();
+					classifierGmm.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+					
+//					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierGmm.getPrototypes(), train);
+					
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierGmm, test);
+					double testError = eval.errorRate();
+					double trainError = Double.NaN;
+					
+					System.out.println("TestError:"+testError+"\n");
+//					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
+
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
+				}
+			}
+		}catch(	Exception e){
+		e.printStackTrace();
+		}
+	}
+	
 	public void launchGmm() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
-			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
+//			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
 			String algo = "GMM";
 			System.out.println(algo);
 
@@ -459,8 +498,8 @@ public class ExperimentsLauncher {
 					System.out.println("TestError:"+testError+"\n");
 //					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
-					out.flush();
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
 				}
 			}
 		}catch(	Exception e){
@@ -517,6 +556,54 @@ public class ExperimentsLauncher {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void launchFCM() {
+		try {
+//			out = new PrintStream(new FileOutputStream(rep + "/FCMDTW_"+dataName+"_results.csv", true));
+//			out.println("dataset;algorithm;nbPrototypes;testErrorRate");
+			String algo = "FCM";
+			System.out.println(algo);
+
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			if(nbPrototypesMax>10)
+			nbPrototypesMax=10;
+			int tmp;
+			tmp = nbExp;
+
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					DTWKNNClassifierFCM classifierFCM = new DTWKNNClassifierFCM();
+					classifierFCM.setNClustersPerClass(j);
+
+					startTime = System.currentTimeMillis();
+					classifierFCM.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+					
+//					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierGmm.getPrototypes(), train);
+					
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierFCM, test);
+					double testError = eval.errorRate();
+					double trainError = Double.NaN;
+					
+					System.out.println("TestError:"+testError+"\n");
+//					PrototyperUtil.savePrototypes(classifierGmm.getPrototypes(), rep + "/" + dataName + "_GMM[" + j + "]_XP" + n + ".proto");
+
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
+				}
+			}
+		}catch(	Exception e){
+		e.printStackTrace();
 		}
 	}
 	
@@ -718,20 +805,22 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals(args[0]))
+			if(!dataRep.getName().equals("CBF"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchDrops();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmm();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmm();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchGmmEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansProbabilisticEUC();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchNewKMeans();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFCM();
 		}
 	}
 
