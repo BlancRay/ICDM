@@ -91,7 +91,7 @@ public class DTWFCMSymbolicSequence {
 		
 		
 		//calculate centroids
-		double error=0;
+		double diff=0;
 		do {
 			double[][] uij_1=new double[data.size()][nbClusters];
 			for (int k = 0; k < nbClusters; k++) {
@@ -112,19 +112,19 @@ public class DTWFCMSymbolicSequence {
 					uij_1[i][j] = uik;
 				}
 			}
-			error = maxerror(uij_1, uij);
+			diff = maxdiff(uij_1, uij);
 			uij=uij_1;
 			iteration++;
-		} while (error >= threshold);
+		} while (diff >= threshold);
 	}
 
-	private double maxerror(double[][] m1, double[][] m2) {
+	private double maxdiff(double[][] m1, double[][] m2) {
 		double max = 0;
 		for (int i = 0; i < m1.length; i++) {
 			for (int j = 0; j < m1[i].length; j++) {
-				double err = m1[i][j] - m2[i][j];
-				if (err > max) {
-					max = err;
+				double diff = m1[i][j] - m2[i][j];
+				if (diff > max) {
+					max = diff;
 				}
 			}
 		}
