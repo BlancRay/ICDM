@@ -27,14 +27,20 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
 
+import classif.DT.DecisionTreeClassifier;
+import classif.Majority.KMeans;
 import classif.ahc.DTWKNNClassifierAHC;
 import classif.dropx.DTWKNNClassifierDropOne;
 import classif.dropx.DTWKNNClassifierDropThree;
 import classif.dropx.DTWKNNClassifierDropTwo;
 import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
+import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.fuzzycmeans.DTWKNNClassifierFCM;
 import classif.gmm.DTWKNNClassifierGmm;
 import classif.gmm.EUCKNNClassifierGmm;
@@ -45,9 +51,12 @@ import classif.kmeans.EUCProbabilisticClassifierKMeans;
 import classif.kmedoid.DTWKNNClassifierKMedoids;
 import classif.newkmeans.DTWKNNClassifierNK;
 import classif.random.DTWKNNClassifierRandom;
+import classif.sep.Unbalancecluster;
 import items.ClassedSequence;
+import items.Sequence;
 import tools.UCR2CSV;
 import weka.classifiers.Evaluation;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 
@@ -199,14 +208,14 @@ public class ExperimentsLauncher {
 //				return;
 //			}
 //
-			out = new PrintStream(new FileOutputStream(rep + "/KMeansDTW_" + dataName + "_results.csv", true));
-//			out.println("dataset,algorithm,nbPrototypes,testErrorRate");
+//			out = new PrintStream(new FileOutputStream(rep + "/KMeansDTW_" + "all" + "_results.csv", true));
+//			out.println("dataset,algorithm,nbPrototypes,testErrorRate,trainErrorRate");
 			String algo = "KMEANS";
 			System.out.println(algo);
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
-//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
-//			if (nbPrototypesMax>10)
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			if (nbPrototypesMax>10)
 			nbPrototypesMax = 10;
 			int tmp;
 			tmp = nbExp;
@@ -230,17 +239,30 @@ public class ExperimentsLauncher {
 
 					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.prototypes, train);
 
-					Evaluation eval = new Evaluation(train);
-					eval.evaluateModel(classifierKMeans, test);
+//					Evaluation eval = new Evaluation(train);
+//					eval.evaluateModel(classifierKMeans, test);
+					Evaluation evaltrain = new Evaluation(train);
+					evaltrain.evaluateModel(classifierKMeans, train);
 					
-					double testError = eval.errorRate();
-					double trainError = Double.NaN;
-					System.out.println("TestError:"+testError+"\n");
+//					double testError = eval.errorRate();
+					double trainError = evaltrain.errorRate();
+//					System.out.println("TestError:"+testError+"\n");
+					System.out.println("trainError:"+trainError+"\n");
+					
+					
+/*					DTWKNNClassifierKMeans KMeans = new DTWKNNClassifierKMeans();
+					KMeans.setNbPrototypesPerClass(j);
+					KMeans.setFillPrototypes(true);
+					Evaluation evalcv = new Evaluation(train);
+					Random rand = new Random(1);
+					evalcv.crossValidateModel(KMeans, train, 10, rand);
+					double testError = evalcv.errorRate();
+					System.out.println("CVError:"+testError+"\n");*/
 
 //					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
-					out.flush();
+//					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
+//					out.flush();
 				}
 
 			}
@@ -779,6 +801,213 @@ public class ExperimentsLauncher {
 		}
 	}
 
+	public void launchseq() {
+		try {
+			nbPrototypesMax = 10;
+			int[] bestprototypes= new int[train.numClasses()];
+			double lowerror=1.0;
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				int[] nbPrototypesPerClass = new int[train.numClasses()];
+				for (int i = 0; i < train.numClasses(); i++) {
+					nbPrototypesPerClass[i] = j;
+				}
+				double errorBefore = 1;
+				double errorNow = 1;
+				int flag = 0;
+				do {
+					Unbalancecluster classifierseq = new Unbalancecluster();
+					classifierseq.setNbPrototypesPerClass(nbPrototypesPerClass);
+					System.out.println(Arrays.toString(nbPrototypesPerClass));
+//					classifierseq.buildClassifier(train);
+					Evaluation evalcv = new Evaluation(train);
+					Random rand = new Random(1);
+					evalcv.crossValidateModel(classifierseq, train, 10, rand);
+//					errorNow = classifierseq.predictAccuracyXVal(10);
+					errorNow = evalcv.errorRate();
+					System.out.println("errorBefore " + errorBefore);
+					System.out.println("errorNow " + errorNow);
+					if (errorNow < errorBefore) {
+						nbPrototypesPerClass[flag]++;
+						errorBefore = errorNow;
+					} else {
+						nbPrototypesPerClass[flag]--;
+						flag++;
+						if (flag >= nbPrototypesPerClass.length)
+							break;
+						nbPrototypesPerClass[flag]++;
+					}
+				} while (flag < nbPrototypesPerClass.length);
+//				System.out.println("\nbest nbPrototypesPerClass " + Arrays.toString(nbPrototypesPerClass));
+				double testError = 0;
+				for (int n = 0; n < nbExp; n++) {
+					Unbalancecluster classifier = new Unbalancecluster();
+					classifier.setNbPrototypesPerClass(nbPrototypesPerClass);
+					classifier.buildClassifier(train);
+					Evaluation evaltest = new Evaluation(train);
+					evaltest.evaluateModel(classifier, test);
+					testError += evaltest.errorRate();
+				}
+				double avgTestError=testError / nbExp;
+				System.out.println(avgTestError);
+				if(avgTestError<lowerror){
+					bestprototypes=nbPrototypesPerClass;
+					lowerror=avgTestError;
+				}
+			}
+			System.out.println("Best prototypes:" + Arrays.toString(bestprototypes) + "\n");
+			System.out.println("Best errorRate:" + lowerror + "\n");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void launchFSKMeans() {
+		try {
+//			File f = new File(rep + "/" + dataName + "_results.csv");
+//			// if somebody is processing it
+//			if (f.exists()) {
+//				return;
+//			}
+//
+			out = new PrintStream(new FileOutputStream(rep + "/FastKMeansDTW_" + dataName + "_results.csv", true));
+//			out.println("dataset,algorithm,nbPrototypes,testErrorRate,trainErrorRate");
+			String algo = "FastKMEANS";
+			System.out.println(algo);
+//			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
+
+//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+//			if (nbPrototypesMax>10)
+			nbPrototypesMax = 2000;
+			int tmp;
+			tmp = nbExp;
+			double[] trainrctmp = new double[5];
+			double[] testrctmp = new double[5];
+			double[] cvrctmp = new double[5];
+			boolean stopflag=false;
+			for (int j = 1; j <= nbPrototypesMax; j++) {
+				double[] trainrc = new double[5];
+				double[] testrc = new double[5];
+				double[] cvrc = new double[5];
+				if (j == 1)
+					nbExp = 1;
+				else
+					nbExp = tmp;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					DTWKNNClassifierKMeansCached classifierKMeans = new DTWKNNClassifierKMeansCached();
+					classifierKMeans.setNbPrototypesPerClass(j);
+					classifierKMeans.setFillPrototypes(true);
+
+					startTime = System.currentTimeMillis();
+					classifierKMeans.buildClassifier(train);
+					endTime = System.currentTimeMillis();
+					duration = endTime - startTime;
+
+					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.prototypes, train);
+
+					Evaluation evaltest = new Evaluation(train);
+					evaltest.evaluateModel(classifierKMeans, test);
+					Evaluation evaltrain = new Evaluation(train);
+					evaltrain.evaluateModel(classifierKMeans, train);
+					
+					double testError = evaltest.errorRate();
+					double trainError = evaltrain.errorRate();
+					System.out.println("TestError:"+testError+"\n");
+					System.out.println("trainError:"+trainError+"\n");
+					
+					
+					DTWKNNClassifierKMeansCached KMeans = new DTWKNNClassifierKMeansCached();
+					KMeans.setNbPrototypesPerClass(j);
+					KMeans.setFillPrototypes(true);
+					Evaluation evalcv = new Evaluation(train);
+					Random rand = new Random(1);
+					evalcv.crossValidateModel(KMeans, train, 10, rand);
+					double CVError = evalcv.errorRate();
+					System.out.println("CVError:"+CVError+"\n");
+
+//					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
+
+					out.format("%s,%s,%d,%.4f,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()), testError,CVError,trainError);
+					out.flush();
+					trainrc[n]=trainError;
+					testrc[n]=testError;
+					cvrc[n]=CVError;
+					if (n == 4) {
+						if (j == 1) {
+							trainrctmp = trainrc;
+							testrctmp = testrc;
+							cvrctmp = cvrc;
+						} else {
+							if (Arrays.equals(trainrc, trainrctmp) && Arrays.equals(testrc, testrctmp)
+									&& Arrays.equals(cvrc, cvrctmp)) {
+								System.out.println("Stable at " + j);
+								stopflag=true;
+							} else {
+								trainrctmp = trainrc;
+								testrctmp = testrc;
+								cvrctmp = cvrc;
+							}
+						}
+					}
+				}
+				if(stopflag==true)
+					break;
+			}
+//			outProto.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void launchAllKMeans() {
+		try {
+			String algo = "AllKMEANS";
+			System.out.println(algo);
+
+			nbPrototypesMax = this.train.numInstances();
+			int prototypestart = this.train.numClasses();
+			for (int j = prototypestart; j <= nbPrototypesMax; j++) {
+				double testError=0.0;
+				System.out.println("nbPrototypes=" + j);
+				for (int n = 0; n < nbExp; n++) {
+					System.out.println("This is the "+n+" time.");
+					KMeans classifier = new KMeans();
+					classifier.setNbPrototypes(j);
+					classifier.buildClassifier(train);
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifier, test);
+					testError += eval.errorRate();
+					System.out.println("TestError:"+eval.errorRate()+"\n");
+				}
+				System.out.println("TestError of average:"+(testError/nbExp)+"\n");
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void launchDT() {
+		try {
+			String algo = "DecisionTree";
+			System.out.println(algo);
+
+			double testError = 0.0;
+			DecisionTreeClassifier dt = new DecisionTreeClassifier();
+			dt.buildClassifier(train);
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(dt, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		File repSave = new File(saveoutputDir);
 //		File[] repSavelist;
@@ -805,12 +1034,12 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals(args[0]))
+			if(!dataRep.getName().equals("Gun_Point"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
@@ -820,7 +1049,11 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchKMeansProbabilistic();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansProbabilisticEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchNewKMeans();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFCM();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFCM();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchseq();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFSKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchAllKMeans();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
 		}
 	}
 

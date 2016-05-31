@@ -88,7 +88,7 @@ public class DTWKNNClassifierFCM extends Classifier{
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
 				prior[c][k] = fcmclusterer.getNck()[k] / data.numInstances();
-//				System.out.println(fcmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+//				System.out.println(fcmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]);
 			}
 		}
 	}

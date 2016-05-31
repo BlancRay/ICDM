@@ -96,6 +96,21 @@ public class DTWKNNClassifierGmm extends Classifier{
 //				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
+/*		for (int i = 0; i < centroidsPerClass.length; i++) {
+			for (int j = 0; j < centroidsPerClass.length; j++) {
+				if(i==j)
+					continue;
+				for (int i2 = 0; i2 < centroidsPerClass[i].length; i2++) {
+					for (int j2 = 0; j2 < centroidsPerClass[j].length; j2++) {
+						double d=centroidsPerClass[i][i2].distance(centroidsPerClass[j][j2]);
+						System.out.println(trainingData.classAttribute().value(i)+i2+" "+sigmasPerClass[i][i2]+" "+trainingData.classAttribute().value(j)+j2+" "+sigmasPerClass[j][j2]+" "+d);
+						
+					}
+					
+				}
+				
+			}
+		}*/
 	}
 
 		/**

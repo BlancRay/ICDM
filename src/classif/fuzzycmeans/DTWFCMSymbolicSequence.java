@@ -42,7 +42,8 @@ public class DTWFCMSymbolicSequence {
 	protected Sequence[] centroidsPerCluster = null;
 	protected int dataAttributes;
 
-	private static final double threshold = Math.pow(Math.E,-6);
+	private static final double threshold = Math.pow(10,-6);
+	private static final double minObj = 2;
 	private double[] nck = null;
 
 	public DTWFCMSymbolicSequence(int nbClusters, ArrayList<Sequence> data, int dataAttributes) {
@@ -58,11 +59,26 @@ public class DTWFCMSymbolicSequence {
 
 	public void cluster() {
 		// init
+		boolean isBig;
 		ArrayList<Sequence>[] affectation=new ArrayList[nbClusters];
-		KMeansSymbolicSequence kmeans = new KMeansSymbolicSequence(nbClusters,data);
-		kmeans.cluster();
-		centroidsPerCluster = kmeans.centers;
-		affectation = kmeans.affectation;
+		int runtime=0;
+		do {
+			if(runtime>10)
+				nbClusters-=1;
+			isBig = true;
+			KMeansSymbolicSequence kmeans = new KMeansSymbolicSequence(nbClusters,data);
+			kmeans.cluster();
+			centroidsPerCluster = kmeans.centers;
+			affectation = kmeans.affectation;
+			for (ArrayList<Sequence> Eachaffectation : affectation) {
+				if (Eachaffectation.size() < minObj) {
+					isBig = false;
+					break;
+				}
+			}
+			runtime++;
+		} while (isBig == false);
+		
 		nck = new double[nbClusters];
 		
 		for (int k = 0; k < nbClusters; k++) {
@@ -71,32 +87,52 @@ public class DTWFCMSymbolicSequence {
 			} else
 				System.err.println("ERROR");
 		}
-//		for (int i = 0; i < 10; i++) {
-//			fcm(i);
-//		}
-		fcm(0);
+		
+		fcm();
 	}
 
-	private void fcm(int iteration) {
-		
+	private void fcm() {
+
 		double[][] uij = new double[data.size()][nbClusters];
-		double m=2;
+		double m = 2;
 		ArrayList<Sequence> sequencesForClass = data;
-		//init uij
+		// init uij
+//		for (int i = 0; i < uij.length; i++) {
+//			for (int j = 0; j < uij[i].length; j++) {
+//				uij[i][j] = 1 / nck[j];
+//			}
+//		}
 		for (int i = 0; i < uij.length; i++) {
+			Sequence s = sequencesForClass.get(i);
 			for (int j = 0; j < uij[i].length; j++) {
-				uij[i][j]=1/nck[j];
+				double d1 = s.distance(centroidsPerCluster[j]);
+				double uik = 0;
+				for (int k = 0; k < nbClusters; k++) {
+					double d2 = s.distance(centroidsPerCluster[k]);
+					if(d2==0||d1==0){
+						System.out.println("d1	"+d1+"	d2	"+d2);
+						System.out.println("uik	"+uik);
+						System.out.println("c1	"+centroidsPerCluster[j]);
+						System.out.println("c2	"+centroidsPerCluster[k]);
+						System.out.println("s	"+s);
+						System.out.println(nck[k]);
+						
+					}
+					uik += Math.pow((d1 / d2), (2 / (m - 1)));
+				}
+				uij[i][j] = 1/uik;
+//				System.out.println("init	"+i+"	"+j+"	"+uij[i][j]);
 			}
 		}
-		
-		
-		//calculate centroids
-		double diff=0;
+
+		// calculate centroids
+		double diff = 0;
+		int iteration=0;
 		do {
-			double[][] uij_1=new double[data.size()][nbClusters];
+			double[][] uij_1 = new double[data.size()][nbClusters];
 			for (int k = 0; k < nbClusters; k++) {
 				centroidsPerCluster[k] = Sequences.weightMean(centroidsPerCluster[k], data.toArray(new Sequence[0]),
-						uij, k, iteration);
+						uij, k, 0);
 			}
 			// updata uij
 
@@ -109,20 +145,20 @@ public class DTWFCMSymbolicSequence {
 						double d2 = s.distance(centroidsPerCluster[k]);
 						uik += Math.pow((d1 / d2), (2 / (m - 1)));
 					}
-					uij_1[i][j] = uik;
+					uij_1[i][j] = 1/uik;
 				}
 			}
 			diff = maxdiff(uij_1, uij);
-			uij=uij_1;
+			uij = uij_1;
 			iteration++;
-		} while (diff >= threshold);
+		} while (diff >= threshold&&iteration<=20);
 	}
 
 	private double maxdiff(double[][] m1, double[][] m2) {
 		double max = 0;
 		for (int i = 0; i < m1.length; i++) {
 			for (int j = 0; j < m1[i].length; j++) {
-				double diff = m1[i][j] - m2[i][j];
+				double diff = Math.abs(m1[i][j] - m2[i][j]);
 				if (diff > max) {
 					max = diff;
 				}
