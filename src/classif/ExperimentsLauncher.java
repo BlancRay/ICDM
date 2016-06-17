@@ -27,12 +27,10 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
-import classif.DT.DecisionTreeClassifier;
+import classif.DT.ClassifyDT;
 import classif.Majority.KMeans;
 import classif.ahc.DTWKNNClassifierAHC;
 import classif.dropx.DTWKNNClassifierDropOne;
@@ -53,7 +51,6 @@ import classif.newkmeans.DTWKNNClassifierNK;
 import classif.random.DTWKNNClassifierRandom;
 import classif.sep.Unbalancecluster;
 import items.ClassedSequence;
-import items.Sequence;
 import tools.UCR2CSV;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
@@ -990,17 +987,41 @@ public class ExperimentsLauncher {
 	}
 	
 	public void launchDT() {
+		if(train.numClasses()==2){
+			
 		try {
 			String algo = "DecisionTree";
 			System.out.println(algo);
 
 			double testError = 0.0;
-			DecisionTreeClassifier dt = new DecisionTreeClassifier();
+			ClassifyDT dt = new ClassifyDT();
+			dt.buildClassifier(train);
+			System.out.println("\nClassify test sets:\n");
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(dt, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+			System.out.println(eval.toSummaryString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}}
+	
+	public void launchJ48() {
+		try {
+			String algo = "J48";
+			System.out.println(algo);
+
+			double testError = 0.0;
+			J48 dt = new J48();
 			dt.buildClassifier(train);
 			Evaluation eval = new Evaluation(train);
 			eval.evaluateModel(dt, test);
 			testError = eval.errorRate();
 			System.out.println("TestError:" + testError + "\n");
+			System.out.println(dt.toSummaryString());
+			System.out.println(dt.graph());
+			System.out.println(eval.toSummaryString());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1034,12 +1055,12 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 				continue;
-			if(!dataRep.getName().equals("Gun_Point"))
+			if(!dataRep.getName().equals(args[0]))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchKMeansEUC();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 100, data[0].numInstances()).launchRandom();
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 1, data[0].numInstances()).launchAHC();
@@ -1054,6 +1075,7 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFSKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchAllKMeans();
 			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchJ48();
 		}
 	}
 

@@ -1,17 +1,14 @@
 package classif.DT;
 
-import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.RevisionUtils;
 import weka.core.Utils;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 import items.ClassedSequence;
-import items.MonoDoubleItemSet;
 import items.Sequence;
 
 /**
@@ -26,7 +23,7 @@ public class C45ModelSelection extends ModelSelection {
 	private static final long serialVersionUID = 3372204862440821989L;
 
 	/** Minimum number of objects in interval. */
-	private int m_minNoObj;
+	private int m_minNoObj=1;
 
 	/** All the training data */
 	private Instances m_allData; //
@@ -49,8 +46,7 @@ public class C45ModelSelection extends ModelSelection {
 	 *            FULL training dataset (necessary for selection of split
 	 *            points).
 	 */
-	public C45ModelSelection(int minNoObj, Instances allData) {
-		m_minNoObj = minNoObj;
+	public C45ModelSelection(Instances allData) {
 		m_allData = allData;
 	}
 
@@ -70,29 +66,28 @@ public class C45ModelSelection extends ModelSelection {
 		Distribution checkDistribution;
 		C45Split bestModel = null;
 		C45Split[][] currentModel;
-		Attribute attribute;
 		double minResult;
-		double currentResult;
 		double averageInfoGain = 0;
 		int validModels = 0;
-		boolean multiVal = true;
-		double sumOfWeights;
-		int i,j;
+		int i, j;
 
 		try {
-
+			
 			// Check if all Instances belong to one class or if not
 			// enough Instances to split.
 			checkDistribution = new Distribution(data);
 			noSplitModel = new NoSplit(checkDistribution);
-			if (Utils.sm(checkDistribution.total(), 2 * m_minNoObj)
-					|| Utils.eq(checkDistribution.total(), checkDistribution.perClass(checkDistribution.maxClass())))
-				return noSplitModel;
-
+			for (int j2 = 0; j2 < data.numClasses(); j2++) {
+				if (checkDistribution.perClass(j2)<= 1){
+					noSplitModel.setSplitPoint(data);
+//					for (int j1 = 0; j1 <data.numInstances(); j1++) {
+//						System.out.println(data.instance(j1));
+//					}
+					return noSplitModel;
+				}
+			}
 
 			currentModel = new C45Split[data.numInstances()][data.numInstances()];
-			sumOfWeights = data.sumOfWeights();
-
 			// For each attribute.
 			for (i = 0; i < data.numInstances(); i++) {
 				for (j = 0; j < data.numInstances(); j++) {
@@ -104,7 +99,7 @@ public class C45ModelSelection extends ModelSelection {
 						int[] pair = new int[data.numClasses()];
 						pair[0] = i;
 						pair[1] = j;
-						currentModel[i][j] = new C45Split(pair, m_minNoObj, sumOfWeights);
+						currentModel[i][j] = new C45Split(pair);
 						currentModel[i][j].buildClassifier(data);
 						if (currentModel[i][j].checkModel())
 							if (m_allData != null) {
@@ -112,7 +107,7 @@ public class C45ModelSelection extends ModelSelection {
 								validModels++;
 							}
 					} else
-						currentModel[i] = null;
+						currentModel[i][j] = null;
 				}
 			}
 
@@ -129,8 +124,7 @@ public class C45ModelSelection extends ModelSelection {
 							&& (currentModel[i][j].checkModel()))
 
 						// Use 1E-3 here to get a closer approximation to the
-						// original
-						// implementation.
+						// original implementation.
 						if ((currentModel[i][j].infoGain() >= (averageInfoGain - 1E-3))
 								&& Utils.gr(currentModel[i][j].gainRatio(), minResult)) {
 						bestModel = currentModel[i][j];
@@ -143,18 +137,15 @@ public class C45ModelSelection extends ModelSelection {
 			if (Utils.eq(minResult, 0))
 				return noSplitModel;
 
-			// Add all Instances with unknown values for the corresponding
-			// attribute to the distribution for the model, so that
-			// the complete distribution is stored with the model.
-			bestModel.distribution().addInstWithUnknown(data, bestModel.attIndex());
-
 			// Set the split point analogue to C45 if attribute numeric.
 			if (m_allData != null)
-				bestModel.setSplitPoint(m_allData);
+				bestModel.setSplitPoint();
+//			for (int j2 = 0; j2 < bestModel.setSplitPoint().numInstances(); j2++) {
+//				System.out.println(bestModel.setSplitPoint().instance(j2));
+//			}
 			return bestModel;
-			
-		}
-		catch (Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
