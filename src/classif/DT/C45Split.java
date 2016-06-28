@@ -22,6 +22,11 @@ public class C45Split extends ClassifierSplitModel {
 
 	/** GainRatio of split. */
 	private double m_gainRatio;
+	
+	  private static InfoGainSplitCrit infoGainCrit = new InfoGainSplitCrit();
+
+	  /** Static reference to splitting criterion. */
+	  private static GainRatioSplitCrit gainRatioCrit = new GainRatioSplitCrit();
 	public static double log2 = Math.log(2);
 
 	/**

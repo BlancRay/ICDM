@@ -38,7 +38,7 @@ public class ClassifyDT extends Classifier{
 	 *             if instance can't be classified successfully
 	 */
 	public double classifyInstance(Instance instance) throws Exception {
-
+		System.out.println("");
 		return root.classifyInstance(instance);
 	}
 }

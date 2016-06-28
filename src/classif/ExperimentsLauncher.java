@@ -1053,9 +1053,9 @@ public class ExperimentsLauncher {
 
 		for (File dataRep : listData) {
 			// only process GunPoint dataset to illustrates
-			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
-				continue;
-			if(!dataRep.getName().equals(args[0]))
+//			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
+//				continue;
+			if(!dataRep.getName().equals("50words"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());

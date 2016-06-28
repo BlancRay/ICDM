@@ -77,20 +77,12 @@ public class C45ModelSelection extends ModelSelection {
 			// enough Instances to split.
 			checkDistribution = new Distribution(data);
 			noSplitModel = new NoSplit(checkDistribution);
-			for (int j2 = 0; j2 < data.numClasses(); j2++) {
-				if (checkDistribution.perClass(j2)<= 1){
-					noSplitModel.setSplitPoint(data);
-//					for (int j1 = 0; j1 <data.numInstances(); j1++) {
-//						System.out.println(data.instance(j1));
-//					}
-					return noSplitModel;
-				}
-			}
+			noSplitModel.setSplitPoint(data);
 
 			currentModel = new C45Split[data.numInstances()][data.numInstances()];
 			// For each attribute.
 			for (i = 0; i < data.numInstances(); i++) {
-				for (j = 0; j < data.numInstances(); j++) {
+				for (j = i; j < data.numInstances(); j++) {
 
 					// Apart from class attribute.
 					if (data.instance(i).classValue() != data.instance(j).classValue()) {
@@ -106,6 +98,7 @@ public class C45ModelSelection extends ModelSelection {
 								averageInfoGain = averageInfoGain + currentModel[i][j].infoGain();
 								validModels++;
 							}
+						
 					} else
 						currentModel[i][j] = null;
 				}
@@ -119,16 +112,20 @@ public class C45ModelSelection extends ModelSelection {
 			// Find "best" attribute to split on.
 			minResult = 0;
 			for (i = 0; i < data.numInstances(); i++) {
-				for (j = 0; j < data.numInstances(); j++) {
+				for (j = i; j < data.numInstances(); j++) {
 					if ((data.instance(i).classValue() != data.instance(j).classValue())
 							&& (currentModel[i][j].checkModel()))
 
 						// Use 1E-3 here to get a closer approximation to the
 						// original implementation.
-						if ((currentModel[i][j].infoGain() >= (averageInfoGain - 1E-3))
-								&& Utils.gr(currentModel[i][j].gainRatio(), minResult)) {
-						bestModel = currentModel[i][j];
-						minResult = currentModel[i][j].gainRatio();
+//						if ((currentModel[i][j].infoGain() >= (averageInfoGain - 1E-3))
+//								&& Utils.gr(currentModel[i][j].gainRatio(), minResult)) {
+//						bestModel = currentModel[i][j];
+//						minResult = currentModel[i][j].gainRatio();
+//						}
+						if(currentModel[i][j].infoGain()>minResult){
+							minResult=currentModel[i][j].infoGain();
+							bestModel = currentModel[i][j];
 						}
 				}
 			}
@@ -141,7 +138,7 @@ public class C45ModelSelection extends ModelSelection {
 			if (m_allData != null)
 				bestModel.setSplitPoint();
 //			for (int j2 = 0; j2 < bestModel.setSplitPoint().numInstances(); j2++) {
-//				System.out.println(bestModel.setSplitPoint().instance(j2));
+//				System.out.println(bestModel.setSplitPoint().instance(j2).classValue());
 //			}
 			return bestModel;
 

@@ -81,16 +81,25 @@ public class ClassifierTree{
 		m_isEmpty = false;
 		m_sons = null;
 		m_localModel = m_toSelectModel.selectModel(data);
-		System.out.println(m_localModel.numSubsets());
+//		System.out.println(m_localModel.numSubsets());
 		if (m_localModel.numSubsets() > 1) {
 			localInstances = m_localModel.split(data);
 			data = null;
 			m_sons = new ClassifierTree[m_localModel.numSubsets()];
 			for (int i = 0; i < m_sons.length; i++) {
-				if (i == 0)
+				if (i == 0) {
 					System.out.println("left branch:");
-				else
+						for (int j = 0; j < localInstances[0].numInstances(); j++) {
+
+							System.out.println(localInstances[0].instance(j));
+						}
+				} else {
 					System.out.println("right branch:");
+						for (int j = 0; j < localInstances[1].numInstances(); j++) {
+
+							System.out.println(localInstances[1].instance(j));
+						}
+				}
 				m_sons[i] = getNewTree(localInstances[i]);
 				localInstances[i] = null;
 			}
