@@ -105,8 +105,11 @@ public class C45ModelSelection extends ModelSelection {
 			}
 
 			// Check if any useful split was found.
-			if (validModels == 0)
-				return noSplitModel;
+			if (validModels == 0){
+//				for (int j2 = 0; j2 < noSplitModel.getSplitPoint().numInstances(); j2++) {
+//					System.out.println(noSplitModel.getSplitPoint().instance(j2).classValue());
+//				}
+				return noSplitModel;}
 			averageInfoGain = averageInfoGain / (double) validModels;
 
 			// Find "best" attribute to split on.
@@ -131,8 +134,11 @@ public class C45ModelSelection extends ModelSelection {
 			}
 
 			// Check if useful split was found.
-			if (Utils.eq(minResult, 0))
-				return noSplitModel;
+			if (Utils.eq(minResult, 0)){
+//				for (int j2 = 0; j2 < noSplitModel.getSplitPoint().numInstances(); j2++) {
+//					System.out.println(noSplitModel.getSplitPoint().instance(j2).classValue());
+//				}
+				return noSplitModel;}
 
 			// Set the split point analogue to C45 if attribute numeric.
 			if (m_allData != null)

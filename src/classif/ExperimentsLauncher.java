@@ -996,12 +996,12 @@ public class ExperimentsLauncher {
 			double testError = 0.0;
 			ClassifyDT dt = new ClassifyDT();
 			dt.buildClassifier(train);
-			System.out.println("\nClassify test sets:\n");
-			Evaluation eval = new Evaluation(train);
-			eval.evaluateModel(dt, test);
-			testError = eval.errorRate();
-			System.out.println("TestError:" + testError + "\n");
-			System.out.println(eval.toSummaryString());
+//			System.out.println("\nClassify test sets:\n");
+//			Evaluation eval = new Evaluation(train);
+//			eval.evaluateModel(dt, test);
+//			testError = eval.errorRate();
+//			System.out.println("TestError:" + testError + "\n");
+//			System.out.println(eval.toSummaryString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1055,7 +1055,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals("50words"))
+			if(!dataRep.getName().equals("MiddlePhalanxOutlineCorrect"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());

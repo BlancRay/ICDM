@@ -23,10 +23,7 @@ public class C45Split extends ClassifierSplitModel {
 	/** GainRatio of split. */
 	private double m_gainRatio;
 	
-	  private static InfoGainSplitCrit infoGainCrit = new InfoGainSplitCrit();
-
-	  /** Static reference to splitting criterion. */
-	  private static GainRatioSplitCrit gainRatioCrit = new GainRatioSplitCrit();
+	/** Static reference to splitting criterion. */
 	public static double log2 = Math.log(2);
 
 	/**
@@ -67,8 +64,8 @@ public class C45Split extends ClassifierSplitModel {
 		}
 
 		// computer error rate
-		int[] nbObjPreClass = new int[trainInstances.numClasses()];
-		nbObjPreClass = classifyInstancesintoClass(trainInstances, prototypes);
+		int[][] nbObjPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
+		nbObjPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
 		
 		
 		
@@ -76,8 +73,8 @@ public class C45Split extends ClassifierSplitModel {
 		int[] error = new int[trainInstances.numClasses()];
 		error = evalerror(trainInstances, prototypes);
 		// computer infoGain
-		m_infoGain = evalInfoGain(trainInstances,nbObjPreClass);
-		m_gainRatio = evalGainRatio(nbObjPreClass, m_infoGain);
+		m_infoGain = evalInfoGain(trainInstances,nbObjPreClass_afterSplit);
+//		m_gainRatio = evalGainRatio(nbObjPreClass_afterSplit, m_infoGain);
 
 		// System.out.println("info\t"+m_infoGain);
 		// System.out.println("gain\t"+m_gainRatio);
@@ -88,7 +85,7 @@ public class C45Split extends ClassifierSplitModel {
 		}
 	}
 
-	public double evalGainRatio(int[] nbObjeachClass, double infoGain) {
+/*	public double evalGainRatio(int[] nbObjeachClass, double infoGain) {
 		double gainRatio = 0.0;
 		double sum = 0.0;
 		sum=Utils.sum(nbObjeachClass);
@@ -96,29 +93,37 @@ public class C45Split extends ClassifierSplitModel {
 			gainRatio -= log2(1.0 * nbObjeachClass[i] / sum);
 		}
 		return (infoGain/gainRatio);
-	}
+	}*/
 
-	public double evalInfoGain(Instances instances,int[] nbObjeachClass) {
-		double Gain = 0.0;
-		double sum = 0.0;
-		double infoGain = 0.0;
-		double[] nbObjPreClass = new double[instances.numClasses()];
+	public double evalInfoGain(Instances instances,int[][] nbObj_aftersplit_eachClass) {
+		double parent_entropy = 0.0;
+		double avg_child_entropy = 0.0;
+		double[] child_entropy = new double[instances.numClasses()];
+		double[] parent_nbObjPreClass = new double[instances.numClasses()];
+		double[] child_nbObjPreClass = new double[instances.numClasses()];
 		for (int i = 0; i < instances.numInstances(); i++) {
 			Instance Obj = instances.instance(i);
-			nbObjPreClass[(int) Obj.classValue()]++;
+			parent_nbObjPreClass[(int) Obj.classValue()]++;
 		}
-		for (int i = 0; i < nbObjPreClass.length; i++) {
-			infoGain -= log2(nbObjPreClass[i] / instances.numInstances());
+		for (int i = 0; i < parent_nbObjPreClass.length; i++) {
+			parent_entropy -= log2(parent_nbObjPreClass[i] / instances.numInstances());
 		}
-		sum=Utils.sum(nbObjeachClass);
-		for (int i = 0; i < nbObjeachClass.length; i++) {
-			Gain -= (1.0 * nbObjeachClass[i] / sum) * (log2(1.0 * nbObjeachClass[i] / sum));
+
+		for (int i = 0; i < nbObj_aftersplit_eachClass.length; i++) {
+			child_nbObjPreClass[i] = Utils.sum(nbObj_aftersplit_eachClass[i]);//sum Objs in each branch
+			for (int j = 0; j < nbObj_aftersplit_eachClass[i].length; j++) {
+				child_entropy[i] -= (log2(nbObj_aftersplit_eachClass[i][j] / child_nbObjPreClass[i]));//entropy for each child
+			}
 		}
-		return infoGain-Gain;
+		for (int i = 0; i < child_nbObjPreClass.length; i++) {
+			avg_child_entropy += child_nbObjPreClass[i] / instances.numInstances() * child_entropy[i];
+		}
+
+		return parent_entropy - avg_child_entropy;
 	}
 
-	public int[] classifyInstancesintoClass(Instances data, ArrayList<ClassedSequence> prototypes) {
-		int[] nbObjeachclass = new int[data.numClasses()];
+	public int[][] classifyInstancesintoClass(Instances data, ArrayList<ClassedSequence> prototypes) {
+		int[][] nbObjeachclass = new int[data.numClasses()][data.numClasses()];
 		for (int i = 0; i < data.numInstances(); i++) {
 			Instance sample = data.instance(i);
 			// transform instance to sequence
@@ -137,7 +142,7 @@ public class C45Split extends ClassifierSplitModel {
 					classValue = s.classValue;
 				}
 			}
-			nbObjeachclass[sample.classAttribute().indexOfValue(classValue)]++;
+			nbObjeachclass[sample.classAttribute().indexOfValue(classValue)][(int) sample.classValue()]++;
 		}
 		return nbObjeachclass;
 	}

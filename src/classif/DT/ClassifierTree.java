@@ -1,5 +1,10 @@
 package classif.DT;
 
+import java.io.File;
+
+import items.MonoDoubleItemSet;
+import items.SymbolicSequence;
+import tools.DrawAllSequences;
 import weka.core.Drawable;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -61,7 +66,7 @@ public class ClassifierTree{
     data = new Instances(data);
     data.deleteWithMissingClass();
     
-    buildTree(data);
+    buildTree(data,0,"./"+data.relationName()+"/");
   }
 
   /**
@@ -72,35 +77,34 @@ public class ClassifierTree{
    * @param keepData is training data to be kept?
    * @throws Exception if something goes wrong
    */
-	public void buildTree(Instances data) throws Exception {
 
+	public void buildTree(Instances data,int runtime,String dir) throws Exception {
+		String loc=null;
 		Instances[] localInstances;
-
 		m_test = null;
 		m_isLeaf = false;
 		m_isEmpty = false;
 		m_sons = null;
 		m_localModel = m_toSelectModel.selectModel(data);
+		if (runtime == 0)
+			plot(data, dir, runtime,"root node");
 //		System.out.println(m_localModel.numSubsets());
 		if (m_localModel.numSubsets() > 1) {
+			plot(m_localModel.getSplitPoint(),dir, runtime,"split data");
 			localInstances = m_localModel.split(data);
 			data = null;
 			m_sons = new ClassifierTree[m_localModel.numSubsets()];
 			for (int i = 0; i < m_sons.length; i++) {
 				if (i == 0) {
 					System.out.println("left branch:");
-						for (int j = 0; j < localInstances[0].numInstances(); j++) {
-
-							System.out.println(localInstances[0].instance(j));
-						}
+					loc = dir + "left/";
+					plot(localInstances[i], loc, runtime,"left branch");
 				} else {
 					System.out.println("right branch:");
-						for (int j = 0; j < localInstances[1].numInstances(); j++) {
-
-							System.out.println(localInstances[1].instance(j));
-						}
+					loc = dir + "right/";
+					plot(localInstances[i], loc, runtime,"right branch");
 				}
-				m_sons[i] = getNewTree(localInstances[i]);
+				m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 				localInstances[i] = null;
 			}
 		} else {
@@ -192,10 +196,10 @@ public class ClassifierTree{
    * @return the generated tree
    * @throws Exception if something goes wrong
    */
-  protected ClassifierTree getNewTree(Instances data) throws Exception {
+  protected ClassifierTree getNewTree(Instances data,int runtime,String dir) throws Exception {
 	 
     ClassifierTree newTree = new ClassifierTree(m_toSelectModel);
-    newTree.buildTree(data);
+    newTree.buildTree(data,++runtime,dir);
     
     return newTree;
   }
@@ -215,5 +219,21 @@ public class ClassifierTree{
   private ClassifierTree son(int index) {
     
     return (ClassifierTree)m_sons[index];
+  }
+  
+  private void plot(Instances instances,String dir,int runtime,String branch){
+	  File repSave=new File(dir);
+	  SymbolicSequence[] m = new SymbolicSequence[instances.numInstances()];
+		for (int i = 0; i < instances.numInstances(); i++) {
+			 System.out.println(instances.instance(i));
+			Instance sample = instances.instance(i);
+			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
+			int shift = (sample.classIndex() == 0) ? 1 : 0;
+			for (int t = 0; t < sequence.length; t++) {
+				sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+			}
+			m[i] = new SymbolicSequence(sequence);
+		}
+		new DrawAllSequences(repSave,m, 0).plot(branch+"_"+runtime);
   }
 }

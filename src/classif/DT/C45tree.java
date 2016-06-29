@@ -47,7 +47,7 @@ public class C45tree
     data = new Instances(data);
     data.deleteWithMissingClass();
     
-   buildTree(data);
+   buildTree(data,0,"./"+data.relationName()+"/");
    if (m_cleanup) {
      cleanup(new Instances(data, 0));
    }
@@ -60,12 +60,11 @@ public class C45tree
    * @return the new tree
    * @throws Exception if something goes wrong
    */
-  protected ClassifierTree getNewTree(Instances data) throws Exception {
+  protected ClassifierTree getNewTree(Instances data,int runtime,String dir) throws Exception {
     
-    C45tree newTree = 
-      new C45tree(m_toSelectModel);
-    newTree.buildTree((Instances)data);
+		C45tree newTree = new C45tree(m_toSelectModel);
+		newTree.buildTree((Instances) data, ++runtime,dir);
 
-    return newTree;
+		return newTree;
   }
 }
