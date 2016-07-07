@@ -80,7 +80,7 @@ public class C45ModelSelection extends ModelSelection {
 			noSplitModel.setSplitPoint(data);
 
 			currentModel = new C45Split[data.numInstances()][data.numInstances()];
-			// For each attribute.
+			// For each attribute. 
 			for (i = 0; i < data.numInstances(); i++) {
 				for (j = i; j < data.numInstances(); j++) {
 

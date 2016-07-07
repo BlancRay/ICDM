@@ -86,24 +86,24 @@ public class ClassifierTree{
 		m_isEmpty = false;
 		m_sons = null;
 		m_localModel = m_toSelectModel.selectModel(data);
-		if (runtime == 0)
-			plot(data, dir, runtime,"root node");
+//		if (runtime == 0)
+//			plot(data, dir, runtime,"root node");
 //		System.out.println(m_localModel.numSubsets());
 		if (m_localModel.numSubsets() > 1) {
-			plot(m_localModel.getSplitPoint(),dir, runtime,"split data");
+//			plot(m_localModel.getSplitPoint(),dir, runtime,"split data");
 			localInstances = m_localModel.split(data);
 			data = null;
 			m_sons = new ClassifierTree[m_localModel.numSubsets()];
 			for (int i = 0; i < m_sons.length; i++) {
-				if (i == 0) {
-					System.out.println("left branch:");
-					loc = dir + "left/";
-					plot(localInstances[i], loc, runtime,"left branch");
-				} else {
-					System.out.println("right branch:");
-					loc = dir + "right/";
-					plot(localInstances[i], loc, runtime,"right branch");
-				}
+//				if (i == 0) {
+//					System.out.println("left branch:");
+//					loc = dir + "left/";
+//					plot(localInstances[i], loc, runtime,"left branch");
+//				} else {
+//					System.out.println("right branch:");
+//					loc = dir + "right/";
+//					plot(localInstances[i], loc, runtime,"right branch");
+//				}
 				m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 				localInstances[i] = null;
 			}
@@ -135,10 +135,10 @@ public class ClassifierTree{
 		}
 		else{
 			int treeindex= localModel().whichSubset(instance);
-			if (treeindex == 0)
-				System.out.println("<--");
-			else
-				System.out.println("-->");
+//			if (treeindex == 0)
+//				System.out.println("<--");
+//			else
+//				System.out.println("-->");
 			return son(treeindex).classifyInstance(instance);
 		}
 	}

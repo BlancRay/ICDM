@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
 
+import classif.BIGDT.Dataselect;
 import classif.DT.ClassifyDT;
 import classif.Majority.KMeans;
 import classif.ahc.DTWKNNClassifierAHC;
@@ -996,12 +997,12 @@ public class ExperimentsLauncher {
 			double testError = 0.0;
 			ClassifyDT dt = new ClassifyDT();
 			dt.buildClassifier(train);
-//			System.out.println("\nClassify test sets:\n");
-//			Evaluation eval = new Evaluation(train);
-//			eval.evaluateModel(dt, test);
-//			testError = eval.errorRate();
-//			System.out.println("TestError:" + testError + "\n");
-//			System.out.println(eval.toSummaryString());
+			System.out.println("\nClassify test sets:\n");
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(dt, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+			System.out.println(eval.toSummaryString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1022,6 +1023,19 @@ public class ExperimentsLauncher {
 			System.out.println(dt.toSummaryString());
 			System.out.println(dt.graph());
 			System.out.println(eval.toSummaryString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void launchBigDT() {
+		try {
+			String algo = "BigDT";
+			System.out.println(algo);
+
+			Dataselect dt = new Dataselect();
+			dt.buildClassifier(train);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1055,7 +1069,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals("MiddlePhalanxOutlineCorrect"))
+			if(!dataRep.getName().equals("ArrowHead"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
@@ -1074,8 +1088,9 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchseq();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFSKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchAllKMeans();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchJ48();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchBigDT();
 		}
 	}
 

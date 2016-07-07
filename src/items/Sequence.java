@@ -24,8 +24,14 @@ package items;
 
 import static java.lang.Math.sqrt;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
+import weka.core.Utils;
 
 public class Sequence implements java.io.Serializable {
 	private static final long serialVersionUID = -8340081464719919763L;
@@ -110,6 +116,59 @@ public class Sequence implements java.io.Serializable {
 			}
 		}
 		return sqrt(matriceW[tailleS - 1][tailleT - 1]);
+	}
+	
+	public synchronized double LB_distance(Sequence a,double longestdist) {
+		double best_so_far = longestdist;
+		double LB_dist = 0.0;
+		double true_dist = 0.0;
+		Sequence S1 = this;
+		Sequence S2 = a;
+		final int tailleS = S1.getNbTuples();
+		final int tailleT = S2.getNbTuples();
+
+		double[] U = new double[tailleS];
+		double[] L = new double[tailleS];
+		for (int k = 0; k < L.length; k++) {
+			int r_i[] = new int[5];
+			int r_j[] = new int[5];
+			for (int n = 0; n < r_j.length; n++) {
+				r_i[n] = k - n;
+				r_j[n] = k + n;
+				if (r_i[n] < 0)
+					r_i[n] = 0;
+				if (r_j[n] > tailleS-1)
+					r_j[n] = tailleS-1;
+			}
+			double value_i[] = new double[5];
+			double value_j[] = new double[5];
+			for (int m = 0; m < r_j.length; m++) {
+				value_i[m] = S1.sequence[r_i[m]].getValue();
+				value_j[m] = S1.sequence[r_j[m]].getValue();
+			}
+			U[k] = Arrays.stream(value_i).max().getAsDouble();
+			L[k] = Arrays.stream(value_j).min().getAsDouble();
+		}
+		double[] dist = new double[tailleS];
+		for (int i = 0; i < tailleT; i++) {
+			double[] C = new double[tailleT];
+			for (int j = 0; j < C.length; j++) {
+				C[j] = S2.sequence[j].getValue();
+			}
+			if (C[i] > U[i])
+				dist[i] = Math.pow((C[i] - U[i]), 2);
+			else if (C[i] < L[i])
+				dist[i] = Math.pow((C[i] - L[i]), 2);
+			else
+				dist[i] = 0.0;
+		}
+		LB_dist = sqrt(Utils.sum(dist));
+		if (LB_dist < best_so_far) {
+			true_dist = S1.distance(S2);
+			if (true_dist < best_so_far)
+				best_so_far = true_dist;
+		}
+		return best_so_far;
 	}
 
 	@Override
