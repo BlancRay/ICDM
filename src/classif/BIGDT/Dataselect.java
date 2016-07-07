@@ -1,0 +1,131 @@
+package classif.BIGDT;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Stack;
+
+
+import items.ClassedSequence;
+import items.MonoDoubleItemSet;
+import items.Pairs;
+import items.Sequence;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+
+public class Dataselect {
+	protected ArrayList<ClassedSequence> prototypes;
+	protected HashMap<String, ArrayList<Sequence>> classedData;
+	HashMap<String, ArrayList<Integer>> indexClassedDataInFullData;
+	protected int nClustersPerClass;
+	Sequence[] sequences;
+	String[] classMap;
+	Instances trainingData = null;
+	int nbPairs;
+
+	
+	public void buildClassifier(Instances data) {
+		trainingData = data;
+		nbPairs=data.numInstances()/10;
+		Attribute classAttribute = data.classAttribute();
+		prototypes = new ArrayList<>();
+
+		classedData = new HashMap<String, ArrayList<Sequence>>();
+		indexClassedDataInFullData = new HashMap<String, ArrayList<Integer>>();
+		for (int c = 0; c < data.numClasses(); c++) {
+			classedData.put(data.classAttribute().value(c), new ArrayList<Sequence>());
+			indexClassedDataInFullData.put(data.classAttribute().value(c), new ArrayList<Integer>());
+		}
+
+		sequences = new Sequence[data.numInstances()];
+		classMap = new String[sequences.length];
+		for (int i = 0; i < sequences.length; i++) {
+			Instance sample = data.instance(i);
+			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
+			int shift = (sample.classIndex() == 0) ? 1 : 0;
+			for (int t = 0; t < sequence.length; t++) {
+				sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+			}
+			sequences[i] = new Sequence(sequence);
+			String clas = sample.stringValue(classAttribute);
+			classMap[i] = clas;
+			classedData.get(clas).add(sequences[i]);
+			indexClassedDataInFullData.get(clas).add(i);
+		}
+		Stack<Pairs> stack=new Stack<Pairs>();
+		Stack<Pairs> stack_sort=new Stack<Pairs>();
+		for (int i = 0; i < classAttribute.numValues()-1; i++) {
+			for (int j = i+1; j < classAttribute.numValues(); j++) {
+				ArrayList<Sequence> class1 = classedData.get(classAttribute.value(i));
+				ArrayList<Sequence> class2 = classedData.get(classAttribute.value(j));
+				for (int n = 0; n < class1.size(); n++) {
+					for (int m = 0; m < class2.size(); m++) {
+						Pairs pairs=new Pairs();
+						Sequence[] pair_Sequence = new Sequence[2];
+						pair_Sequence[0]=class1.get(n);
+						pair_Sequence[1]=class2.get(m);
+						pairs.setPair(pair_Sequence);
+						pairs.setDistance(pairs.Distance());
+						pairs.setClasslable(new String[]{classAttribute.value(i),classAttribute.value(j)});
+						if(stack.size()<nbPairs){
+							while (!stack.isEmpty() && stack.peek().getDistance() > pairs.getDistance()) {
+								stack_sort.push(stack.pop());
+							}
+							stack.push(pairs);
+							while (!stack_sort.isEmpty()) {
+								stack.push(stack_sort.pop());
+							}
+						}
+						else{
+							double d=pair_Sequence[0].LB_distance(pair_Sequence[1], stack.peek().getDistance());
+							if(d<stack.peek().getDistance()){
+								stack.pop();
+								while (!stack.isEmpty() && stack.peek().getDistance() >d) {
+									stack_sort.push(stack.pop());
+								}
+								stack.push(pairs);
+								while (!stack_sort.isEmpty()) {
+									stack.push(stack_sort.pop());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		while (!stack.isEmpty()) {
+			Pairs pair=stack.pop();
+			System.out.println("Dist: "+pair.getDistance());
+			System.out.println("Sequence: ");
+			for (int i = 0; i < pair.getPair().length; i++) {
+				System.out.println(pair.getPair()[i]);
+				
+			}
+			System.out.println("Lable: "+Arrays.toString(pair.getClasslable()));
+			System.out.println();
+		}
+		
+		
+//		Computer infogain for each pairs
+/*
+		Instances data;
+		classedData:C1 C2 C3 C4
+		for C1 to C3
+			for C1+1 to C4
+				for Sequence S1 in C1
+					for Sequence S1 in C1+1
+						if  nb of Pairs !> 100
+							pair[S1,S2].dist=DTW(S1,S2)
+							push pair in Pairs
+						else
+							pair[S1,S2].dist=LB_DTW(S1,S2,Pairs.longestdist)
+							if  pair[S1,S2].dist < Pairs.longestdist
+								pop pair with Pairs.longestdist
+								push pair[S1,S2]
+								recomputer Pairs.longestdist
+		*/
+		
+		
+	}
+}
