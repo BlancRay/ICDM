@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import items.MonoDoubleItemSet;
 import items.Pairs;
+import items.Sequence;
 import items.SymbolicSequence;
 import tools.DrawAllSequences;
 import weka.core.Drawable;
@@ -90,7 +91,31 @@ public class ClassifierTree{
 		m_isEmpty = false;
 		m_sons = null;
 		
-		m_localModel = m_toSelectModel.selectModel(data,pairstack);
+		m_localModel = m_toSelectModel.selectModel(data, pairstack);
+		
+		Instances ins = m_localModel.m_splitPoint;
+		Sequence[] sequences = new Sequence[ins.numInstances()];
+		for (int i = 0; i < sequences.length; i++) {
+			Instance sample = data.instance(i);
+			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
+			int shift = (sample.classIndex() == 0) ? 1 : 0;
+			for (int t = 0; t < sequence.length; t++) {
+				sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
+			}
+			sequences[i] = new Sequence(sequence);
+		}
+		Stack<Pairs> pairstack_store = new Stack<Pairs>();
+		while (!pairstack.isEmpty()) {
+			if (pairstack.peek().getPair() == sequences)
+				pairstack.pop();
+			pairstack_store.push(pairstack.pop());
+		}
+		
+		while(!pairstack_store.isEmpty()){
+			pairstack.push(pairstack_store.pop());
+		}
+		
+		
 //		if (runtime == 0)
 //			plot(data, dir, runtime,"root node");
 //		System.out.println(m_localModel.numSubsets());
