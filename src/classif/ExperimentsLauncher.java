@@ -30,7 +30,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
 
-import classif.BIGDT.Dataselect;
+import classif.BIGDT.ClassifyBigDT;
 import classif.DT.ClassifyDT;
 import classif.Majority.KMeans;
 import classif.ahc.DTWKNNClassifierAHC;
@@ -1033,9 +1033,16 @@ public class ExperimentsLauncher {
 		try {
 			String algo = "BigDT";
 			System.out.println(algo);
+			double testError = 0.0;
 
-			Dataselect dt = new Dataselect();
+			ClassifyBigDT dt = new ClassifyBigDT();
 			dt.buildClassifier(train);
+			System.out.println("\nClassify test sets:\n");
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(dt, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+			System.out.println(eval.toSummaryString());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1069,7 +1076,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals("ArrowHead"))
+			if(!dataRep.getName().equals("ElectricDevices"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());

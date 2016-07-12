@@ -23,11 +23,15 @@ public class Dataselect {
 	String[] classMap;
 	Instances trainingData = null;
 	int nbPairs;
-
+	public Dataselect() {
+		super();
+	}
 	
-	public void buildClassifier(Instances data) {
+	public Stack<Pairs> buildClassifier(Instances data) {
 		trainingData = data;
+//		nbPairs=(int) Math.pow(data.numInstances()/10, 2);
 		nbPairs=data.numInstances()/10;
+		
 		Attribute classAttribute = data.classAttribute();
 		prototypes = new ArrayList<>();
 
@@ -66,9 +70,11 @@ public class Dataselect {
 						pair_Sequence[0]=class1.get(n);
 						pair_Sequence[1]=class2.get(m);
 						pairs.setPair(pair_Sequence);
-						pairs.setDistance(pairs.Distance());
 						pairs.setClasslable(new String[]{classAttribute.value(i),classAttribute.value(j)});
 						if(stack.size()<nbPairs){
+							pairs.setDistance(pairs.Distance());
+							if(pairs.getDistance()==0.0)
+								continue;
 							while (!stack.isEmpty() && stack.peek().getDistance() > pairs.getDistance()) {
 								stack_sort.push(stack.pop());
 							}
@@ -79,7 +85,8 @@ public class Dataselect {
 						}
 						else{
 							double d=pair_Sequence[0].LB_distance(pair_Sequence[1], stack.peek().getDistance());
-							if(d<stack.peek().getDistance()){
+							if(d<stack.peek().getDistance()&&d!=0){
+								pairs.setDistance(pairs.Distance());
 								stack.pop();
 								while (!stack.isEmpty() && stack.peek().getDistance() >d) {
 									stack_sort.push(stack.pop());
@@ -94,17 +101,19 @@ public class Dataselect {
 				}
 			}
 		}
-		while (!stack.isEmpty()) {
-			Pairs pair=stack.pop();
-			System.out.println("Dist: "+pair.getDistance());
-			System.out.println("Sequence: ");
-			for (int i = 0; i < pair.getPair().length; i++) {
-				System.out.println(pair.getPair()[i]);
-				
-			}
-			System.out.println("Lable: "+Arrays.toString(pair.getClasslable()));
-			System.out.println();
-		}
+//		Stack<Pairs>stack_copy=(Stack<Pairs>) stack.clone();
+//		while (!stack_copy.isEmpty()) {
+//			Pairs pair=stack_copy.pop();
+//			System.out.println("Dist: "+pair.getDistance());
+//			System.out.println("Sequence: ");
+//			for (int i = 0; i < pair.getPair().length; i++) {
+//				System.out.println(pair.getPair()[i]);
+//				
+//			}
+//			System.out.println("Lable: "+Arrays.toString(pair.getClasslable()));
+//			System.out.println();
+//		}
+		return stack;
 		
 		
 //		Computer infogain for each pairs
