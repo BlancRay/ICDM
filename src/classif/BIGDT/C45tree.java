@@ -35,11 +35,11 @@ public class C45tree extends ClassifierTree {
 		// remove instances with missing class
 		data = new Instances(data);
 		data.deleteWithMissingClass();
-		Dataselect dataselect = new Dataselect();
-		Stack<Pairs> pairstack = dataselect.buildClassifier(data);
+//		Dataselect dataselect = new Dataselect();
+//		Stack<Pairs> pairstack = dataselect.buildClassifier(data);
 
-		buildTree(data, pairstack, 0, "./" + data.relationName() + "/");
-//		buildTree(data, 0, "./" + data.relationName() + "/");
+//		buildTree(data, pairstack, 0, "./" + data.relationName() + "/");
+		buildTree(data, 0, "./" + data.relationName() + "/");
 		if (m_cleanup) {
 			cleanup(new Instances(data, 0));
 		}
@@ -52,11 +52,18 @@ public class C45tree extends ClassifierTree {
    * @return the new tree
    * @throws Exception if something goes wrong
    */
-	protected ClassifierTree getNewTree(Instances data, Stack<Pairs> pairstack, int runtime, String dir)
+	protected ClassifierTree getNewTree(Instances data, int runtime, String dir)
+			throws Exception {
+		C45tree newTree = new C45tree(m_toSelectModel);
+		newTree.buildTree((Instances) data,  ++runtime, dir);
+
+		return newTree;
+	}
+	
+	protected ClassifierTree getNewTree(Instances data,Stack<Pairs> pairstack, int runtime, String dir)
 			throws Exception {
 		C45tree newTree = new C45tree(m_toSelectModel);
 		newTree.buildTree((Instances) data, pairstack, ++runtime, dir);
-//		newTree.buildTree((Instances) data,  ++runtime, dir);
 
 		return newTree;
 	}

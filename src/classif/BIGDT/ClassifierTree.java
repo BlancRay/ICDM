@@ -93,10 +93,10 @@ public class ClassifierTree{
 		
 		m_localModel = m_toSelectModel.selectModel(data, pairstack);
 		
-		Instances ins = m_localModel.m_splitPoint;
+		Instances ins = m_localModel.getSplitPoint();
 		Sequence[] sequences = new Sequence[ins.numInstances()];
 		for (int i = 0; i < sequences.length; i++) {
-			Instance sample = data.instance(i);
+			Instance sample = ins.instance(i);
 			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
 			int shift = (sample.classIndex() == 0) ? 1 : 0;
 			for (int t = 0; t < sequence.length; t++) {
@@ -106,8 +106,9 @@ public class ClassifierTree{
 		}
 		Stack<Pairs> pairstack_store = new Stack<Pairs>();
 		while (!pairstack.isEmpty()) {
-			if (pairstack.peek().getPair() == sequences)
+			if (pairstack.peek().getDistance() == sequences[0].distance(sequences[1])){
 				pairstack.pop();
+				continue;}
 			pairstack_store.push(pairstack.pop());
 		}
 		
@@ -137,7 +138,8 @@ public class ClassifierTree{
 						// plot(localInstances[i], loc, runtime,"right branch");
 					}
 					flg = 1;
-					m_sons[i] = getNewTree(localInstances[i], pairstack, runtime, loc);
+//					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
+					m_sons[i] = getNewTree(localInstances[i],pairstack ,runtime, loc);
 					localInstances[i] = null;
 				}
 			}
@@ -178,7 +180,7 @@ public class ClassifierTree{
 						// plot(localInstances[i], loc, runtime,"right branch");
 					}
 					flg = 1;
-					m_sons[i] = getNewTree(localInstances[i], pairstack, runtime, loc);
+					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 					localInstances[i] = null;
 				}
 			}
@@ -272,15 +274,21 @@ public class ClassifierTree{
    * @return the generated tree
    * @throws Exception if something goes wrong
    */
-	protected ClassifierTree getNewTree(Instances data, Stack<Pairs> pairstack, int runtime, String dir)
+	protected ClassifierTree getNewTree(Instances data, int runtime, String dir)
 			throws Exception {
 
 		ClassifierTree newTree = new ClassifierTree(m_toSelectModel);
-		newTree.buildTree(data, pairstack, ++runtime, dir);
+		newTree.buildTree(data,  ++runtime, dir);
 
 		return newTree;
 	}
+	protected ClassifierTree getNewTree(Instances data,Stack<Pairs> pairstack, int runtime, String dir)
+			throws Exception {
+		C45tree newTree = new C45tree(m_toSelectModel);
+		newTree.buildTree((Instances) data, pairstack, ++runtime, dir);
 
+		return newTree;
+	}
   /**
    * Method just exists to make program easier to read.
    */

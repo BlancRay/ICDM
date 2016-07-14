@@ -1031,6 +1031,7 @@ public class ExperimentsLauncher {
 	
 	public void launchBigDT() {
 		try {
+			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
 			String algo = "BigDT";
 			System.out.println(algo);
 			double testError = 0.0;
@@ -1043,7 +1044,8 @@ public class ExperimentsLauncher {
 			testError = eval.errorRate();
 			System.out.println("TestError:" + testError + "\n");
 			System.out.println(eval.toSummaryString());
-
+			out.format("%s,%.4f\n", dataName,  testError);
+			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1076,8 +1078,8 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals("ElectricDevices"))
-				continue;
+//			if(!dataRep.getName().equals(args[0]))
+//				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();

@@ -30,7 +30,7 @@ public class Dataselect {
 	public Stack<Pairs> buildClassifier(Instances data) {
 		trainingData = data;
 //		nbPairs=(int) Math.pow(data.numInstances()/10, 2);
-		nbPairs=data.numInstances()/10;
+		nbPairs=Math.max(1, data.numInstances()/10);
 		
 		Attribute classAttribute = data.classAttribute();
 		prototypes = new ArrayList<>();
