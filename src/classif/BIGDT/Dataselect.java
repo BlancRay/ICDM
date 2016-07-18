@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.apache.commons.math3.random.RandomDataGenerator;
 
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
@@ -26,26 +27,35 @@ public class Dataselect {
 	public Dataselect() {
 		super();
 	}
-	
+	int sample=10;
 	public Stack<Pairs> buildClassifier(Instances data) {
-		trainingData = data;
-//		nbPairs=(int) Math.pow(data.numInstances()/10, 2);
-		nbPairs=Math.max(10, data.numInstances()/10);
+		if (data.numInstances() > sample) {
+			trainingData=new Instances(data);
+			RandomDataGenerator randGen = new RandomDataGenerator();
+			int[] selected = randGen.nextPermutation(data.numInstances(), data.numInstances() / sample);
+			for (int i = 0; i < selected.length; i++) {
+				trainingData.add(data.instance(selected[i]));
+			}
+		} else
+			trainingData = data;
+		// nbPairs=(int) Math.pow(data.numInstances()/10, 2);
+		nbPairs = 100;
+
 		
-		Attribute classAttribute = data.classAttribute();
+		Attribute classAttribute = trainingData.classAttribute();
 		prototypes = new ArrayList<>();
 
 		classedData = new HashMap<String, ArrayList<Sequence>>();
 		indexClassedDataInFullData = new HashMap<String, ArrayList<Integer>>();
-		for (int c = 0; c < data.numClasses(); c++) {
-			classedData.put(data.classAttribute().value(c), new ArrayList<Sequence>());
-			indexClassedDataInFullData.put(data.classAttribute().value(c), new ArrayList<Integer>());
+		for (int c = 0; c < trainingData.numClasses(); c++) {
+			classedData.put(trainingData.classAttribute().value(c), new ArrayList<Sequence>());
+			indexClassedDataInFullData.put(trainingData.classAttribute().value(c), new ArrayList<Integer>());
 		}
 
-		sequences = new Sequence[data.numInstances()];
+		sequences = new Sequence[trainingData.numInstances()];
 		classMap = new String[sequences.length];
 		for (int i = 0; i < sequences.length; i++) {
-			Instance sample = data.instance(i);
+			Instance sample = trainingData.instance(i);
 			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
 			int shift = (sample.classIndex() == 0) ? 1 : 0;
 			for (int t = 0; t < sequence.length; t++) {
