@@ -170,15 +170,15 @@ public class ClassifierTree{
 			int flg=0;
 			for (int i = 0; i < m_sons.length; i++) {
 				if (localInstances[i].numInstances() != 0){
-					if (flg == 0) {
-						System.out.println("left branch:");
-						// loc = dir + "left/";
-						// plot(localInstances[i], loc, runtime,"left branch");
-					} else {
-						System.out.println("right branch:");
-						// loc = dir + "right/";
-						// plot(localInstances[i], loc, runtime,"right branch");
-					}
+//					if (flg == 0) {
+//						System.out.println("left branch:");
+//						// loc = dir + "left/";
+//						// plot(localInstances[i], loc, runtime,"left branch");
+//					} else {
+//						System.out.println("right branch:");
+//						// loc = dir + "right/";
+//						// plot(localInstances[i], loc, runtime,"right branch");
+//					}
 					flg = 1;
 					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 					localInstances[i] = null;

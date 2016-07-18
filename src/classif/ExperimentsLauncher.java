@@ -1031,21 +1031,20 @@ public class ExperimentsLauncher {
 	
 	public void launchBigDT() {
 		try {
-			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
+//			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
 			String algo = "BigDT";
 			System.out.println(algo);
 			double testError = 0.0;
 
 			ClassifyBigDT dt = new ClassifyBigDT();
 			dt.buildClassifier(train);
-			System.out.println("\nClassify test sets:\n");
 			Evaluation eval = new Evaluation(train);
 			eval.evaluateModel(dt, test);
 			testError = eval.errorRate();
 			System.out.println("TestError:" + testError + "\n");
-			System.out.println(eval.toSummaryString());
-			out.format("%s,%.4f\n", dataName,  testError);
-			out.flush();
+//			System.out.println(eval.toSummaryString());
+//			out.format("%s,%.4f\n", dataName,  testError);
+//			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1078,7 +1077,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-//			if(!dataRep.getName().equals(args[0]))
+//			if(!dataRep.getName().equals("Meat"))
 //				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
