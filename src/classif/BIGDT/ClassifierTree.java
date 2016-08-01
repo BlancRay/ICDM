@@ -155,7 +155,7 @@ public class ClassifierTree{
 		m_isLeaf = false;
 		m_isEmpty = false;
 		m_sons = null;
-		Dataselect dataselect = new Dataselect();
+		RandomSelect dataselect = new RandomSelect();
 		Stack<Pairs> pairstack = dataselect.buildClassifier(data);
 		
 		m_localModel = m_toSelectModel.selectModel(data,pairstack);

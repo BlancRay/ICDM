@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.apache.commons.math3.analysis.function.Max;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import items.ClassedSequence;
@@ -14,6 +15,7 @@ import items.Sequence;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 
 public class Dataselect {
 	protected ArrayList<ClassedSequence> prototypes;
@@ -27,20 +29,19 @@ public class Dataselect {
 	public Dataselect() {
 		super();
 	}
-	int sample=10;
+	int sample=50;
 	public Stack<Pairs> buildClassifier(Instances data) {
-		if (data.numInstances() > sample) {
-			trainingData=new Instances(data);
-			RandomDataGenerator randGen = new RandomDataGenerator();
-			int[] selected = randGen.nextPermutation(data.numInstances(), data.numInstances() / sample);
-			for (int i = 0; i < selected.length; i++) {
-				trainingData.add(data.instance(selected[i]));
-			}
-		} else
+//		if (data.numInstances() > sample) {
+//			trainingData=new Instances(data);
+//			RandomDataGenerator randGen = new RandomDataGenerator();
+//			int[] selected = randGen.nextPermutation(data.numInstances(), data.numInstances() / sample);
+//			for (int i = 0; i < selected.length; i++) {
+//				trainingData.add(data.instance(selected[i]));
+//			}
+//		} else
 			trainingData = data;
 		// nbPairs=(int) Math.pow(data.numInstances()/10, 2);
 		nbPairs = 100;
-
 		
 		Attribute classAttribute = trainingData.classAttribute();
 		prototypes = new ArrayList<>();
@@ -67,6 +68,14 @@ public class Dataselect {
 			classedData.get(clas).add(sequences[i]);
 			indexClassedDataInFullData.get(clas).add(i);
 		}
+		int totle=0;
+		for (int i = 0; i < classAttribute.numValues()-1; i++) {
+			for (int j = i+1; j < classAttribute.numValues(); j++) {
+				totle+=classedData.get(classAttribute.value(i)).size()*classedData.get(classAttribute.value(j)).size();
+			}
+		}
+		nbPairs=Math.max(totle/sample, 100);
+		
 		Stack<Pairs> stack=new Stack<Pairs>();
 		Stack<Pairs> stack_sort=new Stack<Pairs>();
 		for (int i = 0; i < classAttribute.numValues()-1; i++) {
@@ -95,7 +104,7 @@ public class Dataselect {
 						}
 						else{
 							double d=pair_Sequence[0].LB_distance(pair_Sequence[1], stack.peek().getDistance());
-							if(d<stack.peek().getDistance()&&d!=0){
+							if(d<stack.peek().getDistance()&&d!=0.0){
 								pairs.setDistance(pairs.Distance());
 								stack.pop();
 								while (!stack.isEmpty() && stack.peek().getDistance() >d) {

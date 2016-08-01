@@ -27,6 +27,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -1032,15 +1033,24 @@ public class ExperimentsLauncher {
 	public void launchBigDT() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
-			String algo = "BigDT";
+			String algo = "BigDT_Forest";
 			System.out.println(algo);
 			double testError = 0.0;
-
+			startTime = System.currentTimeMillis();
 			ClassifyBigDT dt = new ClassifyBigDT();
 			dt.buildClassifier(train);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			Duration traintime = Duration.ofMillis(duration);
+			System.out.println(traintime);
+			startTime = System.currentTimeMillis();
 			Evaluation eval = new Evaluation(train);
 			eval.evaluateModel(dt, test);
 			testError = eval.errorRate();
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			Duration testtime = Duration.ofMillis(duration);
+			System.out.println(testtime);
 			System.out.println("TestError:" + testError + "\n");
 //			System.out.println(eval.toSummaryString());
 //			out.format("%s,%.4f\n", dataName,  testError);
@@ -1077,8 +1087,8 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-//			if(!dataRep.getName().equals("Meat"))
-//				continue;
+			if(!dataRep.getName().equals("ElectricDevices"))
+				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
 //			new ExperimentsLauncher(repSave, data[0], data[1],dataRep.getName(), 10, data[0].numInstances()).launchKMedoids();
