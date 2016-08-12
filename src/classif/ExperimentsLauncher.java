@@ -40,6 +40,7 @@ import classif.dropx.DTWKNNClassifierDropThree;
 import classif.dropx.DTWKNNClassifierDropTwo;
 import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
+import classif.ensemble.EnsembleClassify;
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.fuzzycmeans.DTWKNNClassifierFCM;
 import classif.gmm.DTWKNNClassifierGmm;
@@ -235,29 +236,17 @@ public class ExperimentsLauncher {
 					classifierKMeans.buildClassifier(train);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
+					Duration traintime = Duration.ofMillis(duration);
+					System.out.println(traintime);
 
 					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.prototypes, train);
 
-//					Evaluation eval = new Evaluation(train);
-//					eval.evaluateModel(classifierKMeans, test);
-					Evaluation evaltrain = new Evaluation(train);
-					evaltrain.evaluateModel(classifierKMeans, train);
+					Evaluation eval = new Evaluation(train);
+					eval.evaluateModel(classifierKMeans, test);
 					
-//					double testError = eval.errorRate();
-					double trainError = evaltrain.errorRate();
-//					System.out.println("TestError:"+testError+"\n");
-					System.out.println("trainError:"+trainError+"\n");
+					double testError = eval.errorRate();
+					System.out.println("TestError:"+testError+"\n");
 					
-					
-/*					DTWKNNClassifierKMeans KMeans = new DTWKNNClassifierKMeans();
-					KMeans.setNbPrototypesPerClass(j);
-					KMeans.setFillPrototypes(true);
-					Evaluation evalcv = new Evaluation(train);
-					Random rand = new Random(1);
-					evalcv.crossValidateModel(KMeans, train, 10, rand);
-					double testError = evalcv.errorRate();
-					System.out.println("CVError:"+testError+"\n");*/
-
 //					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
 //					out.format("%s,%s,%d,%.4f\n", dataName, algo, (j * train.numClasses()), testError);
@@ -868,7 +857,7 @@ public class ExperimentsLauncher {
 //				return;
 //			}
 //
-			out = new PrintStream(new FileOutputStream(rep + "/FastKMeansDTW_" + dataName + "_results.csv", true));
+//			out = new PrintStream(new FileOutputStream(rep + "/FastKMeansDTW_" + dataName + "_results.csv", true));
 //			out.println("dataset,algorithm,nbPrototypes,testErrorRate,trainErrorRate");
 			String algo = "FastKMEANS";
 			System.out.println(algo);
@@ -876,17 +865,17 @@ public class ExperimentsLauncher {
 
 //			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if (nbPrototypesMax>10)
-			nbPrototypesMax = 2000;
+			nbPrototypesMax = 4;
 			int tmp;
 			tmp = nbExp;
-			double[] trainrctmp = new double[5];
-			double[] testrctmp = new double[5];
-			double[] cvrctmp = new double[5];
-			boolean stopflag=false;
-			for (int j = 1; j <= nbPrototypesMax; j++) {
-				double[] trainrc = new double[5];
-				double[] testrc = new double[5];
-				double[] cvrc = new double[5];
+//			double[] trainrctmp = new double[5];
+//			double[] testrctmp = new double[5];
+//			double[] cvrctmp = new double[5];
+//			boolean stopflag=false;
+			for (int j = 4; j <= nbPrototypesMax; j++) {
+//				double[] trainrc = new double[5];
+//				double[] testrc = new double[5];
+//				double[] cvrc = new double[5];
 				if (j == 1)
 					nbExp = 1;
 				else
@@ -907,51 +896,51 @@ public class ExperimentsLauncher {
 
 					Evaluation evaltest = new Evaluation(train);
 					evaltest.evaluateModel(classifierKMeans, test);
-					Evaluation evaltrain = new Evaluation(train);
-					evaltrain.evaluateModel(classifierKMeans, train);
+//					Evaluation evaltrain = new Evaluation(train);
+//					evaltrain.evaluateModel(classifierKMeans, train);
 					
 					double testError = evaltest.errorRate();
-					double trainError = evaltrain.errorRate();
+//					double trainError = evaltrain.errorRate();
 					System.out.println("TestError:"+testError+"\n");
-					System.out.println("trainError:"+trainError+"\n");
+//					System.out.println("trainError:"+trainError+"\n");
 					
 					
-					DTWKNNClassifierKMeansCached KMeans = new DTWKNNClassifierKMeansCached();
+					/*DTWKNNClassifierKMeansCached KMeans = new DTWKNNClassifierKMeansCached();
 					KMeans.setNbPrototypesPerClass(j);
 					KMeans.setFillPrototypes(true);
 					Evaluation evalcv = new Evaluation(train);
 					Random rand = new Random(1);
 					evalcv.crossValidateModel(KMeans, train, 10, rand);
 					double CVError = evalcv.errorRate();
-					System.out.println("CVError:"+CVError+"\n");
+					System.out.println("CVError:"+CVError+"\n");*/
 
 //					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
-					out.format("%s,%s,%d,%.4f,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()), testError,CVError,trainError);
-					out.flush();
-					trainrc[n]=trainError;
-					testrc[n]=testError;
-					cvrc[n]=CVError;
-					if (n == 4) {
-						if (j == 1) {
-							trainrctmp = trainrc;
-							testrctmp = testrc;
-							cvrctmp = cvrc;
-						} else {
-							if (Arrays.equals(trainrc, trainrctmp) && Arrays.equals(testrc, testrctmp)
-									&& Arrays.equals(cvrc, cvrctmp)) {
-								System.out.println("Stable at " + j);
-								stopflag=true;
-							} else {
-								trainrctmp = trainrc;
-								testrctmp = testrc;
-								cvrctmp = cvrc;
-							}
-						}
-					}
+//					out.format("%s,%s,%d,%.4f,%.4f,%.4f\n", dataName, algo, (j * train.numClasses()), testError,CVError,trainError);
+//					out.flush();
+//					trainrc[n]=trainError;
+//					testrc[n]=testError;
+//					cvrc[n]=CVError;
+//					if (n == 4) {
+//						if (j == 1) {
+//							trainrctmp = trainrc;
+//							testrctmp = testrc;
+//							cvrctmp = cvrc;
+//						} else {
+//							if (Arrays.equals(trainrc, trainrctmp) && Arrays.equals(testrc, testrctmp)
+//									&& Arrays.equals(cvrc, cvrctmp)) {
+//								System.out.println("Stable at " + j);
+//								stopflag=true;
+//							} else {
+//								trainrctmp = trainrc;
+//								testrctmp = testrc;
+//								cvrctmp = cvrc;
+//							}
+//						}
+//					}
 				}
-				if(stopflag==true)
-					break;
+//				if(stopflag==true)
+//					break;
 			}
 //			outProto.close();
 		} catch (Exception e) {
@@ -989,25 +978,26 @@ public class ExperimentsLauncher {
 	}
 	
 	public void launchDT() {
-		if(train.numClasses()==2){
-			
-		try {
-			String algo = "DecisionTree";
-			System.out.println(algo);
+		if (train.numClasses() == 2) {
 
-			double testError = 0.0;
-			ClassifyDT dt = new ClassifyDT();
-			dt.buildClassifier(train);
-			System.out.println("\nClassify test sets:\n");
-			Evaluation eval = new Evaluation(train);
-			eval.evaluateModel(dt, test);
-			testError = eval.errorRate();
-			System.out.println("TestError:" + testError + "\n");
-			System.out.println(eval.toSummaryString());
-		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				String algo = "DecisionTree";
+				System.out.println(algo);
+
+				double testError = 0.0;
+				ClassifyDT dt = new ClassifyDT();
+				dt.buildClassifier(train);
+				System.out.println("\nClassify test sets:\n");
+				Evaluation eval = new Evaluation(train);
+				eval.evaluateModel(dt, test);
+				testError = eval.errorRate();
+				System.out.println("TestError:" + testError + "\n");
+				System.out.println(eval.toSummaryString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-	}}
+	}
 	
 	public void launchJ48() {
 		try {
@@ -1060,6 +1050,42 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	public void launchEnsemble() {
+		try {
+			String algo = "Ensemble";
+			System.out.println(algo);
+
+			double testError = 0.0;
+			double testError_DT = 0.0;
+			double testError_FKM = 0.0;
+			startTime = System.currentTimeMillis();
+			EnsembleClassify ensembleClassify = new EnsembleClassify();
+			ensembleClassify.buildClassifier(train);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			Duration traintime = Duration.ofMillis(duration);
+			System.out.println(traintime);
+			
+			Evaluation eval_FKM = new Evaluation(train);
+			eval_FKM.evaluateModel(ensembleClassify.getFkm(), test);
+			testError_FKM = eval_FKM.errorRate();
+			System.out.println("TestError of FKM:" + testError_FKM + "\n");
+
+			Evaluation eval_DT = new Evaluation(train);
+			eval_DT.evaluateModel(ensembleClassify.getDt(), test);
+			testError_DT = eval_DT.errorRate();
+			System.out.println("TestError of DT:" + testError_DT + "\n");
+
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(ensembleClassify, test);
+			testError = eval.errorRate();
+			System.out.println("TestError of Ensemble:" + testError + "\n");
+			System.out.println(eval.toSummaryString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public static void main(String[] args) {
 		File repSave = new File(saveoutputDir);
@@ -1087,7 +1113,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals("ElectricDevices"))
+			if(!dataRep.getName().equals(args[0]))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
@@ -1104,11 +1130,12 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchNewKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFCM();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchseq();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFSKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchFSKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchAllKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchJ48();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchBigDT();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchBigDT();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchEnsemble();
 		}
 	}
 

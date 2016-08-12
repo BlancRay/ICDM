@@ -31,7 +31,7 @@ public class ClassifyBigDT extends Classifier{
 		for (int i = 0; i < root.length; i++) {
 			root[i] = new C45tree(modSelection);
 			root[i].buildClassifier(instances);
-			System.out.println(i+"th tree has been built.");
+//			System.out.println(i+"th tree has been built.");
 		}
 	}
 
