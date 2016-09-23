@@ -92,11 +92,11 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 		Instance instance;
 		double[] weights;
 
-		m_perClassPerBag = new double[modelToUse.numSubsets()][0];
-		m_perBag = new double[modelToUse.numSubsets()];
+		m_perClassPerBag = new double[2][0];
+		m_perBag = new double[2];
 		totaL = 0;
 		m_perClass = new double[source.numClasses()];
-		for (int i = 0; i < modelToUse.numSubsets(); i++)
+		for (int i = 0; i < 2; i++)
 			m_perClassPerBag[i] = new double[source.numClasses()];
 		Enumeration enu = source.enumerateInstances();
 		while (enu.hasMoreElements()) {
@@ -207,6 +207,7 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 
 		classIndex = (int) instance.classValue();
 		weight = instance.weight();
+//		System.out.println(bagIndex+"   "+classIndex+"    "+m_perClassPerBag.length+"    "+m_perBag.length+"\t"+m_perClass.length);
 		m_perClassPerBag[bagIndex][classIndex] = m_perClassPerBag[bagIndex][classIndex] + weight;
 		m_perBag[bagIndex] = m_perBag[bagIndex] + weight;
 		m_perClass[classIndex] = m_perClass[classIndex] + weight;

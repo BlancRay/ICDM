@@ -90,6 +90,7 @@ public class ClassifierTree{
 		m_isLeaf = false;
 		m_isEmpty = false;
 		m_sons = null;
+		m_train = data;
 		
 		m_localModel = m_toSelectModel.selectModel(data, pairstack);
 		
@@ -155,6 +156,7 @@ public class ClassifierTree{
 		m_isLeaf = false;
 		m_isEmpty = false;
 		m_sons = null;
+		m_train = data;
 		RandomSelect dataselect = new RandomSelect();
 		Stack<Pairs> pairstack = dataselect.buildClassifier(data);
 		
@@ -183,6 +185,9 @@ public class ClassifierTree{
 					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 					localInstances[i] = null;
 				}
+				else {
+					System.out.println(localInstances[i].numInstances());
+				}
 			}
 		} else {
 			m_isLeaf = true;
@@ -201,6 +206,12 @@ public class ClassifierTree{
 	public double classifyInstance(Instance instance) throws Exception {
 		double classlable = -1;
 		if (m_isLeaf){
+			if (localModel().m_splitPoint==null) {
+				System.out.println("!!!");
+			}
+			if (localModel().getSplitPoint()==null) {
+				System.out.println("!!!123123");
+			}
 			classlable = localModel().whichSubset(instance);
 //			for (int j2 = 0; j2 < localModel().getSplitPoint().numInstances(); j2++) {
 //				System.out.println(localModel().getSplitPoint().instance(j2));

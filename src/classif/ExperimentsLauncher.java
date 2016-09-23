@@ -27,7 +27,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.time.Duration;
+//import java.time.Duration;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -40,7 +40,9 @@ import classif.dropx.DTWKNNClassifierDropThree;
 import classif.dropx.DTWKNNClassifierDropTwo;
 import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
-import classif.ensemble.EnsembleClassify;
+import classif.ensemble.BDTEClassifier;
+import classif.ensemble.FKMDEClassifier;
+import classif.ensemble.StaticEnsembleClassify;
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.fuzzycmeans.DTWKNNClassifierFCM;
 import classif.gmm.DTWKNNClassifierGmm;
@@ -236,8 +238,8 @@ public class ExperimentsLauncher {
 					classifierKMeans.buildClassifier(train);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
-					Duration traintime = Duration.ofMillis(duration);
-					System.out.println(traintime);
+//					Duration traintime = Duration.ofMillis(duration);
+//					System.out.println(traintime);
 
 					int[] classDistrib = PrototyperUtil.getPrototypesPerClassDistribution(classifierKMeans.prototypes, train);
 
@@ -863,16 +865,16 @@ public class ExperimentsLauncher {
 			System.out.println(algo);
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
-//			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
+			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 //			if (nbPrototypesMax>10)
-			nbPrototypesMax = 4;
+			nbPrototypesMax = 50;
 			int tmp;
 			tmp = nbExp;
 //			double[] trainrctmp = new double[5];
 //			double[] testrctmp = new double[5];
 //			double[] cvrctmp = new double[5];
 //			boolean stopflag=false;
-			for (int j = 4; j <= nbPrototypesMax; j++) {
+			for (int j = 1; j <= nbPrototypesMax; j++) {
 //				double[] trainrc = new double[5];
 //				double[] testrc = new double[5];
 //				double[] cvrc = new double[5];
@@ -1031,16 +1033,16 @@ public class ExperimentsLauncher {
 			dt.buildClassifier(train);
 			endTime = System.currentTimeMillis();
 			duration = endTime - startTime;
-			Duration traintime = Duration.ofMillis(duration);
-			System.out.println(traintime);
+//			Duration traintime = Duration.ofMillis(duration);
+//			System.out.println(traintime);
 			startTime = System.currentTimeMillis();
 			Evaluation eval = new Evaluation(train);
 			eval.evaluateModel(dt, test);
 			testError = eval.errorRate();
 			endTime = System.currentTimeMillis();
 			duration = endTime - startTime;
-			Duration testtime = Duration.ofMillis(duration);
-			System.out.println(testtime);
+//			Duration testtime = Duration.ofMillis(duration);
+//			System.out.println(testtime);
 			System.out.println("TestError:" + testError + "\n");
 //			System.out.println(eval.toSummaryString());
 //			out.format("%s,%.4f\n", dataName,  testError);
@@ -1050,34 +1052,50 @@ public class ExperimentsLauncher {
 		}
 	}
 	
-	public void launchEnsemble() {
+	public void launchStaticEnsemble() {
 		try {
-			String algo = "Ensemble";
+			String algo = "StaticEnsemble";
 			System.out.println(algo);
 
 			double testError = 0.0;
 			double testError_DT = 0.0;
-			double testError_FKM = 0.0;
+			double testError_FKM_4 = 0.0;
+			double testError_FKM_10 = 0.0;
+//			double testError_KMeans = 0.0;
 			startTime = System.currentTimeMillis();
-			EnsembleClassify ensembleClassify = new EnsembleClassify();
-			ensembleClassify.buildClassifier(train);
+			StaticEnsembleClassify staticensembleClassify = new StaticEnsembleClassify();
+			staticensembleClassify.buildClassifier(train);
 			endTime = System.currentTimeMillis();
 			duration = endTime - startTime;
-			Duration traintime = Duration.ofMillis(duration);
-			System.out.println(traintime);
+//			Duration traintime = Duration.ofMillis(duration);
+//			System.out.println(traintime);
 			
-			Evaluation eval_FKM = new Evaluation(train);
-			eval_FKM.evaluateModel(ensembleClassify.getFkm(), test);
-			testError_FKM = eval_FKM.errorRate();
-			System.out.println("TestError of FKM:" + testError_FKM + "\n");
+			Evaluation eval_FKM_4 = new Evaluation(train);
+			eval_FKM_4.evaluateModel(staticensembleClassify.getFkm_4(), test);
+			testError_FKM_4 = eval_FKM_4.errorRate();
+			staticensembleClassify.setWeight_fkm_4(testError_FKM_4);
+			System.out.println("TestError of FKM_4:" + testError_FKM_4 + "\n");
+			
+//			Evaluation eval_KMeans = new Evaluation(train);
+//			eval_KMeans.evaluateModel(ensembleClassify.getKMeans(), test);
+//			testError_KMeans = eval_KMeans.errorRate();
+//			ensembleClassify.setWeight_kmeans(testError_KMeans);
+//			System.out.println("TestError of KMeans:" + testError_KMeans + "\n");
+			
+			Evaluation eval_FKM_10 = new Evaluation(train);
+			eval_FKM_10.evaluateModel(staticensembleClassify.getFkm_10(), test);
+			testError_FKM_10 = eval_FKM_10.errorRate();
+			staticensembleClassify.setWeight_fkm_10(testError_FKM_10);
+			System.out.println("TestError of FKM_10:" + testError_FKM_10 + "\n");
 
 			Evaluation eval_DT = new Evaluation(train);
-			eval_DT.evaluateModel(ensembleClassify.getDt(), test);
+			eval_DT.evaluateModel(staticensembleClassify.getDt(), test);
 			testError_DT = eval_DT.errorRate();
+			staticensembleClassify.setWeight_dt(testError_DT);
 			System.out.println("TestError of DT:" + testError_DT + "\n");
 
 			Evaluation eval = new Evaluation(train);
-			eval.evaluateModel(ensembleClassify, test);
+			eval.evaluateModel(staticensembleClassify, test);
 			testError = eval.errorRate();
 			System.out.println("TestError of Ensemble:" + testError + "\n");
 			System.out.println(eval.toSummaryString());
@@ -1086,6 +1104,49 @@ public class ExperimentsLauncher {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public void launchDynamicEnsemble() {
+		int method = 0;
+		switch (method) {
+		case 0:
+			try {
+				String algo = "BigDTDynamicEnsemble";
+				System.out.println(algo);
+
+				double testError = 0.0;
+				BDTEClassifier dynamicEnsembleClassify = new BDTEClassifier();
+				dynamicEnsembleClassify.buildClassifier(train);
+				Evaluation eval = new Evaluation(train);
+				eval.evaluateModel(dynamicEnsembleClassify, test);
+				testError = eval.errorRate();
+				System.out.println("TestError:" + testError + "\n");
+				System.out.println(eval.toSummaryString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+
+		case 1:
+			try {
+				String algo = "FKMDynamicEnsemble";
+				System.out.println(algo);
+
+				double testError = 0.0;
+				FKMDEClassifier dynamicEnsembleClassify = new FKMDEClassifier();
+				dynamicEnsembleClassify.buildClassifier(train);
+				Evaluation eval = new Evaluation(train);
+				eval.evaluateModel(dynamicEnsembleClassify, test);
+				testError = eval.errorRate();
+				System.out.println("TestError:" + testError + "\n");
+				System.out.println(eval.toSummaryString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		File repSave = new File(saveoutputDir);
@@ -1113,7 +1174,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals(args[0]))
+			if(!dataRep.getName().equals("Ham"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
@@ -1130,12 +1191,13 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchNewKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchFCM();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchseq();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 1, data[0].numInstances()).launchFSKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[0], dataRep.getName(), 1, data[0].numInstances()).launchFSKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchAllKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDT();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchJ48();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchBigDT();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchEnsemble();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchStaticEnsemble();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDynamicEnsemble();
 		}
 	}
 

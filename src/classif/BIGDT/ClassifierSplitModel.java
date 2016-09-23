@@ -10,7 +10,7 @@ public abstract class ClassifierSplitModel {
 
 	/** Number of created subsets. */
 	protected int m_numSubsets;
-	public Instances m_splitPoint;
+	protected Instances m_splitPoint;
 	protected Distribution m_distribution;
 //	protected Stack<Pairs> m_Pairs;
 
@@ -101,9 +101,22 @@ public abstract class ClassifierSplitModel {
 	public abstract int whichSubset(Instance instance) throws Exception;
 
 	public double[] weights(Instance instance) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+	  /**
+	   * Sets distribution associated with model.
+	   */
+	  public void resetDistribution(Instances data) throws Exception {
+
+	    m_distribution = new Distribution(data, this);
+	  }
+	  /**
+	   * Returns the distribution of class values induced by the model.
+	   */
+	  public final Distribution distribution() {
+
+	    return m_distribution;
+	  }
 
 	public abstract Instances getSplitPoint();
 

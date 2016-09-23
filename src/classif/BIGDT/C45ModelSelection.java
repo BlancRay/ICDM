@@ -68,6 +68,10 @@ public class C45ModelSelection extends ModelSelection {
 			// enough Instances to split.
 			checkDistribution = new Distribution(data);
 			noSplitModel = new NoSplit(checkDistribution);
+			if(data==null)
+			{
+				System.out.println("!!!!!!!!");
+			}
 			noSplitModel.setSplitPoint(data);
 
 			currentModel = new Split[pairs.size()];

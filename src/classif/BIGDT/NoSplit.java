@@ -35,9 +35,9 @@ public final class NoSplit extends ClassifierSplitModel {
 	 */
 	public final int whichSubset(Instance instance) {
 		int classlable = -1;
-		Sequence[] splitsequences = new Sequence[m_splitPoint.numInstances()];
+		Sequence[] splitsequences = new Sequence[getSplitPoint().numInstances()];
 		for (int i = 0; i < splitsequences.length; i++) {
-			Instance splitInstance = m_splitPoint.instance(i);
+			Instance splitInstance = getSplitPoint().instance(i);
 			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[splitInstance.numAttributes() - 1];
 			int shift = (splitInstance.classIndex() == 0) ? 1 : 0;
 			for (int t = 0; t < sequence.length; t++) {

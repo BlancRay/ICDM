@@ -1,6 +1,7 @@
 package classif.BIGDT;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
@@ -12,16 +13,13 @@ import weka.core.Utils;
 
 public class Split extends ClassifierSplitModel{
 	private Pairs m_pair;
-
-	/** Value of split point. */
-	public Instances m_splitPoint;
-
 	/** InfoGain of split. */
 	private double m_infoGain;
-
+	/** Desired number of branches. */
+	private int m_complexityIndex;
 	
 	/** Static reference to splitting criterion. */
-	public static double log2 = Math.log(2);
+	private static double log2 = Math.log(2);
 	public Split(Pairs pair) {
 
 		// Get index of attribute to split on.
@@ -35,6 +33,8 @@ public class Split extends ClassifierSplitModel{
 		m_numSubsets = 0;
 		m_splitPoint = new Instances(trainInstances, 2);
 		m_infoGain = 0;
+		m_complexityIndex = 2;
+		
 		ArrayList<ClassedSequence> prototypes = new ArrayList<>();
 		for (int i = 0; i < 2; i++) {
 			Sequence seq=m_pair.getPair()[i];
@@ -49,6 +49,17 @@ public class Split extends ClassifierSplitModel{
 			m_splitPoint.add(sample);
 		}
 
+		m_distribution = new Distribution(m_complexityIndex, trainInstances.numClasses());
+		Instance instance;
+		// Only Instances with known values are relevant.
+		Enumeration enu = trainInstances.enumerateInstances();
+		while (enu.hasMoreElements()) {
+			instance = (Instance) enu.nextElement();
+			m_distribution.add(whichSubset(instance), instance);
+		}
+		
+		
+
 		// computer error rate
 		int[][] nbObjPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
 		nbObjPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
@@ -61,10 +72,12 @@ public class Split extends ClassifierSplitModel{
 		int[] error = new int[trainInstances.numClasses()];
 		error = evalerror(trainInstances, prototypes);
 		for (int i = 0; i < error.length; i++) {
-			if (error[i] != 0){
-				m_numSubsets=trainInstances.numClasses();
-			break;}
+			if (error[i] != 0) {
+				m_numSubsets = trainInstances.numClasses();
+				break;
+			}
 		}
+//		setSplitPoint(m_splitPoint);
 	}
 	public double evalInfoGain(Instances instances,int[][] nbObj_aftersplit_eachClass) {
 		double parent_entropy = 0.0;

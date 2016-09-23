@@ -146,8 +146,8 @@ public class Sequence implements java.io.Serializable {
 				value_i[m] = S1.sequence[r_i[m]].getValue();
 				value_j[m] = S1.sequence[r_j[m]].getValue();
 			}
-			U[k] = Arrays.stream(value_i).max().getAsDouble();
-			L[k] = Arrays.stream(value_j).min().getAsDouble();
+			U[k] = value_i[Utils.maxIndex(value_i)];
+			L[k] = value_j[Utils.minIndex(value_j)];
 		}
 		double[] dist = new double[tailleS];
 		for (int i = 0; i < tailleT; i++) {
