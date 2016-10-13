@@ -1,4 +1,4 @@
-package classif.BIGDT;
+package classif.pu;
 
 import weka.core.Instance;
 import weka.core.Instances;
@@ -705,4 +705,17 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 	public String getRevision() {
 		return RevisionUtils.extract("$Revision: 1.12 $");
 	}
+
+	public double[][] getperClassPerBag() {
+		return m_perClassPerBag;
+	}
+
+	public double[] getperBag() {
+		return m_perBag;
+	}
+
+	public double[] getperClass() {
+		return m_perClass;
+	}
+	
 }

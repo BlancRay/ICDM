@@ -1,8 +1,7 @@
-package classif.BIGDT;
+package classif.pu;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Pairs;
@@ -15,6 +14,7 @@ public class Split extends ClassifierSplitModel{
 	private Pairs m_pair;
 	/** InfoGain of split. */
 	private double m_infoGain;
+	private double m_gainRatio; 
 	/** Desired number of branches. */
 	private int m_complexityIndex;
 	
@@ -61,13 +61,13 @@ public class Split extends ClassifierSplitModel{
 		
 
 		// computer error rate
-		int[][] nbObjPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
-		nbObjPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
+//		int[][] nbObjPreBagPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
+//		nbObjPreBagPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
 		
 		// computer infoGain
-		m_infoGain = evalInfoGain(trainInstances,nbObjPreClass_afterSplit);
-
-		// System.out.println("info\t"+m_infoGain);
+		m_infoGain = evalInfoGain(trainInstances, m_distribution.getperClassPerBag());
+		m_gainRatio = splitCritValue(m_distribution, trainInstances.numInstances(), m_infoGain);
+//		System.out.println("info\t" + m_infoGain);
 
 		int[] error = new int[trainInstances.numClasses()];
 		error = evalerror(trainInstances, prototypes);
@@ -79,32 +79,25 @@ public class Split extends ClassifierSplitModel{
 		}
 //		setSplitPoint(m_splitPoint);
 	}
-	public double evalInfoGain(Instances instances,int[][] nbObj_aftersplit_eachClass) {
+	public double evalInfoGain(Instances instances,double[][] nbObjPreBagPreClass_afterSplit) {
 		double parent_entropy = 0.0;
 		double avg_child_entropy = 0.0;
 		double[] child_entropy = new double[instances.numClasses()];
-		double[] parent_nbObjPreClass = new double[instances.numClasses()];
-		double[] child_nbObjPreClass = new double[instances.numClasses()];
-		for (int i = 0; i < instances.numInstances(); i++) {
-			Instance Obj = instances.instance(i);
-			parent_nbObjPreClass[(int) Obj.classValue()]++;
-		}
-		for (int i = 0; i < parent_nbObjPreClass.length; i++) {
-			parent_entropy -= log2(parent_nbObjPreClass[i] / instances.numInstances());
-		}
-
-		for (int i = 0; i < nbObj_aftersplit_eachClass.length; i++) {
-			child_nbObjPreClass[i] = Utils.sum(nbObj_aftersplit_eachClass[i]);//sum Objs in each branch
-			if(child_nbObjPreClass[i]==0.0){
-				child_entropy[i]= 0.0;
+		double[] parent_weightPreClass = m_distribution.getperClass();
+		double[] child_nbObjPreBag = m_distribution.getperBag();
+		
+		parent_entropy=OneClassEntropy(parent_weightPreClass[0],parent_weightPreClass[1]);
+		
+		for (int i = 0; i < nbObjPreBagPreClass_afterSplit.length; i++) {
+			if (child_nbObjPreBag[i] == 0.0) {
+				child_entropy[i] = 0.0;
 				continue;
 			}
-			for (int j = 0; j < nbObj_aftersplit_eachClass[i].length; j++) {
-				child_entropy[i] -= (log2(nbObj_aftersplit_eachClass[i][j] / child_nbObjPreClass[i]));//entropy for each child
-			}
+			child_entropy[i] = OneClassEntropy(nbObjPreBagPreClass_afterSplit[i][0],
+					nbObjPreBagPreClass_afterSplit[i][1]);
 		}
-		for (int i = 0; i < child_nbObjPreClass.length; i++) {
-			avg_child_entropy += child_nbObjPreClass[i] / instances.numInstances() * child_entropy[i];
+		for (int i = 0; i < child_nbObjPreBag.length; i++) {
+			avg_child_entropy += nbObjPreBagPreClass_afterSplit[i][1] / parent_weightPreClass[1] * child_entropy[i];
 		}
 
 		return parent_entropy - avg_child_entropy;
@@ -138,6 +131,9 @@ public class Split extends ClassifierSplitModel{
 	public int[] evalerror(Instances data, ArrayList<ClassedSequence> prototypes) {
 
 		int[] errorclassifyObj = new int[data.numClasses()];
+		for (int i = 0; i < errorclassifyObj.length; i++) {
+			errorclassifyObj[i]=(int) m_distribution.numIncorrect(i);
+		}
 		for (int i = 0; i < data.numInstances(); i++) {
 			Instance sample = data.instance(i);
 			// transform instance to sequence
@@ -150,7 +146,7 @@ public class Split extends ClassifierSplitModel{
 			double minD = Double.MAX_VALUE;
 			String classValue = null;
 			for (ClassedSequence s : prototypes) {
-				double tmpD = seq.distance(s.sequence);
+				double tmpD = seq.LB_distance(s.sequence,minD);
 				if (tmpD < minD) {
 					minD = tmpD;
 					classValue = s.classValue;
@@ -170,7 +166,6 @@ public class Split extends ClassifierSplitModel{
 	}
 
 	public Instances getSplitPoint() {
-		// TODO Auto-generated method stub
 		return m_splitPoint;
 	}
 
@@ -181,7 +176,9 @@ public class Split extends ClassifierSplitModel{
 
 		return m_infoGain;
 	}
-
+	  public final double gainRatio() {
+		    return m_gainRatio;
+		  }
 	/**
 	 * Sets split point to greatest value in given data smaller or equal to old
 	 * split point. (C4.5 does this for some strange reason).
@@ -234,36 +231,68 @@ public class Split extends ClassifierSplitModel{
 		return classlable;
 	}
 	
-	public final int whichbag(Instance sample) throws Exception {
-		int baglable = -1;
-		Sequence[] splitsequences = new Sequence[m_splitPoint.numInstances()];
-		for (int i = 0; i < splitsequences.length; i++) {
-			Instance splitInstance = m_splitPoint.instance(i);
-			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[splitInstance.numAttributes() - 1];
-			int shift = (splitInstance.classIndex() == 0) ? 1 : 0;
-			for (int t = 0; t < sequence.length; t++) {
-				sequence[t] = new MonoDoubleItemSet(splitInstance.value(t + shift));
-			}
-			splitsequences[i] = new Sequence(sequence);
-		}
+	public double OneClassEntropy(double dPosWeight, double dUnlWeight) {
+		double p1 = (dPosWeight / ClassifyPOSC45.nPosSize) * ClassifyPOSC45.dDF * (ClassifyPOSC45.nUnlSize / dUnlWeight);
+		if ((p1 > 1) || (Utils.eq(dUnlWeight, 0)))
+			p1 = 1;
+		double p0 = 1 - p1;
+//		System.out.println("P1:"+p1+"\tP0:"+p0);
+		double entropy = -log2(p0) - log2(p1);
+		return entropy;
+	}
 
-		MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
-		int shift = (sample.classIndex() == 0) ? 1 : 0;
-		for (int t = 0; t < sequence.length; t++) {
-			sequence[t] = new MonoDoubleItemSet(sample.value(t + shift));
-		}
-		Sequence seq = new Sequence(sequence);
+	public final double splitCritValue(Distribution bags, double totalnoInst, double numerator) {
 
-		double minD = Double.MAX_VALUE;
-		int locatesplitpoint = -1;
-		for (int i = 0; i < splitsequences.length; i++) {
-			double tmpD = seq.LB_distance(splitsequences[i], minD);
-			if (tmpD < minD) {
-				minD = tmpD;
-				locatesplitpoint = i;
+		double denumerator;
+		double noUnknown;
+		double unknownRate;
+		int i;
+
+		// Compute split info.
+		denumerator = splitEnt(bags, totalnoInst);
+
+		// Test if split is trivial.
+		if (Utils.eq(denumerator, 0))
+			return 0;
+		denumerator = denumerator / totalnoInst;
+
+		return numerator / denumerator;
+	}
+	  private final double splitEnt(Distribution bags,double totalnoInst){
+		    
+		    double returnValue = 0;
+		    double noUnknown;
+		    int i;
+		    
+		    noUnknown = totalnoInst-bags.total();
+		    if (Utils.gr(bags.total(),0)){
+		      for (i=0;i<bags.numBags();i++)
+			returnValue = returnValue-log2(bags.perBag(i));
+		      returnValue = returnValue-log2(noUnknown);
+		      returnValue = returnValue+log2(totalnoInst);
+		    }
+		    return returnValue;
+		  }
+	  
+	public final double classProb(int classIndex, Instance instance, int theSubset) throws Exception {
+
+		if (theSubset <= -1) {
+			double[] weights = weights(instance);
+			if (weights == null) {
+				return m_distribution.prob(classIndex);
+			} else {
+				double prob = 0;
+				for (int i = 0; i < weights.length; i++) {
+					prob += weights[i] * m_distribution.prob(classIndex, i);
+				}
+				return prob;
+			}
+		} else {
+			if (Utils.gr(m_distribution.perBag(theSubset), 0)) {
+				return m_distribution.prob(classIndex, theSubset);
+			} else {
+				return m_distribution.prob(classIndex);
 			}
 		}
-		baglable = locatesplitpoint;
-		return baglable;
 	}
 }

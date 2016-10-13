@@ -1,4 +1,4 @@
-package classif.BIGDT;
+package classif.pu;
 
 import java.util.Stack;
 import items.Pairs;
@@ -45,14 +45,14 @@ public class C45tree extends ClassifierTree {
 	public void buildClassifier(Instances data) throws Exception {
 		// remove instances with missing class
 		data = new Instances(data);
-		data.deleteWithMissingClass();
-		// Dataselect dataselect = new Dataselect();
-		// Stack<Pairs> pairstack = dataselect.buildClassifier(data);
+		// data.deleteWithMissingClass();
+//		Dataselect dataselect = new Dataselect();
+//		Stack<Pairs> pairstack = dataselect.buildClassifier(data);
 
-		// buildTree(data, pairstack, 0, "./" + data.relationName() + "/");
-		buildTree(data, 0, "./" + data.relationName() + "/");
-//		collapse();
-//		prune();
+//		buildTree(data, pairstack, 0, "./" + data.relationName() + "/");
+		 buildTree(data, 0, "./" + data.relationName() + "/");
+//		 collapse();
+//		 prune();
 		if (m_cleanup) {
 			cleanup(new Instances(data, 0));
 		}
@@ -85,7 +85,7 @@ public class C45tree extends ClassifierTree {
 					nbObjPreClass[(int) Obj.classValue()]++;
 				}
 				int classlable=Utils.maxIndex(nbObjPreClass);
-				Instances splitpoint=new Instances(m_train, m_train.numInstances());
+				Instances splitpoint=new Instances(m_train, 0);
 				for (int j = 0; j < m_train.numInstances(); j++) {
 					if (m_train.instance(j).classValue()==classlable) {
 						splitpoint.add(m_train.instance(j));
@@ -175,7 +175,7 @@ public class C45tree extends ClassifierTree {
 					nbObjPreClass[(int) Obj.classValue()]++;
 				}
 				int classlable=Utils.maxIndex(nbObjPreClass);
-				Instances splitpoint=new Instances(m_train, m_train.numInstances());
+				Instances splitpoint=new Instances(m_train, 0);
 				for (int j = 0; j < m_train.numInstances(); j++) {
 					if (m_train.instance(j).classValue()==classlable) {
 						splitpoint.add(m_train.instance(j));

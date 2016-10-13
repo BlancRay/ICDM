@@ -1,7 +1,10 @@
-package classif.BIGDT;
+package classif.pu;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Stack;
+
+import org.apache.commons.math3.random.RandomDataGenerator;
 
 import items.MonoDoubleItemSet;
 import items.Pairs;
@@ -189,6 +192,20 @@ public class ClassifierTree{
 			}
 		} else {
 			m_isLeaf = true;
+			System.out.println(Arrays.deepToString(m_localModel.m_distribution.getperClassPerBag()));
+//			System.out.println(m_localModel.m_distribution.maxClass());
+			//add unlabeled to positive
+			if (m_localModel.m_distribution.getperBag()[0] <= ClassifyPOSC45.dDF*ClassifyPOSC45.nUnlSize) {
+				RandomDataGenerator rd=new RandomDataGenerator();
+				for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
+					if(rd.nextBinomial(1, ClassifyPOSC45.dDF)==1)
+					m_localModel.getSplitPoint().instance(i).setClassValue(0.0);
+				}
+				m_localModel.m_distribution=new Distribution(m_localModel.getSplitPoint());
+			}
+//			for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
+//				System.out.println(m_localModel.getSplitPoint().instance(i));
+//			}
 			data = null;
 		}
 	}
@@ -221,6 +238,24 @@ public class ClassifierTree{
 			return son(treeindex).classifyInstance(instance);
 		}
 	}
+	
+//	public double classifyInstance(Instance instance) throws Exception {
+//
+//		double maxProb = -1;
+//		double currentProb;
+//		int maxIndex = 0;
+//		int j;
+//
+//		for (j = 0; j < instance.numClasses(); j++) {
+//			currentProb = getProbs(j, instance, 1);
+//			if (Utils.gr(currentProb, maxProb)) {
+//				maxIndex = j;
+//				maxProb = currentProb;
+//			}
+//		}
+//
+//		return (double) maxIndex;
+//	}
 
 	/**
 	 * Cleanup in order to save memory.

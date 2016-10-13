@@ -170,6 +170,12 @@ public class Sequence implements java.io.Serializable {
 		}
 		return best_so_far;
 	}
+	
+	public synchronized double DTWD_distance(Sequence a) {
+		Sequence S1 = this;
+		Sequence S2 = a;
+		return S1.distance(S2) / (S1.distanceEuc(S2) + Double.MIN_NORMAL);
+	}
 
 	@Override
 	public String toString() {
