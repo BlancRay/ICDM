@@ -61,7 +61,7 @@ public class UCR2CSV {
 					line = line.substring(k);
 //					temp = line.split("\\s+");
 					temp = line.split(",");
-					if(temp[0].isEmpty())
+					if(temp[0].isEmpty()||temp[0].equals("0"))
 						temp[0]="-1";
 					out.print("'"+((int)Math.round(Double.valueOf(temp[0])))+"'");
 					for (int j = 1; j < temp.length; j++) {
