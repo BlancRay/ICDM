@@ -38,7 +38,7 @@ public class BDTEClassifier extends Classifier{
 				resample.add(Traindata.instance(selected[j]));
 			}
 			bigDTs[i] = new ClassifyBigDT();
-			bigDTs[i].buildClassifier(data);
+			bigDTs[i].buildClassifier(resample);
 			System.out.println(i+" Decision Tree build finished");
 		}
 	}

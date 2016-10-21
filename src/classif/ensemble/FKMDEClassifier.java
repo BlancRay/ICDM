@@ -25,7 +25,6 @@ public class FKMDEClassifier extends Classifier{
 	Instances Traindata;
 	public void buildClassifier(Instances data) throws Exception {
 		Traindata=new Instances(data);
-		Traindata=data;
 		nbclassifiers=(Traindata.numInstances() / Traindata.numClasses())/2;
 		K=Traindata.numInstances()/2;
 //		nbbestclassifiers=nbclassifiers/10;
