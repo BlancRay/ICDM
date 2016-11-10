@@ -33,6 +33,7 @@ import java.util.Random;
 import classif.BIGDT.ClassifyBigDT;
 import classif.DT.ClassifyDT;
 import classif.Majority.KMeans;
+import classif.NNClassifier.DTWKNNClassifier;
 import classif.ahc.DTWKNNClassifierAHC;
 import classif.dropx.DTWKNNClassifierDropOne;
 import classif.dropx.DTWKNNClassifierDropThree;
@@ -41,6 +42,7 @@ import classif.dropx.DTWKNNClassifierSimpleRank;
 import classif.dropx.PrototyperSorted;
 import classif.ensemble.BDTEClassifier;
 import classif.ensemble.FKMDEClassifier;
+import classif.ensemble.PUDTClassifier;
 import classif.ensemble.StaticEnsembleClassify;
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.fuzzycmeans.DTWKNNClassifierFCM;
@@ -52,9 +54,12 @@ import classif.kmeans.EUCKNNClassifierKMeans;
 import classif.kmeans.EUCProbabilisticClassifierKMeans;
 import classif.kmedoid.DTWKNNClassifierKMedoids;
 import classif.newkmeans.DTWKNNClassifierNK;
+import classif.pu.DTEnsemble;
 import classif.pu.DTWD;
 import classif.pu.POSC45;
+import classif.pu.Test;
 import classif.pukmeans.DTWPUKMeans;
+import classif.pukmeans.PUtoPN;
 import classif.random.DTWKNNClassifierRandom;
 import classif.sep.Unbalancecluster;
 import items.ClassedSequence;
@@ -78,8 +83,8 @@ public class ExperimentsLauncher {
 	long endTime;
 	long duration;
 	private static boolean append = false;
-	private static String datasetsDir = "./PUDATA/";
-//	private static String datasetsDir = "./UCR_TS_Archive_2015/";
+//	private static String datasetsDir = "./PUDATA/";
+	private static String datasetsDir = "./UCR_TS_Archive_2015/";
 	private static String saveoutputDir = "./save/";
 
 	public ExperimentsLauncher(File rep, Instances train, Instances test, String dataName, int nbExp,
@@ -204,9 +209,6 @@ public class ExperimentsLauncher {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void launchKMeans() {
 		try {
 //			File f = new File(rep + "/" + dataName + "_results.csv");
@@ -267,7 +269,9 @@ public class ExperimentsLauncher {
 		}
 	}
 	
-	
+	/**
+	 * KMeans with Euclidean distance measure
+	 */
 	public void launchKMeansEUC() {
 		try {
 			out = new PrintStream(new FileOutputStream(rep + "/KEUC_All_results.csv", true));
@@ -327,6 +331,9 @@ public class ExperimentsLauncher {
 		}
 	}
 
+	/**
+	 * KMeans with Bayesian theory
+	 */
 	public void launchKMeansProbabilistic() {
 		try {
 			out = new PrintStream(new FileOutputStream(rep + "/All_results.csv", true));
@@ -374,7 +381,9 @@ public class ExperimentsLauncher {
 		e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * KMeans with Bayesian theory and Euclidean distance measure
+	 */
 	public void launchKMeansProbabilisticEUC() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/KPEUC_All_results.csv", true));
@@ -475,7 +484,9 @@ public class ExperimentsLauncher {
 		e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Gaussian mixture model instead of KMeans
+	 */
 	public void launchGmm() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/GMMDTW_"+dataName+"_results.csv", true));
@@ -523,7 +534,9 @@ public class ExperimentsLauncher {
 		e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * GMM in Euclidean distance measure
+	 */
 	public void launchGmmEUC() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/GMMEUC_"+dataName+"_results.csv", true));
@@ -576,6 +589,9 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	/**
+	 * use fuzzy-C-Means instead of KMeans 
+	 */
 	public void launchFCM() {
 		try {
 			out = new PrintStream(new FileOutputStream(rep + "/FCMDTW_"+dataName+"_results.csv", true));
@@ -624,9 +640,6 @@ public class ExperimentsLauncher {
 		}
 	}
 	
-	/**
-	 * 
-	 */
 	public void launchRandom() {
 		try {
 			File f = new File(rep + "/" + dataName + "_results.csv");
@@ -686,9 +699,6 @@ public class ExperimentsLauncher {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void launchKMedoids() {
 		try {
 			File f = new File(rep + "/" + dataName + "_results.csv");
@@ -796,7 +806,11 @@ public class ExperimentsLauncher {
 		}
 	}
 
-	public void launchseq() {
+	/**
+	 * each cluster has different number of prototypes
+	 * use fast KMeans to cluster
+	 */
+	public void launchUnbalanceCluster() {
 		try {
 			nbPrototypesMax = 10;
 			int[] bestprototypes= new int[train.numClasses()];
@@ -871,8 +885,8 @@ public class ExperimentsLauncher {
 //			PrintStream outProto = new PrintStream(new FileOutputStream(rep + "/" + dataName + "_KMEANS.proto", append));
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
-//			if (nbPrototypesMax>10)
-			nbPrototypesMax = 50;
+			if (nbPrototypesMax>100)
+			nbPrototypesMax = 200;
 			int tmp;
 			tmp = nbExp;
 			double[] avgerror=new double[5];
@@ -881,7 +895,7 @@ public class ExperimentsLauncher {
 //			double[] testrctmp = new double[5];
 //			double[] cvrctmp = new double[5];
 //			boolean stopflag=false;
-			for (int j = 1; j <= nbPrototypesMax; j++) {
+			for (int j = 5; j <= nbPrototypesMax; j+=5) {
 //				double[] trainrc = new double[5];
 //				double[] testrc = new double[5];
 //				double[] cvrc = new double[5];
@@ -907,6 +921,7 @@ public class ExperimentsLauncher {
 					evaltest.evaluateModel(classifierKMeans, test);
 					avgerror[n]=evaltest.errorRate();
 					avgf1[n]=evaltest.fMeasure(0);
+					System.out.println(evaltest.toMatrixString());
 //					Evaluation evaltrain = new Evaluation(train);
 //					evaltrain.evaluateModel(classifierKMeans, train);
 					
@@ -983,6 +998,9 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	/**
+	 * Decision Tree
+	 */
 	public void launchDT() {
 		if (train.numClasses() == 2) {
 
@@ -1026,6 +1044,9 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	/**
+	 * Decision Forest
+	 */
 	public void launchBigDT() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
@@ -1109,7 +1130,30 @@ public class ExperimentsLauncher {
 		}
 	}
 	
+	public void launchDTWKNNClassifier() {
+		try {
+			String algo = "1NNDTWClassifier";
+			System.out.println(algo);
+			startTime = System.currentTimeMillis();
+			DTWKNNClassifier KNNClassifier = new DTWKNNClassifier();
+			KNNClassifier.buildClassifier(train);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("time:"+duration);
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(KNNClassifier, test);
+			double error = eval.errorRate();
+			System.out.println("TestError:" + error + "\n" + eval.fMeasure(0));
+			System.out.println(eval.toMatrixString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+	/**
+	 * Dynamic Ensemble Decision Forest
+	 * Dynamic Ensemble Fast KMeans with different prototypes
+	 */
 	public void launchDynamicEnsemble() {
 		int method = 0;
 		switch (method) {
@@ -1119,13 +1163,28 @@ public class ExperimentsLauncher {
 				System.out.println(algo);
 
 				double testError = 0.0;
+				startTime = System.currentTimeMillis();
 				BDTEClassifier dynamicEnsembleClassify = new BDTEClassifier();
 				dynamicEnsembleClassify.buildClassifier(train);
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+				System.out.println("time:"+duration);
 				Evaluation eval = new Evaluation(train);
 				eval.evaluateModel(dynamicEnsembleClassify, test);
 				testError = eval.errorRate();
-				System.out.println("TestError:" + testError + "\n");
-				System.out.println(eval.toSummaryString());
+				System.out.println("TestError:" + testError + "\n" + eval.fMeasure(0));
+				System.out.println(eval.toMatrixString());
+				int nbclassifiers=dynamicEnsembleClassify.getBigDTs().length;
+				double[] error = new double[nbclassifiers];
+				double[] fmeasures = new double[nbclassifiers];
+				for (int i = 0; i < nbclassifiers; i++) {
+					Evaluation evaleach = new Evaluation(train);
+					evaleach.evaluateModel(dynamicEnsembleClassify.getBigDTs()[i], test);
+					error[i]=evaleach.errorRate();
+					fmeasures[i]=evaleach.fMeasure(0);
+					System.out.println(i+"\tDT TestError:" + error[i] + "\tFMeasures:" + fmeasures[i]);
+				}
+				System.out.println("Average Error:"+Utils.mean(error)+"\tFMeasure:"+Utils.mean(fmeasures));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1150,47 +1209,50 @@ public class ExperimentsLauncher {
 			break;
 		}
 	}
-	
-	public void launchPU(double ratio) {
+	/**
+	 * Decision Tree for PU Learning
+	 * @param ratio
+	 */
+	public void launchPU() {
 		try {
 //			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
 			String algo = "PU";
 			System.out.println(algo);
-			double testError = 0.0;
-			startTime = System.currentTimeMillis();
-//			POSC45 pu = new POSC45();
-			DTWD pu =new DTWD();
-			pu.setRatio(ratio);
-			pu.buildClassifier(train);
-			endTime = System.currentTimeMillis();
-			duration = endTime - startTime;
-//			Duration traintime = Duration.ofMillis(duration);
-//			System.out.println(traintime);
-			startTime = System.currentTimeMillis();
-			Evaluation eval = new Evaluation(train);
-			eval.evaluateModel(pu, test);
-//			StringBuffer forPredictionsPrinting = new StringBuffer();
-//			eval.evaluateModel(pu, train, forPredictionsPrinting, null, false);
-//			System.out.println(eval.toClassDetailsString());
-//			System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-//			System.out.println(eval.toMatrixString());
-//			System.out.println(forPredictionsPrinting);
-			System.out.println(eval.fMeasure(0));
-			testError = eval.errorRate();
-			endTime = System.currentTimeMillis();
-			duration = endTime - startTime;
-//			Duration testtime = Duration.ofMillis(duration);
-//			System.out.println(testtime);
-			System.out.println("TestError:" + testError + "\n");
-//			System.out.println(eval.toSummaryString());
-//			out.format("%s,%.4f\n", dataName,  testError);
-//			out.flush();
+				double testError = 0.0;
+				startTime = System.currentTimeMillis();
+				DTEnsemble dtEnsemble=new DTEnsemble();
+				dtEnsemble.buildClassifier(train);
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+//				Duration traintime = Duration.ofMillis(duration);
+//				System.out.println(traintime);
+				startTime = System.currentTimeMillis();
+				Evaluation eval = new Evaluation(train);
+				eval.evaluateModel(dtEnsemble, test);
+//				StringBuffer forPredictionsPrinting = new StringBuffer();
+//				eval.evaluateModel(pu, train, forPredictionsPrinting, null, false);
+//				System.out.println(eval.toClassDetailsString());
+//				System.out.println(eval.toSummaryString("\nResults\n======\n", false));
+				System.out.println(eval.toMatrixString());
+//				System.out.println(forPredictionsPrinting);
+				System.out.println("FMeasure:" + eval.fMeasure(0));
+				testError = eval.errorRate();
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+//				Duration testtime = Duration.ofMillis(duration);
+//				System.out.println(testtime);
+				System.out.println("TestError:" + testError + "\n");
+//				System.out.println(eval.toSummaryString());
+//				out.format("%s,%.4f\n", dataName,  testError);
+//				out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	
+	/**
+	 * KMeans for PU Learning
+	 */
 	public void launchPUKMeans() {
 		try {
 //			File f = new File(rep + "/" + dataName + "_results.csv");
@@ -1207,15 +1269,17 @@ public class ExperimentsLauncher {
 
 			nbPrototypesMax = this.train.numInstances() / this.train.numClasses();
 			if (nbPrototypesMax>100)
-			nbPrototypesMax = 50;
+			nbPrototypesMax = 200;
 			int tmp;
 			tmp = nbExp;
 			double[] avgerror=new double[5];
 			double[] avgf1=new double[5];
 
-			for (int j = 1; j <= nbPrototypesMax; j+=1) {
-				if (j == 1)
+			for (int j = 5; j <= nbPrototypesMax; j+=5) {
+				if (j <= 1){
 					nbExp = 1;
+					j=1;
+				}
 				else
 					nbExp = tmp;
 				System.out.println("nbPrototypes=" + j);
@@ -1224,15 +1288,20 @@ public class ExperimentsLauncher {
 					DTWPUKMeans classifierKMeans = new DTWPUKMeans();
 					classifierKMeans.setNbClustersinUNL(j);
 					startTime = System.currentTimeMillis();
+					classifierKMeans.setDf((n+1)*0.05);
 					classifierKMeans.buildClassifier(train);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
 //					Duration traintime = Duration.ofMillis(duration);
 //					System.out.println(traintime);
 					Evaluation eval = new Evaluation(train);
+//					StringBuffer forPredictionsPrinting = new StringBuffer();
+//					eval.evaluateModel(classifierKMeans, train, forPredictionsPrinting, null, false);
 					eval.evaluateModel(classifierKMeans, test);
+					System.out.println(eval.toMatrixString());
 					avgerror[n]=eval.errorRate();
 					avgf1[n]=eval.fMeasure(0);
+					System.out.println(avgerror[n]+"\t"+avgf1[n]);
 					
 //					PrototyperUtil.savePrototypes(classifierKMeans.prototypes, rep + "/" + dataName + "_KMEANS[" + j + "]_XP" + n + ".proto");
 
@@ -1246,13 +1315,53 @@ public class ExperimentsLauncher {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Decision Tree Dynamic Ensemble for PU Learning
+	 */
+	public void launchPUDTEnsemble() {
+		try {
+			String algo = "PUDTDynamicEnsemble";
+			System.out.println(algo);
+			double testError = 0.0;
+			PUDTClassifier dynamicEnsembleClassify = new PUDTClassifier();
+			dynamicEnsembleClassify.buildClassifier(train);
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(dynamicEnsembleClassify, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+			System.out.println(eval.fMeasure(0));
+			System.out.println(eval.toMatrixString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+	/**
+	 * Decision Tree Dynamic Ensemble for PU Learning
+	 */
+	public void launchPUGMM() {
+		try {
+			String algo = "PUGMM";
+			System.out.println(algo);
+			double testError = 0.0;
+			PUtoPN pugmm = new PUtoPN();
+			pugmm.buildClassifier(train);
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(pugmm, test);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n");
+			System.out.println(eval.fMeasure(0));
+			System.out.println(eval.toMatrixString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args) {
-		String dataname="ECG";
-		double ration=0.3;
+		String dataname="Gun_Point";
+//		datasetsDir = "./PUDATA/";
 //		String dataname=args[0];
 //		datasetsDir=args[1];
-//		double ration=Double.parseDouble(args[2]);
 		File repSave = new File(saveoutputDir);
 //		File[] repSavelist;
 //		if (!repSave.exists()) {
@@ -1301,9 +1410,12 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchJ48();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchBigDT();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchStaticEnsemble();
-//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDynamicEnsemble();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPU(ration);
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDTWKNNClassifier();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDynamicEnsemble();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPU();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUKMeans();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUDTEnsemble();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPUGMM();
 		}
 	}
 

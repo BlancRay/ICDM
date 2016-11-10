@@ -17,7 +17,7 @@ public class BDTEClassifier extends Classifier{
 	public BDTEClassifier() {
 		super();
 	}
-	private int nbclassifiers;
+	private int nbclassifiers = 1;
 	private int K=5;
 	private int nbbestclassifiers;
 	private ClassifyBigDT[] bigDTs;
@@ -27,7 +27,7 @@ public class BDTEClassifier extends Classifier{
 		Traindata=new Instances(data);
 		Traindata=data;
 //		K=Traindata.numInstances()/2;
-		nbclassifiers=(Traindata.numInstances() / Traindata.numClasses())/2;
+		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
 //		nbbestclassifiers=nbclassifiers/10;
 		bigDTs=new ClassifyBigDT[nbclassifiers];
 		for (int i = 0; i < nbclassifiers; i++) {
@@ -79,13 +79,18 @@ public class BDTEClassifier extends Classifier{
 		}
 		Utils.normalize(besterrorRate);
 //		System.out.println(Arrays.toString(besterrorRate));
-		int[] classlabel = new int[sample.numClasses()];
+		double[] classlabel = new double[sample.numClasses()];
 		for (int i = 0; i < nbbestclassifiers; i++) {
-			classlabel[(int) bigDTs[classifiers[i]].classifyInstance(sample)] +=(int) (besterrorRate[i]*100);
+			classlabel[(int) bigDTs[classifiers[i]].classifyInstance(sample)] +=besterrorRate[i];
 		}
 		
 //		System.out.println(Arrays.toString(classlabel));
 		return Utils.maxIndex(classlabel);
 	}
+
+	public ClassifyBigDT[] getBigDTs() {
+		return bigDTs;
+	}
+	
 	
 }

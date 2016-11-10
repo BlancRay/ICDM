@@ -40,21 +40,21 @@ public class DTWKNNClassifierGmm extends Classifier{
 	 */
 	public void buildClassifier(Instances data) {
 
-		trainingData = data;
-		Attribute classAttribute = data.classAttribute();
+		trainingData = new Instances(data);
+		Attribute classAttribute = trainingData.classAttribute();
 		prototypes = new ArrayList<>();
 
 		classedData = new HashMap<String, ArrayList<Sequence>>();
 		indexClassedDataInFullData = new HashMap<String, ArrayList<Integer>>();
-		for (int c = 0; c < data.numClasses(); c++) {
-			classedData.put(data.classAttribute().value(c), new ArrayList<Sequence>());
-			indexClassedDataInFullData.put(data.classAttribute().value(c), new ArrayList<Integer>());
+		for (int c = 0; c < trainingData.numClasses(); c++) {
+			classedData.put(trainingData.classAttribute().value(c), new ArrayList<Sequence>());
+			indexClassedDataInFullData.put(trainingData.classAttribute().value(c), new ArrayList<Integer>());
 		}
 
-		sequences = new Sequence[data.numInstances()];
+		sequences = new Sequence[trainingData.numInstances()];
 		classMap = new String[sequences.length];
 		for (int i = 0; i < sequences.length; i++) {
-			Instance sample = data.instance(i);
+			Instance sample = trainingData.instance(i);
 			MonoDoubleItemSet[] sequence = new MonoDoubleItemSet[sample.numAttributes() - 1];
 			int shift = (sample.classIndex() == 0) ? 1 : 0;
 			for (int t = 0; t < sequence.length; t++) {
@@ -76,7 +76,7 @@ public class DTWKNNClassifierGmm extends Classifier{
 		
 		prior = new double[classes.size()][nClustersPerClass];
 		nck = new double[nClustersPerClass];
-		int dataAttributes=data.numAttributes() - 1;
+		int dataAttributes=trainingData.numAttributes() - 1;
 
 		for (String clas : classes) {
 			int c = trainingData.classAttribute().indexOfValue(clas);
@@ -92,8 +92,8 @@ public class DTWKNNClassifierGmm extends Classifier{
 					continue;
 				ClassedSequence s = new ClassedSequence(centroidsPerClass[c][k], clas);
 				prototypes.add(s);
-				prior[c][k] = gmmclusterer.getNck()[k] / data.numInstances();
-//				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
+				prior[c][k] = gmmclusterer.getNck()[k] / trainingData.numInstances();
+				System.out.println(gmmclusterer.getNck()[k]+" objects,priors is "+prior[c][k]+" Gaussian "+clas+" #"+k+":mu="+centroidsPerClass[c][k]+"\tsigma="+sigmasPerClass[c][k]);
 			}
 		}
 /*		for (int i = 0; i < centroidsPerClass.length; i++) {
@@ -139,12 +139,13 @@ public class DTWKNNClassifierGmm extends Classifier{
 			for (int k = 0; k < centroidsPerClass[c].length; k++) {
 				// compute P(Q|k_c)
 				if (sigmasPerClass[c][k] == Double.NaN||sigmasPerClass[c][k] ==0){
-					System.err.println("sigma=NAN||sigma=0");
+					System.out.println("sigma=NAN||sigma=0");
 					continue;
 				}
 				double dist = seq.distance(centroidsPerClass[c][k]);
+				System.out.println(sigmasPerClass[c][k]+"\t"+dist);
 				double p = computeProbaForQueryAndCluster(sigmasPerClass[c][k], dist);
-//				System.out.println(p);
+				System.out.println(p);
 //				prob += p/centroidsPerClass[c].length;
 //				prob += p*prior[c][k];
 				if (p > maxProb) {
@@ -158,7 +159,7 @@ public class DTWKNNClassifierGmm extends Classifier{
 			}
 		}
 //		System.out.println(Arrays.toString(pr));
-//		System.out.println(classValue);
+		System.out.println(classValue);
 		return sample.classAttribute().indexOfValue(classValue);
 	}
 	

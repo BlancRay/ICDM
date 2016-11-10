@@ -34,7 +34,7 @@ public class RandomSelect {
 	protected int sample = 10;
 
 	public Stack<Pairs> buildClassifier(Instances data) {
-		trainingData = data;
+		trainingData = new Instances(data);
 		Attribute classAttribute = trainingData.classAttribute();
 
 		classedData = new HashMap<String, ArrayList<Sequence>>();

@@ -167,7 +167,7 @@ public class ClassifierTree{
 		m_localModel = m_toSelectModel.selectModel(data,pairstack);
 //		if (runtime == 0)
 //			plot(data, dir, runtime,"root node");
-//		System.out.println(m_localModel.getSplitPoint().numInstances());
+		System.out.println(Arrays.deepToString(m_localModel.m_distribution.getperClassPerBag()));
 		if (m_localModel.numSubsets() > 1) {
 //			plot(m_localModel.getSplitPoint(),dir, runtime,"split data");
 			localInstances = m_localModel.split(data);
@@ -176,15 +176,15 @@ public class ClassifierTree{
 			int flg=0;
 			for (int i = 0; i < m_sons.length; i++) {
 				if (localInstances[i].numInstances() != 0){
-//					if (flg == 0) {
-//						System.out.println("left branch:");
+					if (flg == 0) {
+						System.out.println("left branch:");
 //						// loc = dir + "left/";
 //						// plot(localInstances[i], loc, runtime,"left branch");
-//					} else {
-//						System.out.println("right branch:");
+					} else {
+						System.out.println("right branch:");
 //						// loc = dir + "right/";
 //						// plot(localInstances[i], loc, runtime,"right branch");
-//					}
+					}
 					flg = 1;
 					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 					localInstances[i] = null;
@@ -195,14 +195,36 @@ public class ClassifierTree{
 			System.out.println(Arrays.deepToString(m_localModel.m_distribution.getperClassPerBag()));
 //			System.out.println(m_localModel.m_distribution.maxClass());
 			//add unlabeled to positive
-			if (m_localModel.m_distribution.getperBag()[0] <= ClassifyPOSC45.dDF*ClassifyPOSC45.nUnlSize) {
-				RandomDataGenerator rd=new RandomDataGenerator();
-				for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
-					if(rd.nextBinomial(1, ClassifyPOSC45.dDF)==1)
-					m_localModel.getSplitPoint().instance(i).setClassValue(0.0);
+			
+			/**
+			 * method 1
+			 */
+			/*if (ClassifyPOSC45.nPosSize < (ClassifyPOSC45.nPosSize + ClassifyPOSC45.nUnlSize) * ClassifyPOSC45.dDF) {
+				int nbpos = (int) (ClassifyPOSC45.dDF * m_localModel.m_distribution.getperBag()[0]);
+				while (m_localModel.m_distribution.getperClassPerBag()[0][0] < nbpos) {
+					RandomDataGenerator rd = new RandomDataGenerator();
+					for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
+						if (m_localModel.getSplitPoint().instance(i).classValue() == 1.0)
+							if (rd.nextBinomial(1, ClassifyPOSC45.dDF) == 1) {
+								m_localModel.getSplitPoint().instance(i).setClassValue(0.0);
+								break;
+							}
+					}
+					m_localModel.m_distribution = new Distribution(m_localModel.getSplitPoint());
 				}
-				m_localModel.m_distribution=new Distribution(m_localModel.getSplitPoint());
+			}*/
+			/**
+			 * method 2
+			 */
+			if (m_localModel.m_distribution.getperClassPerBag()[0][0] > 1) {
+				for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
+					if (m_localModel.getSplitPoint().instance(i).classValue() == 1.0)
+						m_localModel.getSplitPoint().instance(i).setClassValue(0.0);
+				}
+				m_localModel.m_distribution = new Distribution(m_localModel.getSplitPoint());
 			}
+			
+			
 //			for (int i = 0; i < m_localModel.getSplitPoint().numInstances(); i++) {
 //				System.out.println(m_localModel.getSplitPoint().instance(i));
 //			}
@@ -239,13 +261,15 @@ public class ClassifierTree{
 		}
 	}
 	
-//	public double classifyInstance(Instance instance) throws Exception {
-//
-//		double maxProb = -1;
-//		double currentProb;
-//		int maxIndex = 0;
-//		int j;
-//
+	/*public double classifyInstance(Instance instance) throws Exception {
+
+		double maxProb = -1;
+		double currentProb;
+		int maxIndex = 0;
+		int j;
+
+		double[] prob=getProbs(instance);
+		return Utils.maxIndex(prob);
 //		for (j = 0; j < instance.numClasses(); j++) {
 //			currentProb = getProbs(j, instance, 1);
 //			if (Utils.gr(currentProb, maxProb)) {
@@ -255,7 +279,7 @@ public class ClassifierTree{
 //		}
 //
 //		return (double) maxIndex;
-//	}
+	}*/
 
 	/**
 	 * Cleanup in order to save memory.
@@ -335,6 +359,36 @@ public class ClassifierTree{
 		}
 	}
 	
+	
+	private double[] getProbs(Instance instance) throws Exception {
+
+		double[] prob = new double[instance.numClasses()];
+
+		if (m_isLeaf) {
+//			prob[0]=(localModel().m_distribution.getperClass()[0] / ClassifyPOSC45.nPosSize) * ClassifyPOSC45.dDF * (ClassifyPOSC45.nUnlSize / localModel().m_distribution.getperClass()[1])*localModel().m_distribution.total();
+//			prob[1] = 1 - prob[0];
+			prob[localModel().whichSubset(instance)]++;
+			return prob;
+		} else {
+			int treeIndex = localModel().whichSubset(instance);
+			if (treeIndex == 0) {
+				prob[treeIndex]++;
+				double[] tmp=son(treeIndex).getProbs(instance);
+				for (int i = 0; i < prob.length; i++) {
+					prob[i]+=tmp[i];
+				}
+				return prob;
+			} else {
+				prob[treeIndex]++;
+				son(treeIndex).getProbs(instance);
+				double[] tmp=son(treeIndex).getProbs(instance);
+				for (int i = 0; i < prob.length; i++) {
+					prob[i]+=tmp[i];
+				}
+				return prob;
+			}
+		}
+	}
 	
   /**
    * Method just exists to make program easier to read.

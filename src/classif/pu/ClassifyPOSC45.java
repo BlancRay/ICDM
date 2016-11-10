@@ -13,8 +13,8 @@ public class ClassifyPOSC45 extends Classifier{
 	static final long serialVersionUID = -217733168393644444L;
 
 	/** The decision tree */
-//	private ClassifierTree[] root=new ClassifierTree[10];
-	private ClassifierTree root;
+	private ClassifierTree[] root=new ClassifierTree[10];
+//	private ClassifierTree root;
 	public static int nPosSize;
 	public static int nUnlSize;
 	public static double dDF = 0.5;
@@ -58,13 +58,13 @@ public class ClassifyPOSC45 extends Classifier{
 		Instances dataset = createTrainingData();
 		ModelSelection modSelection;
 		modSelection = new C45ModelSelection(dataset);
-		root =new C45tree(modSelection);
-		root.buildClassifier(dataset);
-//		for (int i = 0; i < root.length; i++) {
-//			root[i] = new C45tree(modSelection);
-//			root[i].buildClassifier(instances);
-//			System.out.println(i+"th tree has been built.");
-//		}
+//		root =new C45tree(modSelection);
+//		root.buildClassifier(dataset);
+		for (int i = 0; i < root.length; i++) {
+			root[i] = new C45tree(modSelection);
+			root[i].buildClassifier(dataset);
+			System.out.println(i+"th tree has been built.");
+		}
 	}
 
 	/**
@@ -77,12 +77,12 @@ public class ClassifyPOSC45 extends Classifier{
 	 *             if instance can't be classified successfully
 	 */
 	public double classifyInstance(Instance instance) throws Exception {
-//		int[] classlabel=new int[instance.numClasses()];
-//		for (int j = 0; j < root.length; j++) {
-//			classlabel[(int) root[j].classifyInstance(instance)]++;
-//		}
-////		System.out.println("classlabel:"+Arrays.toString(classlabel));
-//		return Utils.maxIndex(classlabel);
-		return root.classifyInstance(instance);
+		int[] classlabel=new int[instance.numClasses()];
+		for (int j = 0; j < root.length; j++) {
+			classlabel[(int) root[j].classifyInstance(instance)]++;
+		}
+//		System.out.println("classlabel:"+Arrays.toString(classlabel));
+		return Utils.maxIndex(classlabel);
+//		return root.classifyInstance(instance);
 	}
 }

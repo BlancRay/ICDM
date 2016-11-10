@@ -61,11 +61,11 @@ public class Split extends ClassifierSplitModel{
 		
 
 		// computer error rate
-		int[][] nbObjPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
-		nbObjPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
+//		int[][] nbObjPreClass_afterSplit = new int[trainInstances.numClasses()][trainInstances.numClasses()];
+//		nbObjPreClass_afterSplit = classifyInstancesintoClass(trainInstances, prototypes);
 		
 		// computer infoGain
-		m_infoGain = evalInfoGain(trainInstances,nbObjPreClass_afterSplit);
+		m_infoGain = evalInfoGain(trainInstances);
 
 		// System.out.println("info\t"+m_infoGain);
 
@@ -79,28 +79,23 @@ public class Split extends ClassifierSplitModel{
 		}
 //		setSplitPoint(m_splitPoint);
 	}
-	public double evalInfoGain(Instances instances,int[][] nbObj_aftersplit_eachClass) {
+	public double evalInfoGain(Instances instances) {
 		double parent_entropy = 0.0;
 		double avg_child_entropy = 0.0;
 		double[] child_entropy = new double[instances.numClasses()];
-		double[] parent_nbObjPreClass = new double[instances.numClasses()];
-		double[] child_nbObjPreClass = new double[instances.numClasses()];
-		for (int i = 0; i < instances.numInstances(); i++) {
-			Instance Obj = instances.instance(i);
-			parent_nbObjPreClass[(int) Obj.classValue()]++;
-		}
+		double[] parent_nbObjPreClass = m_distribution.getM_perClass();
+		double[] child_nbObjPreClass = m_distribution.getM_perBag();
 		for (int i = 0; i < parent_nbObjPreClass.length; i++) {
 			parent_entropy -= log2(parent_nbObjPreClass[i] / instances.numInstances());
 		}
 
-		for (int i = 0; i < nbObj_aftersplit_eachClass.length; i++) {
-			child_nbObjPreClass[i] = Utils.sum(nbObj_aftersplit_eachClass[i]);//sum Objs in each branch
+		for (int i = 0; i < m_distribution.matrix().length; i++) {
 			if(child_nbObjPreClass[i]==0.0){
 				child_entropy[i]= 0.0;
 				continue;
 			}
-			for (int j = 0; j < nbObj_aftersplit_eachClass[i].length; j++) {
-				child_entropy[i] -= (log2(nbObj_aftersplit_eachClass[i][j] / child_nbObjPreClass[i]));//entropy for each child
+			for (int j = 0; j < m_distribution.matrix()[i].length; j++) {
+				child_entropy[i] -= (log2(m_distribution.matrix()[i][j] / child_nbObjPreClass[i]));//entropy for each child
 			}
 		}
 		for (int i = 0; i < child_nbObjPreClass.length; i++) {
@@ -223,7 +218,7 @@ public class Split extends ClassifierSplitModel{
 		double minD = Double.MAX_VALUE;
 		int locatesplitpoint = -1;
 		for (int i = 0; i < splitsequences.length; i++) {
-			double tmpD = seq.LB_distance(splitsequences[i], minD);
+			double tmpD = seq.distance(splitsequences[i]);
 			if (tmpD < minD) {
 				minD = tmpD;
 				locatesplitpoint = i;
@@ -257,7 +252,7 @@ public class Split extends ClassifierSplitModel{
 		double minD = Double.MAX_VALUE;
 		int locatesplitpoint = -1;
 		for (int i = 0; i < splitsequences.length; i++) {
-			double tmpD = seq.LB_distance(splitsequences[i], minD);
+			double tmpD = seq.distance(splitsequences[i]);
 			if (tmpD < minD) {
 				minD = tmpD;
 				locatesplitpoint = i;

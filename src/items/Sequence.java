@@ -118,6 +118,31 @@ public class Sequence implements java.io.Serializable {
 		return sqrt(matriceW[tailleS - 1][tailleT - 1]);
 	}
 	
+	public synchronized double distanceDTWD(Sequence a) {
+		Sequence S1 = this;
+		Sequence S2 = a;
+
+		final int tailleS = S1.getNbTuples();
+		final int tailleT = S2.getNbTuples();
+
+		int i, j;
+		matriceW[0][0] = S1.sequence[0].squaredDistance(S2.sequence[0]);
+		for (i = 1; i < tailleS; i++) {
+			matriceW[i][0] = matriceW[i - 1][0] + S1.sequence[i].squaredDistance(S2.sequence[0]);
+		}
+		for (j = 1; j < tailleT; j++) {
+			matriceW[0][j] = matriceW[0][j - 1] + S1.sequence[0].squaredDistance(S2.sequence[j]);
+		}
+
+		for (i = 1; i < tailleS; i++) {
+			for (j = 1; j < tailleT; j++) {
+				matriceW[i][j] = Tools.Min3(matriceW[i - 1][j - 1], matriceW[i][j - 1], matriceW[i - 1][j]) + S1.sequence[i].squaredDistance(S2.sequence[j]);
+			}
+		}
+		double ed=S1.distanceEuc(S2)+Double.MIN_VALUE;
+		return (sqrt(matriceW[tailleS - 1][tailleT - 1])/ed);
+	}
+	
 	public synchronized double LB_distance(Sequence a,double longestdist) {
 		double best_so_far = longestdist;
 		double LB_dist = 0.0;

@@ -23,6 +23,7 @@
 package classif.kmeans;
 
 import items.ClassedSequence;
+import items.Sequence;
 
 import java.util.ArrayList;
 
@@ -48,6 +49,13 @@ public class DTWKNNClassifierKMeans extends Prototyper {
 				continue;
 			KMeansSymbolicSequence kmeans = new KMeansSymbolicSequence(nbPrototypesPerClass, classedData.get(clas));
 			kmeans.cluster();
+			ArrayList<Sequence>[] aff=kmeans.affectation;
+			for (int i = 0; i < aff.length; i++) {
+				System.out.println("aaaafff");
+				for (Sequence s : aff[0]) {
+					System.out.println(s);
+				}
+			}
 			for (int i = 0; i < kmeans.centers.length; i++) {
 				if(kmeans.centers[i]!=null){ //~ if empty cluster
 					ClassedSequence s = new ClassedSequence(kmeans.centers[i], clas);

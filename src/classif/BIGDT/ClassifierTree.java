@@ -64,16 +64,19 @@ public class ClassifierTree{
    * @param data the data to build the tree from
    * @throws Exception if something goes wrong
    */
-  public void buildClassifier(Instances data) throws Exception {
+	public void buildClassifier(Instances data) throws Exception {
 
-    // remove instances with missing class
-    data = new Instances(data);
-    data.deleteWithMissingClass();
-    
-    Dataselect dataselect=new Dataselect();
-	Stack<Pairs> pairstack= dataselect.buildClassifier(data);
-    buildTree(data,pairstack,0,"./"+data.relationName()+"/");
-  }
+		/**
+		 * remove instances with missing class
+		 */
+		data = new Instances(data);
+		data.deleteWithMissingClass();
+
+		// Dataselect dataselect=new Dataselect();
+		// Stack<Pairs> pairstack= dataselect.buildClassifier(data);
+		// buildTree(data,pairstack,0,"./"+data.relationName()+"/");
+		buildTree(data, 0, "./" + data.relationName() + "/");
+	}
 
   /**
    * Builds the tree structure.

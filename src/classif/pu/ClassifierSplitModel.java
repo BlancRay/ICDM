@@ -105,9 +105,9 @@ public abstract class ClassifierSplitModel {
 		int subset, i, j;
 
 		for (j = 0; j < m_numSubsets; j++)
-			instances[j] = new Instances((Instances) data, 0);
+			instances[j] = new Instances(data, 0);
 		for (i = 0; i < data.numInstances(); i++) {
-			instance = ((Instances) data).instance(i);
+			instance = data.instance(i);
 			subset = whichSubset(instance);
 			instances[subset].add(instance);
 		}

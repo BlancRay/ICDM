@@ -21,10 +21,10 @@ public class DTWPUKMeans extends Classifier {
 	protected ArrayList<ClassedSequence> prototypes;
 	protected Sequence[] clusteredUNL = null;
 	protected ArrayList<Sequence> unlabeledData = new ArrayList<>();
+	protected ArrayList<Sequence> posData = new ArrayList<>();
 	protected int nbClustersinUNL;
 	private double df = 0.25;
 	protected double[][] distances;
-	private int nbClusters;
 	private static final double minObj = 1;
 	private static final String pClass="1.0";
 	private static final String uClass="-1.0";
@@ -45,7 +45,8 @@ public class DTWPUKMeans extends Classifier {
 	public void buildClassifier(Instances data) {
 		trainingData = new Instances(data);
 		prototypes = new ArrayList<>();
-		Instance posData=init();
+		Instances posIns=new Instances(trainingData,0);
+		posIns.add(init());
 		for (int i = 0; i < trainingData.numInstances(); i++) {
 			trainingData.instance(i).setClassValue(uClass);
 		}
@@ -55,18 +56,29 @@ public class DTWPUKMeans extends Classifier {
 			sequences[i] = InsToSeq(sample);
 			unlabeledData.add(sequences[i]);
 		}
-		//find N
-//		findN(pos, unlabeledData);
-		
-		// split data to P and U sets
-		Sequence[] pos=new Sequence[5];
-		pos[0] = InsToSeq(posData);
-		for (int i = 1; i < pos.length; i++) {
-			int unlpos = findUnlabeledNN(posData, unlabeledData);
-			pos[i] = unlabeledData.get(unlpos);
+//		Sequence[] pos=new Sequence[100];
+//		pos[0] = InsToSeq(posIns.instance(0));
+		posData.add(InsToSeq(posIns.instance(0)));
+		for (int i = 1; i < data.numInstances()*df; i++) {
+			int unlpos = findUnlabeledNN(posIns, unlabeledData);
+			posIns.add(trainingData.instance(unlpos));
+			trainingData.delete(unlpos);
+//			pos[i] = unlabeledData.get(unlpos);
+			posData.add(unlabeledData.get(unlpos));
 			unlabeledData.remove(unlpos);
-			ClassedSequence s = new ClassedSequence(pos[i], pClass);
-			prototypes.add(s);
+//			ClassedSequence s = new ClassedSequence(pos[i], pClass);
+//			prototypes.add(s);
+		}
+		
+		KMeansSymbolicSequence km =new KMeansSymbolicSequence(nbClustersinUNL, posData);
+		km.cluster();
+		Sequence[] pos = new Sequence[nbClustersinUNL];
+		pos = km.centers;
+		for (int i = 0; i < pos.length; i++) {
+			if (pos[i] != null) {
+				ClassedSequence s = new ClassedSequence(pos[i], pClass);
+				prototypes.add(s);
+			}
 		}
 
 		if (distances == null) {
@@ -75,11 +87,11 @@ public class DTWPUKMeans extends Classifier {
 		clusteredUNL = new Sequence[nbClustersinUNL];
 		// if the class is empty, continue
 		boolean isBig;
-		ArrayList<Integer>[] affectation = new ArrayList[nbClusters];
+		ArrayList<Integer>[] affectation = new ArrayList[nbClustersinUNL];
 		int runtime = 0;
 		do {
 			if (runtime > 10)
-				nbClusters -= 1;
+				nbClustersinUNL -= 1;
 			isBig = true;
 			KMeansCachedSymbolicSequence kmeans = new KMeansCachedSymbolicSequence(nbClustersinUNL, unlabeledData, distances);
 			kmeans.cluster();
@@ -100,9 +112,14 @@ public class DTWPUKMeans extends Classifier {
 			runtime++;
 		} while (isBig == false);
 
-		findN(pos, clusteredUNL);
-		// search positive from unlabeled
-		searchPOSNEG(clusteredUNL,prototypes);
+		for (int i = 0; i < clusteredUNL.length; i++) {
+			if(clusteredUNL[i]!=null){
+				ClassedSequence s=new ClassedSequence(clusteredUNL[i], uClass);
+				prototypes.add(s);
+			}
+		}
+//		findN(pos, clusteredUNL);
+//		searchPOSNEG(clusteredUNL,prototypes);
 		
 		
 //		for (ClassedSequence s2 : prototypes) {
@@ -195,16 +212,24 @@ public class DTWPUKMeans extends Classifier {
 	}
 	
 	protected void findN(Sequence[] pos, Sequence[] cluster) {
-		double[] dist_pu= new double[cluster.length];
+		double[] dist_pu = new double[cluster.length];
 		for (int i = 0; i < cluster.length; i++) {
-			dist_pu[i]=cluster[i].distance(Sequences.mean(pos));
-		}
-		for (int k = 0; k < dist_pu.length; k++) {
-			if (dist_pu[k] > Utils.kthSmallestValue(dist_pu, dist_pu.length/2)) {
-				ClassedSequence s = new ClassedSequence(cluster[k], uClass);
-				prototypes.add(s);
+			double[] d=new double[pos.length];
+			for (int j = 0; j < pos.length; j++) {
+				d[j] = cluster[i].distance(pos[j]);
 			}
+			dist_pu[i] = Utils.kthSmallestValue(d, 1);
 		}
+		
+		ClassedSequence s = new ClassedSequence(cluster[Utils.maxIndex(dist_pu)], uClass);
+		prototypes.add(s);
+
+//		for (int k = 0; k < dist_pu.length; k++) {
+//			if (dist_pu[k] > Utils.kthSmallestValue(dist_pu, (int) (dist_pu.length*0.5))) {
+//				ClassedSequence s = new ClassedSequence(cluster[k], uClass);
+//				prototypes.add(s);
+//			}
+//		}
 	}
 	
 	/**
@@ -231,80 +256,47 @@ public class DTWPUKMeans extends Classifier {
 		}
 	}
 	
-	protected void SearchPOSinUNL(Sequence[] clusteredunl, Sequence[] pos) {
-		int nbpos = (int) (nbClustersinUNL * df);
-		int[] posunl = new int[nbpos];
-		double[] distpu = new double[nbClustersinUNL];
-		for (int i = 0; i < clusteredunl.length; i++) {
-			double dist = Double.POSITIVE_INFINITY;
-			for (int j = 0; j < pos.length; j++) {
-				double d = clusteredunl[i].distance(pos[j]);
-				if (d < dist) {
-					dist = d;
-				}
-				distpu[i] = dist;
-			}
-		}
-
-		// get position of pos in unl
-		int flg = 0;
-		while (flg < nbpos) {
-			int position = Utils.minIndex(distpu);
-			posunl[flg] = position;
-			distpu[position] = Double.POSITIVE_INFINITY;
-			flg++;
-		}
-
-		// add pos and unl into prototypes
-		Arrays.sort(posunl);
-		for (int i = 0; i < clusteredunl.length; i++) {
-			if (Arrays.binarySearch(posunl, i) >= 0) {
-				ClassedSequence s = new ClassedSequence(clusteredunl[i], pClass);
-//				prototypes.add(s);
-			} else {
-				ClassedSequence s = new ClassedSequence(clusteredunl[i], uClass);
-				prototypes.add(s);
-			}
-		}
-	}
-	
 	/**
 	 * Find a reliable P from U with a positive example
 	 * @param p
 	 * @param u
 	 * @return a reliable P
 	 */
-	private int findUnlabeledNN(Instance p, ArrayList<Sequence> u) {
+	private int findUnlabeledNN(Instances p, ArrayList<Sequence> u) {
 		int unlpos = -1;
-		double dist = Double.POSITIVE_INFINITY;
+		double[][]updist=new double[u.size()][p.numInstances()];
+		double[]mindist=new double[u.size()];
 		for (int i = 0; i < u.size(); i++) {
-			Sequence[] splitsequences = new Sequence[2];
-			splitsequences[0]  = u.get(i);
-			splitsequences[1] = InsToSeq(p);
-			double d = splitsequences[1].distance(splitsequences[0]);
-			if (d < dist) {
-				dist = d;
-				unlpos = i;
+			for (int j = 0; j < p.numInstances(); j++) {
+				Sequence[] splitsequences = new Sequence[2];
+				splitsequences[0] = u.get(i);
+				splitsequences[1] = InsToSeq(p.instance(j));
+				updist[i][j] = splitsequences[0].distance(splitsequences[1]);
 			}
+			// min distance from u to p
+			mindist[i]=updist[i][Utils.minIndex(updist[i])];
 		}
+		unlpos=Utils.minIndex(mindist);
 		return unlpos;
 	}
+	
 	/**
 	 * random select one positive example
 	 * @return positive example
 	 */
 	protected Instance init() {
-		Instance posData = new Instance(trainingData.numAttributes());
-		posData.setDataset(trainingData);
-		while (posData.classValue() != trainingData.classAttribute().indexOfValue(pClass)) {
+		Instance posSample = new Instance(trainingData.numAttributes());
+		posSample.setDataset(trainingData);
+		while (posSample.classValue() != trainingData.classAttribute().indexOfValue(pClass)) {
 			int rd = new Random().nextInt(trainingData.numInstances());
 			if (trainingData.instance(rd).classValue() == trainingData.classAttribute().indexOfValue(pClass)) {
-				posData = trainingData.instance(rd);
+				posSample = trainingData.instance(rd);
 				trainingData.delete(rd);
 			}
 		}
-		ClassedSequence s = new ClassedSequence(InsToSeq(posData), pClass);
-		prototypes.add(s);
-		return posData;
+//		ClassedSequence s = new ClassedSequence(InsToSeq(posSample), pClass);
+//		prototypes.add(s);
+		return posSample;
 	}
+	
 }

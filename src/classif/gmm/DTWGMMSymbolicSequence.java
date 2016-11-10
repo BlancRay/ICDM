@@ -146,7 +146,6 @@ public class DTWGMMSymbolicSequence {
 			for (int i = 0; i < sumnck; i++) {
 				sumofgammai += gamma[i][k];
 			}
-//			System.out.println("sumofgammai "+sumofgammai);
 			nck[k] = sumofgammai;
 			if (nck[k] <= minObj) {
 				delcluster(k);
@@ -154,6 +153,7 @@ public class DTWGMMSymbolicSequence {
 				return log;
 			}
 		}
+		System.out.println(Arrays.toString(nck));
 
 		// centroidsPerClass
 		for (int k = 0; k < centroidsPerCluster.length; k++) {

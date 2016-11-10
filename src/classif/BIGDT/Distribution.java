@@ -705,4 +705,14 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 	public String getRevision() {
 		return RevisionUtils.extract("$Revision: 1.12 $");
 	}
+
+	public double[] getM_perBag() {
+		return m_perBag;
+	}
+
+	public double[] getM_perClass() {
+		return m_perClass;
+	}
+	
+	
 }

@@ -99,10 +99,17 @@ public class C45ModelSelection extends ModelSelection {
 			averageInfoGain = averageInfoGain / (double) validModels;
 			// Find "best" attribute to split on.
 			minResult = 0;
+			
 			for (int j = 0; j < currentModel.length; j++) {
 				if (currentModel[j].checkModel())
-					if ((currentModel[j].infoGain() >= (averageInfoGain - 1E-3)) && Utils.gr(currentModel[j].gainRatio(), minResult)){
-						minResult = currentModel[j].gainRatio();
+				/*if ((currentModel[j].infoGain() >= (averageInfoGain - 1E-3))
+						&& Utils.gr(currentModel[j].gainRatio(), minResult))
+				{
+					bestModel = currentModel[j];
+					minResult = currentModel[j].gainRatio();
+				}*/
+					if ((currentModel[j].infoGain() >= minResult)){
+						minResult = currentModel[j].infoGain();
 						bestModel = currentModel[j];
 					}
 			}

@@ -146,7 +146,7 @@ public class Split extends ClassifierSplitModel{
 			double minD = Double.MAX_VALUE;
 			String classValue = null;
 			for (ClassedSequence s : prototypes) {
-				double tmpD = seq.LB_distance(s.sequence,minD);
+				double tmpD = seq.distance(s.sequence);
 				if (tmpD < minD) {
 					minD = tmpD;
 					classValue = s.classValue;
@@ -220,7 +220,7 @@ public class Split extends ClassifierSplitModel{
 		double minD = Double.MAX_VALUE;
 		int locatesplitpoint = -1;
 		for (int i = 0; i < splitsequences.length; i++) {
-			double tmpD = seq.LB_distance(splitsequences[i], minD);
+			double tmpD = seq.distance(splitsequences[i]);
 			if (tmpD < minD) {
 				minD = tmpD;
 				locatesplitpoint = i;
