@@ -1,12 +1,13 @@
 package classif.BIGDT;
 
+import java.io.Serializable;
 import java.util.Stack;
 import items.Pairs;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public abstract class ClassifierSplitModel {
-
+public abstract class ClassifierSplitModel implements Serializable{
+	private static final long serialVersionUID = 758462424142684777L;
 	/** Number of created subsets. */
 	protected int m_numSubsets;
 	protected Instances m_splitPoint;

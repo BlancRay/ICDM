@@ -25,7 +25,6 @@ public class BDTEClassifier extends Classifier{
 	private RandomDataGenerator randGen;
 	public void buildClassifier(Instances data) throws Exception {
 		Traindata=new Instances(data);
-		Traindata=data;
 //		K=Traindata.numInstances()/2;
 		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
 //		nbbestclassifiers=nbclassifiers/10;

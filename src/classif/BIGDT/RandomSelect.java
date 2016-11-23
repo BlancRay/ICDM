@@ -92,9 +92,9 @@ public class RandomSelect {
 			pairs.setPair(pair_Sequence);
 			pairs.setClasslable(
 					new String[] { newclassAttribute.value(classselected[0]), newclassAttribute.value(classselected[1]) });
-			pairs.setDistance(pairs.Distance());
-			if (pairs.getDistance() == 0.0)
-				continue;
+//			pairs.setDistance(pairs.Distance());
+//			if (pairs.getDistance() == 0.0)
+//				continue;
 			stack.push(pairs);
 		}
 		return stack;

@@ -1,6 +1,7 @@
 package classif.BIGDT;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Stack;
 
 import items.MonoDoubleItemSet;
@@ -20,7 +21,7 @@ import weka.core.Utils;
  * @author Eibe Frank (eibe@cs.waikato.ac.nz)
  * @version $Revision: 10256 $
  */
-public class ClassifierTree{
+public class ClassifierTree implements Serializable{
 
   /** for serialization */
   static final long serialVersionUID = -8722249377542734193L;

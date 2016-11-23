@@ -7,7 +7,7 @@ import weka.core.Instances;
 import weka.core.Utils;
 
 public class C45tree extends ClassifierTree {
-
+	private static final long serialVersionUID = 968301386365352742L;
 	/** Cleanup after the tree has been built. */
 	boolean m_cleanup = true;
 	/** Confidence level */

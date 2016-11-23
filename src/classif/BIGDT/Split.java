@@ -12,6 +12,7 @@ import weka.core.Instances;
 import weka.core.Utils;
 
 public class Split extends ClassifierSplitModel{
+	private static final long serialVersionUID = -2324062930716795258L;
 	private Pairs m_pair;
 	/** InfoGain of split. */
 	private double m_infoGain;

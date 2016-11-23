@@ -44,6 +44,7 @@ import classif.ensemble.BDTEClassifier;
 import classif.ensemble.FKMDEClassifier;
 import classif.ensemble.PUDTClassifier;
 import classif.ensemble.StaticEnsembleClassify;
+import classif.ensemble.TestThread;
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.fuzzycmeans.DTWKNNClassifierFCM;
 import classif.gmm.DTWKNNClassifierGmm;
@@ -1139,9 +1140,13 @@ public class ExperimentsLauncher {
 			KNNClassifier.buildClassifier(train);
 			endTime = System.currentTimeMillis();
 			duration = endTime - startTime;
-			System.out.println("time:"+duration);
+			System.out.println("Training time:"+duration);
+			startTime = System.currentTimeMillis();
 			Evaluation eval = new Evaluation(train);
 			eval.evaluateModel(KNNClassifier, test);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("Testing time:" + duration);
 			double error = eval.errorRate();
 			System.out.println("TestError:" + error + "\n" + eval.fMeasure(0));
 			System.out.println(eval.toMatrixString());
@@ -1168,9 +1173,13 @@ public class ExperimentsLauncher {
 				dynamicEnsembleClassify.buildClassifier(train);
 				endTime = System.currentTimeMillis();
 				duration = endTime - startTime;
-				System.out.println("time:"+duration);
+				System.out.println("Training time:"+duration);
+				startTime = System.currentTimeMillis();
 				Evaluation eval = new Evaluation(train);
 				eval.evaluateModel(dynamicEnsembleClassify, test);
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+				System.out.println("Testing time:"+duration);
 				testError = eval.errorRate();
 				System.out.println("TestError:" + testError + "\n" + eval.fMeasure(0));
 				System.out.println(eval.toMatrixString());
@@ -1357,6 +1366,32 @@ public class ExperimentsLauncher {
 		}
 	}
 
+	public void launchTestThread() {
+		try {
+			String algo = "TestThread";
+			System.out.println(algo);
+
+			double testError = 0.0;
+			startTime = System.currentTimeMillis();
+			TestThread testThread = new TestThread();
+			testThread.buildClassifier(train);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("Training time:" + duration);
+			startTime = System.currentTimeMillis();
+			Evaluation eval = new Evaluation(train);
+			eval.evaluateModel(testThread, test);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("Testing time:" + duration);
+			testError = eval.errorRate();
+			System.out.println("TestError:" + testError + "\n" + eval.fMeasure(0));
+			System.out.println(eval.toMatrixString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		String dataname="Gun_Point";
 //		datasetsDir = "./PUDATA/";
@@ -1387,7 +1422,7 @@ public class ExperimentsLauncher {
 			// only process GunPoint dataset to illustrates
 //			if (dataRep.getName().equals("50words")||dataRep.getName().equals("Phoneme")||dataRep.getName().equals("DiatomSizeReduction"))
 //				continue;
-			if(!dataRep.getName().equals(dataname))
+			if(!dataRep.getName().equals(dataname)||dataRep.getName().equals("ElectricDevices"))
 				continue;
 			System.out.println("processing: " + dataRep.getName());
 			Instances[] data = readTrainAndTest(dataRep.getName());
@@ -1416,6 +1451,7 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUDTEnsemble();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPUGMM();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchTestThread();
 		}
 	}
 

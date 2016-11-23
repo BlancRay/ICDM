@@ -10,6 +10,7 @@ import items.MonoDoubleItemSet;
 import items.Sequence;
 
 public class C45Split extends ClassifierSplitModel {
+	private static final long serialVersionUID = -5825985892581042868L;
 
 	/** Attribute to split on. */
 	private int[] m_pairIndex;
