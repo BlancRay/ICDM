@@ -118,6 +118,35 @@ public class Sequence implements java.io.Serializable {
 		return sqrt(matriceW[tailleS - 1][tailleT - 1]);
 	}
 	
+	public synchronized double distanceDDTW(Sequence a) {
+		Sequence S1 = this;
+		Sequence S2 = a;
+
+		final int tailleS = S1.getNbTuples();
+		final int tailleT = S2.getNbTuples();
+
+		int i, j;
+		matriceW[0][0] = S1.sequence[0].squaredDistance(S2.sequence[0]);
+		for (i = 1; i < tailleS; i++) {
+			matriceW[i][0] = matriceW[i - 1][0] + DDTW(S1,i).squaredDistance(S2.sequence[0]);
+		}
+		for (j = 1; j < tailleT; j++) {
+			matriceW[0][j] = matriceW[0][j - 1] + S1.sequence[0].squaredDistance(DDTW(S2, j));
+		}
+
+		for (i = 1; i < tailleS; i++) {
+			for (j = 1; j < tailleT; j++) {
+				matriceW[i][j] = Tools.Min3(matriceW[i - 1][j - 1], matriceW[i][j - 1], matriceW[i - 1][j]) + DDTW(S1, i).squaredDistance(DDTW(S2, j));
+			}
+		}
+		return sqrt(matriceW[tailleS - 1][tailleT - 1]);
+	}
+	public synchronized MonoDoubleItemSet DDTW(Sequence S,int index){
+		MonoDoubleItemSet x=new MonoDoubleItemSet(0);
+		x.value=(S.sequence[index].getValue()-S.sequence[index-1].getValue()+((S.sequence[index+1].getValue()-S.sequence[index-1].getValue())/2))/2;
+		return x;
+	}
+	
 	public synchronized double distanceDTWD(Sequence a) {
 		Sequence S1 = this;
 		Sequence S2 = a;

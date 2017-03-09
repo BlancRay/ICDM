@@ -61,7 +61,7 @@ public class C45tree extends ClassifierTree {
 	/**
 	 * Collapses a tree to a node if training error doesn't increase.
 	 */
-	public final void collapse() {
+/*	public final void collapse() {
 
 		double errorsOfSubtree;
 		double errorsOfTree;
@@ -97,7 +97,7 @@ public class C45tree extends ClassifierTree {
 					if(son(i)!=null)
 					son(i).collapse();
 		}
-	}
+	}*/
 
 	/**
 	 * Returns a newly created tree.
@@ -115,13 +115,13 @@ public class C45tree extends ClassifierTree {
 		return newTree;
 	}
 
-	protected ClassifierTree getNewTree(Instances data, Stack<Pairs> pairstack, int runtime, String dir)
+	/*protected ClassifierTree getNewTree(Instances data, Stack<Pairs> pairstack, int runtime, String dir)
 			throws Exception {
 		C45tree newTree = new C45tree(m_toSelectModel);
 		newTree.buildTree((Instances) data, pairstack, ++runtime, dir);
 
 		return newTree;
-	}
+	}*/
 
 	/**
 	 * Prunes a tree using C4.5's pruning procedure.
@@ -129,7 +129,7 @@ public class C45tree extends ClassifierTree {
 	 * @throws Exception
 	 *             if something goes wrong
 	 */
-	public void prune() throws Exception {
+/*	public void prune() throws Exception {
 
 		double errorsLargestBranch;
 		double errorsLeaf;
@@ -198,7 +198,7 @@ public class C45tree extends ClassifierTree {
 				prune();
 			}
 		}
-	}
+	}*/
 
 	private C45tree son(int index) {
 

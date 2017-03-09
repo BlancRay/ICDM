@@ -267,4 +267,10 @@ public class C45Split extends ClassifierSplitModel {
 	public void setSplitPoint(Instances splitPoint) {
 		this.m_splitPoint = splitPoint;
 	}
+
+	@Override
+	public double[] weights(Instance instance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

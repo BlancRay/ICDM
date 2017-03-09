@@ -33,12 +33,12 @@ public class DTEnsemble extends Classifier {
 			Instances unlData = new Instances(traindata, 0);
 
 			posData=init(traindata,nbInitPos);
-			Instances posDatacopy = new Instances(posData);
-			Instances traindatacopy = new Instances(traindata);
-			Instances unlDatacopy = new Instances(traindatacopy,0);
-			double[] dist = new double[traindatacopy.numInstances()];
+//			Instances posDatacopy = new Instances(posData);
+//			Instances traindatacopy = new Instances(traindata);
+//			Instances unlDatacopy = new Instances(traindatacopy,0);
+			double[] dist = new double[traindata.numInstances()];
 			int flg = 0;
-//			PrintStream outPoscopy=new PrintStream("/stor9000/apps/users/NWSUAF/2008117287/ICDM/test/DTWD");
+/*//			PrintStream outPoscopy=new PrintStream("/stor9000/apps/users/NWSUAF/2008117287/ICDM/test/DTWD");
 			while (traindatacopy.numInstances() != 0) {
 				double[] mindist = findUnlabeledNNDTWD(posDatacopy, traindatacopy);
 				int unlpos = Utils.minIndex(mindist);
@@ -59,11 +59,11 @@ public class DTEnsemble extends Classifier {
 				posDatacopy.delete(j);
 			}
 
-			/**
+			*//**
 			 * test of leaf node with 50% positive samples
-			 */
+			 *//*
 			dist = new double[traindata.numInstances()];
-			flg = 0;
+			flg = 0;*/
 //			PrintStream outPos = new PrintStream("/stor9000/apps/users/NWSUAF/2008117287/ICDM/test/DTW");
 			while (traindata.numInstances() != 0) {
 				double[] mindist = findUnlabeledNN(posData, traindata);
@@ -86,7 +86,10 @@ public class DTEnsemble extends Classifier {
 				posData.delete(j);
 			}
 			System.out.println(ratio);
-			if (Utils.maxIndex(scc) > Utils.maxIndex(scccopy)) {
+			c45posunl[i] = new ClassifyPOSC45(ratio);
+			c45posunl[i].setDataset(posData, unlData);
+			c45posunl[i].buildClassifier(null);
+			/*if (Utils.maxIndex(scc) > Utils.maxIndex(scccopy)) {
 				c45posunl[i] = new ClassifyPOSC45(ratio);
 				c45posunl[i].setDataset(posData, unlData);
 				c45posunl[i].buildClassifier(null);
@@ -98,7 +101,7 @@ public class DTEnsemble extends Classifier {
 				c45posunl[i] = new ClassifyPOSC45(ratio);
 				c45posunl[i].setDataset(posDatacopy, unlDatacopy);
 				c45posunl[i].buildClassifier(null);
-			}
+			}*/
 		}
 		double[] fmeasures = new double[nbPOStree];
 		for (int j = 0; j < c45posunl.length; j++) {

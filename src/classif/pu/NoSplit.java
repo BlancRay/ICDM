@@ -71,8 +71,10 @@ public final class NoSplit extends ClassifierSplitModel {
 	 * Always returns null because there is only one subset.
 	 */
 	public final double[] weights(Instance instance) {
-
-		return null;
+		double[] weights= new double [2];
+		for (int i = 0; i < 2; i++)
+			weights[i] = m_distribution.perClass(i) / m_distribution.total();
+		return weights;
 	}
 
 	/**

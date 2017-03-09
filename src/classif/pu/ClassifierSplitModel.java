@@ -1,6 +1,9 @@
 package classif.pu;
 
+import java.util.ArrayList;
 import java.util.Stack;
+
+import items.ClassedSequence;
 import items.Pairs;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -10,6 +13,7 @@ public abstract class ClassifierSplitModel {
 	/** Number of created subsets. */
 	protected int m_numSubsets;
 	protected Instances m_splitPoint;
+//	protected ArrayList<ClassedSequence> m_prototypes;
 	protected Distribution m_distribution;
 //	protected Stack<Pairs> m_Pairs;
 
@@ -102,15 +106,19 @@ public abstract class ClassifierSplitModel {
 
 		Instances[] instances = new Instances[m_numSubsets];
 		Instance instance;
+		double [] weights;
 		int subset, i, j;
 
 		for (j = 0; j < m_numSubsets; j++)
 			instances[j] = new Instances(data, 0);
 		for (i = 0; i < data.numInstances(); i++) {
 			instance = data.instance(i);
+			weights = weights(instance);
 			subset = whichSubset(instance);
 			instances[subset].add(instance);
 		}
+		for (j = 0; j < m_numSubsets; j++)
+			instances[j].compactify();
 		return instances;
 	}
 
@@ -123,9 +131,7 @@ public abstract class ClassifierSplitModel {
 	 */
 	public abstract int whichSubset(Instance instance) throws Exception;
 
-	public double[] weights(Instance instance) {
-		return null;
-	}
+	public abstract double[] weights(Instance instance);
 	  /**
 	   * Sets distribution associated with model.
 	   */

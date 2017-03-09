@@ -225,6 +225,30 @@ public class ClassifierTree implements Serializable{
 			return son(treeindex).classifyInstance(instance);
 		}
 	}
+	
+/*	public double classifyInstance(Instance instance) throws Exception {
+
+		int j;
+		double[] prob=getProbs(instance);
+		return instance.classAttribute().indexOfValue(localModel().m_splitPoint.classAttribute().value((int)Utils.maxIndex(prob)));
+//		return Utils.maxIndex(prob);
+		
+	}
+	private double[] getProbs(Instance instance) throws Exception {
+
+		double[] prob = new double[instance.numClasses()];
+
+		if (m_isLeaf) {
+			int treeIndex = localModel().whichSubset(instance);
+			prob[treeIndex]++;
+			return prob;
+		} else {
+			int treeIndex = localModel().whichSubset(instance);
+			prob=son(treeIndex).getProbs(instance);
+			prob[treeIndex]++;
+			return prob;
+		}
+	}*/
 
 	/**
 	 * Cleanup in order to save memory.

@@ -72,7 +72,8 @@ public class RandomSelect {
 						* classedData.get(newclassAttribute.value(j)).size();
 			}
 		}
-		nbPairs = Math.min(totle / sample, trainingData.numInstances());
+		nbPairs=Math.max(totle/10,100);
+//		nbPairs = Math.min(totle / sample, trainingData.numInstances());
 		Stack<Pairs> stack = new Stack<Pairs>();
 		while (stack.size() < nbPairs) {
 			RandomDataGenerator randGen = new RandomDataGenerator();
@@ -92,9 +93,9 @@ public class RandomSelect {
 			pairs.setPair(pair_Sequence);
 			pairs.setClasslable(
 					new String[] { newclassAttribute.value(classselected[0]), newclassAttribute.value(classselected[1]) });
-			pairs.setDistance(pairs.Distance());
-			if (pairs.getDistance() == 0.0)
-				continue;
+//			pairs.setDistance(pairs.Distance());
+//			if (pairs.getDistance() == 0.0)
+//				continue;
 			stack.push(pairs);
 		}
 		return stack;

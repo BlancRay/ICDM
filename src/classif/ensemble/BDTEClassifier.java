@@ -23,13 +23,17 @@ public class BDTEClassifier extends Classifier{
 	private ClassifyBigDT[] bigDTs;
 	private Instances Traindata;
 	private RandomDataGenerator randGen;
+	private long startTime,endTime,duration;
 	public void buildClassifier(Instances data) throws Exception {
 		Traindata=new Instances(data);
 //		K=Traindata.numInstances()/2;
 		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
+//		nbclassifiers=30;
+		System.out.println("nbclassifiers:"+nbclassifiers);
 //		nbbestclassifiers=nbclassifiers/10;
 		bigDTs=new ClassifyBigDT[nbclassifiers];
 		for (int i = 0; i < nbclassifiers; i++) {
+			startTime = System.currentTimeMillis();
 			Instances resample = new Instances(Traindata, Traindata.numInstances()/2);
 			randGen = new RandomDataGenerator();
 			int[] selected = randGen.nextPermutation(Traindata.numInstances(), Traindata.numInstances()/2);
@@ -38,7 +42,9 @@ public class BDTEClassifier extends Classifier{
 			}
 			bigDTs[i] = new ClassifyBigDT();
 			bigDTs[i].buildClassifier(resample);
-			System.out.println(i+" Decision Tree build finished");
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println(i+" Decision Tree build finished,time used:"+duration);
 		}
 	}
 	

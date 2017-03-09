@@ -21,4 +21,5 @@ public abstract class ModelSelection
    * @exception Exception if model can't be selected
    */
   public abstract ClassifierSplitModel selectModel(Instances data,Stack<Pairs> stack) throws Exception;
+  public abstract ClassifierSplitModel selectModel(Instances data) throws Exception;
 }
