@@ -12,7 +12,7 @@ import classif.BIGDT.ClassifyBigDT;
 import classif.ensemble.FindKNN;
 import weka.classifiers.*;
 
-public class POSC45 extends Classifier {
+public class TSPOSC45 extends Classifier {
 	private static final long serialVersionUID = -8055689900166489949L;
 
 	// the classifier
@@ -23,9 +23,11 @@ public class POSC45 extends Classifier {
 	private Instances Traindata;
 	private int nbclassifiers=15;
 	public double r=0.3;
+	private long startTime,endTime,dfTime,buildTime;
 
 	// training
 	public void buildClassifier(Instances data) throws Exception{
+		startTime = System.currentTimeMillis();
 		// split data to P and U sets
 		Traindata=new Instances(data);
 		nbpos=(int) (nbpos*r);
@@ -44,7 +46,7 @@ public class POSC45 extends Classifier {
 			}
 		}
 		// split the POS dataset
-		double[] error=new double[nbclassifiers];
+/*		double[] dfj=new double[nbclassifiers];
 		for (int i = 0; i < nbclassifiers; i++) {
 			Instances two[] = splitdata(posData);
 			Instances posTrainData = two[0];
@@ -66,19 +68,25 @@ public class POSC45 extends Classifier {
 			for (int j = 0; j < 9; j++) {
 				dEstimate[j] = evaluateBaseEstimate(c45posunl[j], posTestData, unlTestData);
 			}
-
-			error[i] = Utils.minIndex(dEstimate);
+			dfj[i] = Utils.minIndex(dEstimate);
+			System.out.println("df_" + (i+1) + ":" + (dfj[i]+1)/10.0);
+			System.out.println("");
 		}
-		double df = (Utils.mean(error) + 1) / 10.0;
+		double df = (Utils.mean(dfj) + 1) / 10.0;
 		System.out.println("df="+df);
+		endTime = System.currentTimeMillis();
+		dfTime=endTime-startTime;
+		System.out.println("dfTime:"+dfTime);*/
 
 		// train the final classifier
 //		claC45posunl = new ClassifyPOSC45((nBestIndex + 1) / 10.0);
 //		claC45posunl.setDataset(posData, unlData);
 //		claC45posunl.buildClassifier(null);
 //		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
+		double df = 0.35333333333333333;
 		claC45posunls = new ClassifyPOSC45[nbclassifiers];
 		for (int i = 0; i < claC45posunls.length; i++) {
+			startTime = System.currentTimeMillis();
 			Instances resample_pos = new Instances(posData, posData.numInstances()/2);
 			Instances resample_unl = new Instances(unlData, unlData.numInstances()/2);
 			int[] selected_pos = new RandomDataGenerator().nextPermutation(posData.numInstances(), posData.numInstances()/2);
@@ -93,6 +101,9 @@ public class POSC45 extends Classifier {
 			claC45posunls[i] = new ClassifyPOSC45(df);
 			claC45posunls[i].setDataset(resample_pos, resample_unl);
 			claC45posunls[i].buildClassifier(null);
+			endTime = System.currentTimeMillis();
+			buildTime=endTime-startTime;
+			System.out.println("buildTime:"+buildTime);
 		}
 		
 	}

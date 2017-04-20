@@ -43,7 +43,8 @@ public class CombinetoPN {
 					/**
 					 * for PU
 					 */
-					if(temp[0].equals("1")){
+					if(temp[0].equals("10")){
+						temp[0]="1";
 						out_p.print(((int) Math.round(Double.valueOf(temp[0]))));
 						for (int j = 1; j < temp.length; j++) {
 							out_p.print("," + temp[j]);

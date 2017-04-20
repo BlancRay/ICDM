@@ -57,7 +57,8 @@ import classif.kmedoid.DTWKNNClassifierKMedoids;
 import classif.newkmeans.DTWKNNClassifierNK;
 import classif.pu.DTEnsemble;
 import classif.pu.DTWD;
-import classif.pu.POSC45;
+import classif.POSC45.POSC45;
+import classif.pu.TSPOSC45;
 import classif.pu.Test;
 import classif.pukmeans.DTWPUKMeans;
 import classif.pukmeans.PUtoPN;
@@ -1031,11 +1032,19 @@ public class ExperimentsLauncher {
 
 			double testError = 0.0;
 			J48 dt = new J48();
+			startTime = System.currentTimeMillis();
 			dt.buildClassifier(train);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("Training time:" + duration);
 			Evaluation eval = new Evaluation(train);
+			startTime = System.currentTimeMillis();
 			eval.evaluateModel(dt, test);
+			endTime = System.currentTimeMillis();
+			duration = endTime - startTime;
+			System.out.println("Testing time:" + duration);
 			testError = eval.errorRate();
-			System.out.println("TestError:" + testError + "\n");
+			System.out.println("TestError:" + testError + "\nFMeasures:" + eval.fMeasure(0));
 			System.out.println(dt.toSummaryString());
 			System.out.println(dt.graph());
 			System.out.println(eval.toSummaryString());
@@ -1181,8 +1190,8 @@ public class ExperimentsLauncher {
 				duration = endTime - startTime;
 				System.out.println("Testing time:"+duration);
 				testError = eval.errorRate();
-				System.out.println("TestError:" + testError + "\n" + eval.fMeasure(0));
-//				System.out.println(eval.toMatrixString());
+				System.out.println("TestError:" + testError + "\nFMeasures:" + eval.fMeasure(0));
+				System.out.println(eval.toMatrixString());
 				int nbclassifiers=dynamicEnsembleClassify.getBigDTs().length;
 				double[] error = new double[nbclassifiers];
 				double[] fmeasures = new double[nbclassifiers];
@@ -1233,43 +1242,75 @@ public class ExperimentsLauncher {
 			String algo = "PU";
 			System.out.println(algo);
 				double testError = 0.0;
+				TSPOSC45 tsposc45=new TSPOSC45();
+				tsposc45.nbpos=nbPrototypesMax;
+				tsposc45.r=0.3;
 				startTime = System.currentTimeMillis();
-				POSC45 posc45=new POSC45();
-				posc45.nbpos=nbPrototypesMax;
-				posc45.r=0.3;
-				posc45.buildClassifier(train);
+				tsposc45.buildClassifier(train);
 				endTime = System.currentTimeMillis();
 				duration = endTime - startTime;
 //				Duration traintime = Duration.ofMillis(duration);
-//				System.out.println(traintime);
-				startTime = System.currentTimeMillis();
+				System.out.println("Training time:"+duration);
 				Evaluation eval = new Evaluation(train);
-				eval.evaluateModel(posc45, test);
+				startTime = System.currentTimeMillis();
+				eval.evaluateModel(tsposc45, test);
 				endTime = System.currentTimeMillis();
 				duration = endTime - startTime;
 //				Duration testtime = Duration.ofMillis(duration);
-//				System.out.println(testtime);
+				System.out.println("Test time:"+duration);
 				System.out.println(eval.toMatrixString());
 				System.out.println("FMeasure:" + eval.fMeasure(0));
 				testError = eval.errorRate();
 				System.out.println("TestError:" + testError + "\n");
 				
-				int nbclassifiers=posc45.getClaC45posunls().length;
+				int nbclassifiers=tsposc45.getClaC45posunls().length;
 				double[] error = new double[nbclassifiers];
 				double[] fmeasures = new double[nbclassifiers];
 				double[] testtime = new double[nbclassifiers];
 				for (int i = 0; i < nbclassifiers; i++) {
-					startTime = System.currentTimeMillis();
 					Evaluation evaleach = new Evaluation(train);
-					evaleach.evaluateModel(posc45.getClaC45posunls()[i], test);
+					startTime = System.currentTimeMillis();
+					evaleach.evaluateModel(tsposc45.getClaC45posunls()[i], test);
 					endTime = System.currentTimeMillis();
 					duration = endTime - startTime;
 					error[i]=evaleach.errorRate();
 					fmeasures[i]=evaleach.fMeasure(0);
 					testtime[i]=duration;
-					System.out.println(i+"\tDT TestError:" + error[i] + "\tFMeasures:" + fmeasures[i]);
+					System.out.println(i+"\tDT TestError:" + error[i] + "\tFMeasures:" + fmeasures[i] + "\tTest Time:" + testtime[i]);
 				}
 				System.out.println("Average Error:"+Utils.mean(error)+"\tFMeasure:"+Utils.mean(fmeasures)+"\tTesttime:"+Utils.mean(testtime));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void launchPOSC45() {
+		try {
+//			out = new PrintStream(new FileOutputStream(rep + "/DT_" + dataName + "_results.csv", true));
+			String algo = "PU";
+			System.out.println(algo);
+				double testError = 0.0;
+				POSC45 posc45=new POSC45();
+				posc45.nbpos=nbPrototypesMax;
+				posc45.r=0.3;
+				startTime = System.currentTimeMillis();
+				posc45.buildClassifier(train);
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+//				Duration traintime = Duration.ofMillis(duration);
+				System.out.println("Training time:"+duration);
+				Evaluation eval = new Evaluation(train);
+				startTime = System.currentTimeMillis();
+				eval.evaluateModel(posc45, test);
+				endTime = System.currentTimeMillis();
+				duration = endTime - startTime;
+//				Duration testtime = Duration.ofMillis(duration);
+				System.out.println("Test time:"+duration);
+				System.out.println(eval.toMatrixString());
+				System.out.println("FMeasure:" + eval.fMeasure(0));
+				testError = eval.errorRate();
+				System.out.println("TestError:" + testError + "\n");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1409,10 +1450,10 @@ public class ExperimentsLauncher {
 	}
 	
 	public static void main(String[] args) {
-		String dataname="ECG";
-		datasetsDir = "./PUDATA/";
-//		String dataname=args[0];
-//		datasetsDir=args[1];
+//		String dataname="ProximalPhalanxTW";
+//		datasetsDir = "./PUDATA/";
+		String dataname=args[0];
+		datasetsDir=args[1];
 		File repSave = new File(saveoutputDir);
 //		File[] repSavelist;
 //		if (!repSave.exists()) {
@@ -1463,7 +1504,8 @@ public class ExperimentsLauncher {
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchStaticEnsemble();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDTWKNNClassifier();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchDynamicEnsemble();
-			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPU();
+//			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPU();
+			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPOSC45();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUKMeans();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 5, data[0].numInstances()).launchPUDTEnsemble();
 //			new ExperimentsLauncher(repSave, data[0], data[1], dataRep.getName(), 10, data[0].numInstances()).launchPUGMM();

@@ -16,12 +16,12 @@ public class PULauncher {
 	long startTime;
 	long endTime;
 	long duration;
-//	private static String datasetsDir = "./PUDATA/";
-	private static String datasetsDir = "./UCR_TS_Archive_2015/";
+	private static String datasetsDir = "./PUDATA/";
+//	private static String datasetsDir = "./UCR_TS_Archive_2015/";
 	private static String saveoutputDir = "./save/";
 
 	public static void main(String[] args) {
-		String dataname="ECG200";
+		String dataname="CBF";
 		datasetsDir = "./PUDATA/";
 //		String dataname=args[0];
 //		datasetsDir=args[1];
@@ -65,7 +65,7 @@ public class PULauncher {
 			/**
 			 * 调用launchPU
 			 */
-			new ExperimentsLauncher(repSave, train, test, dataRep.getName(), 10, nbpos).launchPU();
+			new ExperimentsLauncher(repSave, train, test, dataRep.getName(), 10, nbpos).launchPOSC45();
 			
 			
 		}

@@ -162,13 +162,13 @@ public class ClassifierTree{
 		m_isEmpty = false;
 		m_sons = null;
 		m_train = data;
-		Distribution checkDistribution=new Distribution(m_train);
-		System.out.println("Node:"+Arrays.deepToString(checkDistribution.getperClassPerBag()));
+//		Distribution checkDistribution=new Distribution(m_train);
+//		System.out.println("Node:"+Arrays.deepToString(checkDistribution.getperClassPerBag()));
 		
 		m_localModel = m_toSelectModel.selectModel(data);
 //		if (runtime == 0)
 //			plot(data, dir, runtime,"root node");
-		System.out.println("After split:"+Arrays.deepToString(m_localModel.m_distribution.getperClassPerBag()));
+//		System.out.println("After split:"+Arrays.deepToString(m_localModel.m_distribution.getperClassPerBag()));
 		if (m_localModel.numSubsets() > 1) {
 //			plot(m_localModel.getSplitPoint(),dir, runtime,"split data");
 			localInstances = m_localModel.split(data);
@@ -177,7 +177,7 @@ public class ClassifierTree{
 			int flg=0;
 			for (int i = 0; i < m_sons.length; i++) {
 				if (localInstances[i].numInstances() != 0){
-					if (flg == 0) {
+/*					if (flg == 0) {
 						System.out.println("left branch:");
 //						// loc = dir + "left/";
 //						// plot(localInstances[i], loc, runtime,"left branch");
@@ -185,7 +185,7 @@ public class ClassifierTree{
 						System.out.println("right branch:");
 //						// loc = dir + "right/";
 //						// plot(localInstances[i], loc, runtime,"right branch");
-					}
+					}*/
 					flg = 1;
 					m_sons[i] = getNewTree(localInstances[i], runtime, loc);
 					localInstances[i] = null;

@@ -61,8 +61,8 @@ public class C45ModelSelection extends ModelSelection {
 			if (Utils.sm(checkDistribution.total(), 3)
 					|| Utils.eq(checkDistribution.total(), checkDistribution.perClass(checkDistribution.maxClass())))
 				return noSplitModel;
-			// RandomSelect dataselect = new RandomSelect();
-			// Stack<Pairs> pairs = dataselect.buildClassifier(data);
+//			 RandomSelect dataselect = new RandomSelect();
+//			 Stack<Pairs> pairs = dataselect.buildClassifier(data);
 			SelectPN dataselect = new SelectPN();
 			Stack<Pairs> pairs = dataselect.buildClassifier(data);
 

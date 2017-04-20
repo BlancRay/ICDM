@@ -69,7 +69,7 @@ public class SelectPN {
 		knn_N = findKNN.KNN();
 		
 		/*
-		 * use P and pnn_N to combine pairs
+		 * use P and knn_N to combine pairs
 		 */
 		ArrayList<Sequence> class_P = new ArrayList<Sequence>();
 		for (int i = 0; i < p.numInstances(); i++) {
