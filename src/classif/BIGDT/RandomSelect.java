@@ -31,7 +31,7 @@ public class RandomSelect {
 		super();
 	}
 
-	protected double sample = 0.1;
+	protected double sample = 0.05;
 
 	public Stack<Pairs> buildClassifier(Instances data) {
 		trainingData = data;
@@ -76,7 +76,7 @@ public class RandomSelect {
 //		nbPairs = totle>0?Math.min(Math.min(totle, 5),100):0;
 //		nbPairs = (int) Math.min(totle * 0.5, 100);
 		nbPairs = (totle > 2 ? ((int) Math.ceil(totle * sample) == 1 ? 2 : Math.min((int) (totle * sample), 100)) : totle);
-//		System.out.println(totle+"\t"+nbPairs);
+//		System.out.println(totle * sample+"\t"+nbPairs);
 		Stack<Pairs> stack = new Stack<Pairs>();
 		while (stack.size() < nbPairs) {
 			RandomDataGenerator randGen = new RandomDataGenerator();
@@ -103,4 +103,5 @@ public class RandomSelect {
 		}
 		return stack;
 	}
+	
 }

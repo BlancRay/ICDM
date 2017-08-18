@@ -17,7 +17,7 @@ public class BDTEClassifier extends Classifier{
 	public BDTEClassifier() {
 		super();
 	}
-	private int nbclassifiers = 1;
+	private int nbclassifiers = 30;
 	private int K=5;
 	private int nbbestclassifiers;
 	private ClassifyBigDT[] bigDTs;
@@ -27,7 +27,7 @@ public class BDTEClassifier extends Classifier{
 	public void buildClassifier(Instances data) throws Exception {
 		Traindata=new Instances(data);
 //		K=Traindata.numInstances()/2;
-		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
+//		nbclassifiers=Math.min(Math.max((Traindata.numInstances() / Traindata.numClasses())/2,30),100);
 //		nbclassifiers=30;
 		System.out.println("nbclassifiers:"+nbclassifiers);
 //		nbbestclassifiers=nbclassifiers/10;
@@ -96,6 +96,5 @@ public class BDTEClassifier extends Classifier{
 	public ClassifyBigDT[] getBigDTs() {
 		return bigDTs;
 	}
-	
 	
 }
