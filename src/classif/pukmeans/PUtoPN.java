@@ -8,12 +8,13 @@ import java.util.Random;
 
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.gmm.DTWKNNClassifierGmm;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class PUtoPN extends Classifier {
+public class PUtoPN extends AbstractClassifier {
 
 	private static final long serialVersionUID = 6150443653739190526L;
 	private static final String pClass = "1.0";
@@ -96,7 +97,7 @@ public class PUtoPN extends Classifier {
 	 * @return positive example
 	 */
 	protected Instance init(Instances data) {
-		Instance posSample = new Instance(data.numAttributes());
+		Instance posSample = new DenseInstance(data.numAttributes());
 		posSample.setDataset(data);
 		while (posSample.classValue() != data.classAttribute().indexOfValue(pClass)) {
 			int rd = new Random().nextInt(data.numInstances());

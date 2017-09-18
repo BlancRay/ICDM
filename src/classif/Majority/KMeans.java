@@ -8,13 +8,12 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class KMeans extends Classifier{
-	private static final long serialVersionUID = 922540906465712982L;
-
+public class KMeans extends AbstractClassifier{
+	private static final long serialVersionUID = 2198495636176008932L;
 	protected ArrayList<ClassedSequence> prototypes;
 	protected ArrayList<ClassedSequence> classedData;
 	protected HashMap<String, ArrayList<Integer>> indexClassedDataInFullData;
@@ -106,6 +105,4 @@ public class KMeans extends Classifier{
 	public void setNbPrototypes(int nbPrototypes) {
 		this.nbPrototypes = nbPrototypes;
 	}
-	
-	
 }

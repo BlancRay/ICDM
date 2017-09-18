@@ -16,7 +16,7 @@
  *    		title = {Learning from positive and unlabeled examples},
  *    		booktitle = {Theoretical Computer Science 348 },
  *    		year = {2005},
- *    		pages = {70 �C 83},
+ *    		pages = {70 锟紺 83},
  *    		publisher = {ELSEVIER},
  *    	}
  *    
@@ -25,11 +25,6 @@
  *        the first class is the POS class, here, POS=won
  *        and the second class is the NEG class, NEG=nowin
  *        
- *    ����ζ���ڱ�ʾ������ѵ��������ͷ����Ʒ��������������б��еĵ�һ�����
- *    
- *    �������ڣ�
- *        ��Ʒ�а�������ֵȱʧ������� ��δ��������
- *        ��Ʒ�а����������ԣ�         ��δ��������
  */
 
 package classif.POSC45;
@@ -40,7 +35,8 @@ import java.util.*;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-public class POSC45 extends Classifier {
+public class POSC45 extends AbstractClassifier{
+	private static final long serialVersionUID = 2214198401582342899L;
 	public int nbpos;
 	private Instances Traindata;
 	public double r=0.3;
@@ -107,7 +103,6 @@ public class POSC45 extends Classifier {
 		int nUn = 0;
 
 		// evaluate on POS dataset
-		// Out.println("��pos��������");
 		for (int i = 0; i < posTestData.numInstances(); i++) {
 			Instance sample = posTestData.instance(i);
 			// Out.print(sample.toString() + "\t");
@@ -118,7 +113,6 @@ public class POSC45 extends Classifier {
 		}
 
 		// evaluate on UN dataset
-		// Out.println("��unlabel��������");
 		for (int i = 0; i < unTestData.numInstances(); i++) {
 			Instance sample = unTestData.instance(i);
 			// Out.print(sample.toString() + "\t");

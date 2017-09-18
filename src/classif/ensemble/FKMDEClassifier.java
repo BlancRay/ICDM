@@ -6,14 +6,14 @@ import java.util.Random;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class FKMDEClassifier extends Classifier{
-	private static final long serialVersionUID = -7921845058957451623L;
+public class FKMDEClassifier extends AbstractClassifier{
+	private static final long serialVersionUID = -9122604448343033527L;
 	public FKMDEClassifier() {
 		super();
 	}

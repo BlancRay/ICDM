@@ -9,9 +9,8 @@ import classif.Prototyper;
 import weka.core.Instances;
 
 public class DTWKNNClassifier extends Prototyper {
+	private static final long serialVersionUID = 4784722751028659039L;
 
-	private static final long serialVersionUID = 1717176683182910935L;
-	
 	public DTWKNNClassifier() {
 		super();
 	}

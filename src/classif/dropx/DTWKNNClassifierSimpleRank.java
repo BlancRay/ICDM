@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import weka.core.Instances;
 
 public class DTWKNNClassifierSimpleRank extends PrototyperSorted {
-	private static final long serialVersionUID = 1717176683182910935L;
-	
+	private static final long serialVersionUID = -8718040020631038656L;
+
 	@Override
 	protected void buildSortedSequences(Instances data) {
 		ArrayList<ClassedSequence> sortedSequencesTmp = new ArrayList<ClassedSequence>();

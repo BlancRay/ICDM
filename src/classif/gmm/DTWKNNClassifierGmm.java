@@ -6,15 +6,15 @@ import java.util.HashMap;
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class DTWKNNClassifierGmm extends Classifier{
-
-	private static final long serialVersionUID = 1717176683182910935L;
-
+public class DTWKNNClassifierGmm extends AbstractClassifier{
+	
+	private static final long serialVersionUID = -424580982624196264L;
+	
 	protected ArrayList<ClassedSequence> prototypes;
 	protected Sequence[][] centroidsPerClass = null;
 	protected double[][] sigmasPerClass = null;

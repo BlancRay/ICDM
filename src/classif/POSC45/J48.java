@@ -22,7 +22,7 @@
 
 package classif.POSC45;
 
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Sourcable;
 import weka.core.AdditionalMeasureProducer;
 import weka.core.Capabilities;
@@ -124,7 +124,7 @@ import java.util.Vector;
  * @author Eibe Frank (eibe@cs.waikato.ac.nz)
  * @version $Revision: 1.6 $
  */
-public class J48 extends Classifier implements OptionHandler, Drawable,
+public class J48 extends AbstractClassifier implements  OptionHandler, Drawable,
 		Matchable, Sourcable, WeightedInstancesHandler, Summarizable,
 		AdditionalMeasureProducer, TechnicalInformationHandler
 {

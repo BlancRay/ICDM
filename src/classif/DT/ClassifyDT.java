@@ -1,14 +1,12 @@
 package classif.DT;
 
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
+import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class ClassifyDT extends Classifier{
-
-	/** for serialization */
-	static final long serialVersionUID = -217733168393644444L;
-
+public class ClassifyDT extends AbstractClassifier{
+	private static final long serialVersionUID = 8295336430552350575L;
 	/** The decision tree */
 	private ClassifierTree root;
 

@@ -6,14 +6,14 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import classif.BIGDT.ClassifyBigDT;
 import items.MonoDoubleItemSet;
 import items.Sequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class PUDTClassifier extends Classifier{
-	private static final long serialVersionUID = -7921845058957451623L;
+public class PUDTClassifier extends AbstractClassifier{
+	private static final long serialVersionUID = 8745748775162435037L;
 	public PUDTClassifier() {
 		super();
 	}

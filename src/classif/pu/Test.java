@@ -8,13 +8,13 @@ import java.util.Random;
 import items.MonoDoubleItemSet;
 import items.Sequence;
 import items.Sequences;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class Test extends Classifier  {
-
+public class Test extends AbstractClassifier {
+	private static final long serialVersionUID = 4578982546614560972L;
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		Instances traindata=new Instances(data);

@@ -27,11 +27,11 @@ import items.ClassedSequence;
 import java.util.ArrayList;
 
 import classif.Prototyper;
+import weka.core.Capabilities;
 import weka.core.Instances;
 
 public class PrototyperFromFileSorted extends Prototyper {
-	private static final long serialVersionUID = -2920033536725442988L;
-	
+	private static final long serialVersionUID = 3763722724847808466L;
 	public ArrayList<ClassedSequence> sortedSequences = null;
 	
 	public PrototyperFromFileSorted(ArrayList<ClassedSequence> prototypes) {

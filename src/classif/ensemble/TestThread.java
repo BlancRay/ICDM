@@ -9,14 +9,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import classif.BIGDT.ClassifyBigDT;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class TestThread extends Classifier {
-	private static final long serialVersionUID = 4323394706742305452L;
+public class TestThread extends AbstractClassifier {
+	private static final long serialVersionUID = 1478342548949228865L;
 
 	public TestThread() {
 		super();
@@ -47,7 +47,7 @@ public class TestThread extends Classifier {
 		try {
 			for (int i = 0; i < al.size(); i++) {
 				classifyBigDTs[i] = new ClassifyBigDT();
-				classifyBigDTs[i] = (ClassifyBigDT) Classifier.makeCopy(al.get(i).get());
+				classifyBigDTs[i] = (ClassifyBigDT) AbstractClassifier.makeCopy(al.get(i).get());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,7 +110,7 @@ public class TestThread extends Classifier {
 		}
 
 		public void setClassifier(ClassifyBigDT classifier) throws Exception {
-			this.classifier = (ClassifyBigDT) Classifier.makeCopy(classifier);
+			this.classifier = (ClassifyBigDT) AbstractClassifier.makeCopy(classifier);
 		}
 
 		public CallThreadTest(CountDownLatch threadsSignal) {
@@ -161,7 +161,7 @@ public class TestThread extends Classifier {
 		}
 
 		public void setClassifier(ClassifyBigDT classifier) throws Exception {
-			this.classifier = (ClassifyBigDT) Classifier.makeCopy(classifier);
+			this.classifier = (ClassifyBigDT) AbstractClassifier.makeCopy(classifier);
 		}
 
 		public CallThreadclassify(CountDownLatch threadsSignal) {

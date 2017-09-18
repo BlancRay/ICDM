@@ -28,9 +28,8 @@ import items.ClassedSequence;
 import weka.core.Instances;
 
 public class DTWKNNClassifierKMedoids extends Prototyper {
+	private static final long serialVersionUID = -3409118188128863227L;
 
-	private static final long serialVersionUID = 1717176683182910935L;
-	
 	public DTWKNNClassifierKMedoids() {
 		super();
 	}

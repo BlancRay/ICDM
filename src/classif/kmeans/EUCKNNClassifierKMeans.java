@@ -7,9 +7,8 @@ import items.ClassedSequence;
 import weka.core.Instances;
 
 public class EUCKNNClassifierKMeans extends PrototyperEUC {
+	private static final long serialVersionUID = 4064640925345667800L;
 
-	private static final long serialVersionUID = 1717176683182910935L;
-	
 	public EUCKNNClassifierKMeans() {
 		super();
 	}

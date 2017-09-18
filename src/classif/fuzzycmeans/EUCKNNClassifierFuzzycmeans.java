@@ -17,15 +17,13 @@ import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
 import tools.Normalization;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class EUCKNNClassifierFuzzycmeans extends Classifier{
-
-	private static final long serialVersionUID = 1717176683182910935L;
-
+public class EUCKNNClassifierFuzzycmeans extends AbstractClassifier{
+	private static final long serialVersionUID = -7328902203363726291L;
 	protected ArrayList<ClassedSequence> prototypes;
 	protected Sequence[][] centroidsPerClass = null;
 	protected double[][] sigmasPerClass = null;

@@ -3,13 +3,13 @@ package classif.ensemble;
 import classif.BIGDT.ClassifyBigDT;
 import classif.fastkmeans.DTWKNNClassifierKMeansCached;
 import classif.kmeans.DTWKNNClassifierKMeans;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class StaticEnsembleClassify extends Classifier{
-	private static final long serialVersionUID = 272706678590256204L;
+public class StaticEnsembleClassify extends AbstractClassifier{
+	private static final long serialVersionUID = -2848829508586998659L;
 	public StaticEnsembleClassify() {
 		super();
 	}

@@ -7,6 +7,7 @@ import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Pairs;
 import items.Sequence;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
@@ -39,7 +40,7 @@ public class Split extends ClassifierSplitModel{
 		ArrayList<ClassedSequence> prototypes = new ArrayList<>();
 		for (int i = 0; i < 2; i++) {
 			Sequence seq=m_pair.getPair()[i];
-			Instance sample = new Instance(trainInstances.numAttributes());
+			Instance sample = new DenseInstance(trainInstances.numAttributes());
 			sample.setDataset(trainInstances);
 			sample.setClassValue(m_pair.getClasslable()[i]);
 			for (int j = 1; j < sample.numAttributes(); j++) {

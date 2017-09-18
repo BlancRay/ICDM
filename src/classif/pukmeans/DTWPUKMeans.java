@@ -10,12 +10,13 @@ import java.util.Arrays;
 import java.util.Random;
 
 import classif.kmeans.KMeansSymbolicSequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class DTWPUKMeans extends Classifier {
+public class DTWPUKMeans extends AbstractClassifier {
 
 	private static final long serialVersionUID = 1717176683182910935L;
 	protected ArrayList<ClassedSequence> prototypes;
@@ -285,7 +286,7 @@ public class DTWPUKMeans extends Classifier {
 	 * @return positive example
 	 */
 	protected Instance init() {
-		Instance posSample = new Instance(trainingData.numAttributes());
+		Instance posSample = new DenseInstance(trainingData.numAttributes());
 		posSample.setDataset(trainingData);
 		while (posSample.classValue() != trainingData.classAttribute().indexOfValue(pClass)) {
 			int rd = new Random().nextInt(trainingData.numInstances());

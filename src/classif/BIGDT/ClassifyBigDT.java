@@ -3,16 +3,15 @@ package classif.BIGDT;
 import java.util.Arrays;
 import java.util.Collections;
 
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
+import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class ClassifyBigDT extends Classifier{
+public class ClassifyBigDT extends AbstractClassifier{
 
-	/** for serialization */
-	static final long serialVersionUID = -217733168393644444L;
-
+	private static final long serialVersionUID = 8221302975920251618L;
 	/** The decision tree */
 //	private ClassifierTree[] root=new ClassifierTree[10];
 	private ClassifierTree root;

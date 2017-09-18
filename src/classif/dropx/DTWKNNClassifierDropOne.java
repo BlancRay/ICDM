@@ -29,10 +29,15 @@ import items.SortedSequence;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import weka.core.Capabilities;
+import weka.core.Instance;
 import weka.core.Instances;
 
 public class DTWKNNClassifierDropOne extends PrototyperSorted  {
-	private static final long serialVersionUID = 3200558026536565321L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3141148850143180076L;
 
 	@Override
 	protected void buildSortedSequences(Instances data) {		
@@ -177,5 +182,17 @@ public class DTWKNNClassifierDropOne extends PrototyperSorted  {
 		for (int j = toRemove.size() - 1; j >= 0; j--) {
 			sortedSequences.add(new ClassedSequence(sequences[toRemove.get(j)],classMap[toRemove.get(j)]));
 		}
+	}
+
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Capabilities getCapabilities() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

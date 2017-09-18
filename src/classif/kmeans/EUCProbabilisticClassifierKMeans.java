@@ -10,16 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.Math;
 
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class EUCProbabilisticClassifierKMeans extends Classifier {
-
-	private static final long serialVersionUID = 1717176683182910935L;
-
+public class EUCProbabilisticClassifierKMeans extends AbstractClassifier {
+	private static final long serialVersionUID = 1355622842016542676L;
 	protected ArrayList<ClassedSequence> prototypes;
 	protected Sequence[][] centroidsPerClass = null;
 	protected double[][] sigmasPerClass = null;

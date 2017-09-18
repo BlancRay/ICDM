@@ -12,9 +12,8 @@ import classif.BIGDT.ClassifyBigDT;
 import classif.ensemble.FindKNN;
 import weka.classifiers.*;
 
-public class TSPOSC45 extends Classifier {
-	private static final long serialVersionUID = -8055689900166489949L;
-
+public class TSPOSC45 extends AbstractClassifier{
+	private static final long serialVersionUID = 4401431537142848774L;
 	// the classifier
 	private ClassifyPOSC45 claC45posunl;
 	private ClassifyPOSC45[] claC45posunls;
@@ -211,5 +210,4 @@ public class TSPOSC45 extends Classifier {
 	public ClassifyPOSC45[] getClaC45posunls() {
 		return claC45posunls;
 	}
-	
 }

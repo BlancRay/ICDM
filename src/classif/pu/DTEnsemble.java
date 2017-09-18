@@ -9,9 +9,8 @@ import items.MonoDoubleItemSet;
 import items.Sequence;
 import weka.classifiers.*;
 
-public class DTEnsemble extends Classifier {
-	private static final long serialVersionUID = -8055689900166489949L;
-
+public class DTEnsemble extends AbstractClassifier {
+	private static final long serialVersionUID = 2907908860776080478L;
 	// the classifier
 	private ClassifyPOSC45 c45posunl[];
 	private ClassifyPOSC45 puc45;

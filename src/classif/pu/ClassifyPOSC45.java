@@ -2,12 +2,14 @@ package classif.pu;
 
 import java.util.Arrays;
 import java.util.Collections;
-import weka.classifiers.Classifier;
+
+import weka.classifiers.AbstractClassifier;
+import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class ClassifyPOSC45 extends Classifier{
+public class ClassifyPOSC45 extends AbstractClassifier{
 
 	/** for serialization */
 	static final long serialVersionUID = -217733168393644444L;

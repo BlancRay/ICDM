@@ -33,8 +33,8 @@ import java.util.Collections;
 import weka.core.Instances;
 
 public class DTWKNNClassifierDropTwo extends PrototyperSorted  {
-	private static final long serialVersionUID = 3200558026536565321L;
-	
+	private static final long serialVersionUID = -634976415435902514L;
+
 	@Override
 	protected void buildSortedSequences(Instances data) {		
 		sortedSequences = new ArrayList<ClassedSequence>();

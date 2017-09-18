@@ -31,13 +31,13 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import items.MonoDoubleItemSet;
 import items.Sequence;
 import items.ClassedSequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public abstract class Prototyper extends Classifier {
+public abstract class Prototyper extends AbstractClassifier{
 	private static final long serialVersionUID = 922540906465712982L;
 
 	protected ArrayList<ClassedSequence> prototypes;
@@ -49,7 +49,6 @@ public abstract class Prototyper extends Classifier {
 	protected Instances trainingData = null;
 	protected boolean fillPrototypes = true;
 
-	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		trainingData = data;
 		Attribute classAttribute = data.classAttribute();

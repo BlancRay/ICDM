@@ -32,7 +32,7 @@ import weka.core.Instances;
 
 public class DTWKNNClassifierKMeans extends Prototyper {
 
-	private static final long serialVersionUID = 1717176683182910935L;
+	private static final long serialVersionUID = -4009393603913976158L;
 	
 	public DTWKNNClassifierKMeans() {
 		super();

@@ -17,9 +17,8 @@ import items.MonoDoubleItemSet;
 import items.Sequence;
 import weka.classifiers.*;
 
-public class DTWD extends Classifier {
-	private static final long serialVersionUID = -8055689900166489949L;
-
+public class DTWD extends AbstractClassifier {
+	private static final long serialVersionUID = -1478983382706926119L;
 	// the classifier
 	private ClassifyPOSC45 claC45posunl;
 	private ClassifyPOSC45 c45posunl[];

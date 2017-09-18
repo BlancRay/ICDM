@@ -8,15 +8,14 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import items.MonoDoubleItemSet;
 import items.Sequence;
 import items.ClassedSequence;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class Unbalancecluster extends Classifier {
-	private static final long serialVersionUID = 922540906465712982L;
-
+public class Unbalancecluster extends AbstractClassifier{
+	private static final long serialVersionUID = -8080623340811851235L;
 	protected ArrayList<ClassedSequence> prototypes;
 	protected HashMap<String, ArrayList<Sequence>> classedData;
 	protected HashMap<String, ArrayList<Integer>> indexClassedDataInFullData;
@@ -177,5 +176,4 @@ public class Unbalancecluster extends Classifier {
 	public ArrayList<ClassedSequence> getPrototypes() {
 		return prototypes;
 	}
-
 }

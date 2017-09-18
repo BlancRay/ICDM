@@ -17,15 +17,14 @@ import items.ClassedSequence;
 import items.MonoDoubleItemSet;
 import items.Sequence;
 import tools.Normalization;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class EUCKNNClassifierGmm extends Classifier{
+public class EUCKNNClassifierGmm extends AbstractClassifier{
 
-	private static final long serialVersionUID = 1717176683182910935L;
-
+	private static final long serialVersionUID = 1786614215872990883L;
 	protected ArrayList<ClassedSequence> prototypes;
 	protected Sequence[][] centroidsPerClass = null;
 	protected double[][] sigmasPerClass = null;

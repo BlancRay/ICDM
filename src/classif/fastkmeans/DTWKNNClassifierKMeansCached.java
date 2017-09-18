@@ -10,8 +10,7 @@ import classif.Prototyper;
 import weka.core.Instances;
 
 public class DTWKNNClassifierKMeansCached extends Prototyper {
-
-	private static final long serialVersionUID = 1717176683182910935L;
+	private static final long serialVersionUID = -2582535745450419480L;
 	HashMap<String, double[][]>distancesPerClass=null;
 	
 	public DTWKNNClassifierKMeansCached() {

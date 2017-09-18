@@ -6,14 +6,15 @@ import java.util.Random;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import classif.BIGDT.ClassifyBigDT;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
+import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class BDTEClassifier extends Classifier{
-	private static final long serialVersionUID = -7921845058957451623L;
+public class BDTEClassifier extends AbstractClassifier{
+	private static final long serialVersionUID = -2642757275050804364L;
 	public BDTEClassifier() {
 		super();
 	}

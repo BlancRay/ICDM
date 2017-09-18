@@ -34,7 +34,7 @@ import classif.Prototyper;
 import weka.core.Instances;
 
 public class DTWKNNClassifierRandom extends Prototyper {
-	private static final long serialVersionUID = 1717176683182910935L;
+	private static final long serialVersionUID = -7066310318246556613L;
 	public ArrayList<Integer> indexPrototypeInTrainData = null;
 	double[][]distances=null;
 	
@@ -110,5 +110,4 @@ public class DTWKNNClassifierRandom extends Prototyper {
 		}
 		
 	}
-
 }
