@@ -9,3 +9,4 @@ It is now under coding and debugging.
 
 -Lei
 ***
+[![Build Status](https://travis-ci.org/xuleiboy1234/ICDM.svg?branch=master)](https://travis-ci.org/xuleiboy1234/ICDM)
