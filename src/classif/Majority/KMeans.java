@@ -3,7 +3,6 @@ package classif.Majority;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
 import items.ClassedSequence;
 import items.MonoDoubleItemSet;
