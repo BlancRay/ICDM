@@ -208,7 +208,7 @@ public class C45Split extends ClassifierSplitModel
 				.numClasses());
 		//Out.println(Weka.ARFF2StringWithWeight(trainInstances));
 		// Only Instances with known values are relevant.
-		Enumeration enu = trainInstances.enumerateInstances();
+		Enumeration<Instance> enu = trainInstances.enumerateInstances();
 		while (enu.hasMoreElements())
 		{
 			instance = (Instance) enu.nextElement();
@@ -253,7 +253,7 @@ public class C45Split extends ClassifierSplitModel
 		m_distribution = new Distribution(2, trainInstances.numClasses());
 
 		// Only Instances with known values are relevant.
-		Enumeration enu = trainInstances.enumerateInstances();
+		Enumeration<Instance> enu = trainInstances.enumerateInstances();
 		i = 0;
 		while (enu.hasMoreElements())
 		{
@@ -445,7 +445,7 @@ public class C45Split extends ClassifierSplitModel
 		if ((allInstances.attribute(m_attIndex).isNumeric())
 				&& (m_numSubsets > 1))
 		{
-			Enumeration enu = allInstances.enumerateInstances();
+			Enumeration<Instance> enu = allInstances.enumerateInstances();
 			while (enu.hasMoreElements())
 			{
 				instance = (Instance) enu.nextElement();

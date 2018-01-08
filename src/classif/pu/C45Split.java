@@ -56,7 +56,7 @@ public class C45Split extends ClassifierSplitModel {
 		m_distribution = new Distribution(m_complexityIndex, trainInstances.numClasses());
 		Instance instance;
 		// Only Instances with known values are relevant.
-		Enumeration enu = trainInstances.enumerateInstances();
+		Enumeration<Instance> enu = trainInstances.enumerateInstances();
 		while (enu.hasMoreElements()) {
 			instance = (Instance) enu.nextElement();
 			m_distribution.add(whichSubset(instance), instance);

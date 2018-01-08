@@ -2,10 +2,10 @@ package classif;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import weka.core.Attribute;
-import weka.core.FastVector;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import classif.ExperimentsLauncher;
@@ -99,9 +99,9 @@ public class PULauncher {
 			loader.setFile(pFile);
 			loader.setNominalAttributes("first");
 			pDataset = loader.getDataSet();
-			FastVector values = new FastVector();
-	        values.addElement("1.0");
-	        values.addElement("-1.0");
+	        ArrayList<String> values =new ArrayList<String>();
+	        values.add("1.0");
+	        values.add("-1.0");
 			pDataset.insertAttributeAt(new Attribute("clas",values), 0);
 			for (int i = 0; i < pDataset.numInstances(); i++) {
 //				System.out.println(pDataset.instance(i).toString(1));

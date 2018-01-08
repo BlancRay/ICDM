@@ -96,7 +96,7 @@ public class DrawAllSequences {
 			if(i==0)contains0=true;
 		}
 		
-		ArrayList[] mTemp=new ArrayList[l.getNbClasses()];
+		ArrayList<SymbolicSequence>[] mTemp=new ArrayList[l.getNbClasses()];
 		for(int i=0;i<mTemp.length;i++){
 			mTemp[i]=new ArrayList<SymbolicSequence>();
 		}

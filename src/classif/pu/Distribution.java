@@ -74,7 +74,7 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 		totaL = 0;
 		m_perClass = new double[source.numClasses()];
 		m_perClassPerBag[0] = new double[source.numClasses()];
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements())
 			add(0, (Instance) enu.nextElement());
 	}
@@ -99,7 +99,7 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 		m_perClass = new double[source.numClasses()];
 		for (int i = 0; i < nbBags; i++)
 			m_perClassPerBag[i] = new double[source.numClasses()];
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements()) {
 			instance = (Instance) enu.nextElement();
 			index = modelToUse.whichSubset(instance);
@@ -272,7 +272,7 @@ public class Distribution implements Cloneable, Serializable, RevisionHandler {
 				probs[j] = m_perBag[j] / totaL;
 			}
 		}
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements()) {
 			instance = (Instance) enu.nextElement();
 			if (instance.isMissing(attIndex)) {

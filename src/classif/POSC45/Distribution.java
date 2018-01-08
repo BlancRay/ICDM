@@ -121,7 +121,7 @@ public class Distribution implements Cloneable, Serializable
 		totaL = 0;
 		m_perClass = new double[source.numClasses()];
 		m_perClassPerBag[0] = new double[source.numClasses()];
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements())
 			add(0, (Instance) enu.nextElement());
 	}
@@ -147,7 +147,7 @@ public class Distribution implements Cloneable, Serializable
 		m_perClass = new double[source.numClasses()];
 		for (int i = 0; i < modelToUse.numSubsets(); i++)
 			m_perClassPerBag[i] = new double[source.numClasses()];
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements())
 		{
 			instance = (Instance) enu.nextElement();
@@ -342,7 +342,7 @@ public class Distribution implements Cloneable, Serializable
 				probs[j] = m_perBag[j] / totaL;
 			}
 		}
-		Enumeration enu = source.enumerateInstances();
+		Enumeration<Instance> enu = source.enumerateInstances();
 		while (enu.hasMoreElements())
 		{
 			instance = (Instance) enu.nextElement();

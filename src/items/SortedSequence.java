@@ -22,7 +22,7 @@
  ******************************************************************************/
 package items;
 
-public class SortedSequence implements Comparable {
+public class SortedSequence implements Comparable<Object> {
 	public Sequence sequence;
 	public int index;
 	public double sortingValue;

@@ -46,10 +46,9 @@ public class CutInto2 extends Resample
 			resample.setInputFormat(originalDataset);
 			Filter.useFilter(originalDataset, resample);
 
+		} catch (Exception e) {
+			System.err.println(e);
 		}
-		catch (Exception e)
-		{
-System.err.println(e);		}
 	}
 
 	public Instances[] randomize(int nRandomInt, int nPercent,

@@ -165,7 +165,7 @@ public class BinC45Split
 				       trainInstances.numClasses());
     
     // Only Instances with known values are relevant.
-    Enumeration enu = trainInstances.enumerateInstances();
+    Enumeration<Instance> enu = trainInstances.enumerateInstances();
     while (enu.hasMoreElements()) {
       instance = (Instance) enu.nextElement();
       if (!instance.isMissing(m_attIndex))
@@ -222,7 +222,7 @@ public class BinC45Split
     m_distribution = new Distribution(2,trainInstances.numClasses());
     
     // Only Instances with known values are relevant.
-    Enumeration enu = trainInstances.enumerateInstances();
+    Enumeration<Instance> enu = trainInstances.enumerateInstances();
     i = 0;
     while (enu.hasMoreElements()) {
       instance = (Instance) enu.nextElement();
@@ -403,7 +403,7 @@ public class BinC45Split
     
     if ((!allInstances.attribute(m_attIndex).isNominal()) &&
 	(m_numSubsets > 1)){
-      Enumeration enu = allInstances.enumerateInstances();
+      Enumeration<Instance> enu = allInstances.enumerateInstances();
       while (enu.hasMoreElements()) {
 	instance = (Instance) enu.nextElement();
 	if (!instance.isMissing(m_attIndex)){

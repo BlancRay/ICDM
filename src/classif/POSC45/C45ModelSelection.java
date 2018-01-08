@@ -78,7 +78,7 @@ public class C45ModelSelection extends ModelSelection
 		//Out.println("�����Ѿ�����C45ModelSelection�Ĳ��֣������Ҫ��ɸ��������������ķ��ѡ�");
 		
 		double minResult;
-		double currentResult;
+//		double currentResult;
 		C45Split[] currentModel;
 		C45Split bestModel = null;
 		NoSplit noSplitModel = null;
@@ -106,7 +106,7 @@ public class C45ModelSelection extends ModelSelection
 			// lot of values.
 			if (m_allData != null)
 			{
-				Enumeration enu = data.enumerateAttributes();
+				Enumeration<Attribute> enu = data.enumerateAttributes();
 				while (enu.hasMoreElements())
 				{
 					attribute = (Attribute) enu.nextElement();

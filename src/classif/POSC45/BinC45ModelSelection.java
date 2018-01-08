@@ -73,7 +73,7 @@ public class BinC45ModelSelection
   public final ClassifierSplitModel selectModel(Instances data){
 
     double minResult;
-    double currentResult;
+//    double currentResult;
     BinC45Split [] currentModel;
     BinC45Split bestModel = null;
     NoSplit noSplitModel = null;
@@ -97,7 +97,7 @@ public class BinC45ModelSelection
 
       // Check if all attributes are nominal and have a 
       // lot of values.
-      Enumeration enu = data.enumerateAttributes();
+      Enumeration<Attribute> enu = data.enumerateAttributes();
       while (enu.hasMoreElements()) {
 	Attribute attribute = (Attribute) enu.nextElement();
 	if ((attribute.isNumeric()) ||

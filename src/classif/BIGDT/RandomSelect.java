@@ -59,10 +59,10 @@ public class RandomSelect {
 			classedData.get(clas).add(sequences[i]);
 			indexClassedDataInFullData.get(clas).add(i);
 		}
-		FastVector values = new FastVector(classAttribute.numValues());
+		ArrayList<String> values = new ArrayList<String>(classAttribute.numValues());
 		for (String clas : classedData.keySet()) {
 			if (classedData.get(clas).size() != 0)
-				values.addElement(clas);
+				values.add(clas);
 		}
 		Attribute newclassAttribute=new Attribute("class",values);
 		int totle = 0;
