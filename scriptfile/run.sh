@@ -12,7 +12,6 @@ for dataset in `ls $dir`;do
 	echo "#SBATCH --mem=4000" >> ./run/run-$dataset.sh
 	echo "#SBATCH --time=150:00:00" >> ./run/run-$dataset.sh
 	echo "#SBATCH --mail-type=FAIL" >> ./run/run-$dataset.sh
-	echo "#SBATCH --mail-user=lei.xu@monash.edu" >> ./run/run-$dataset.sh
 	echo "#SBATCH --output=./outfk/$dataset.out" >> ./run/run-$dataset.sh
 	echo "module load java/1.8.0_77" >> ./run/run-$dataset.sh
 	echo "java -Xmx2g -Dfile.encoding=UTF-8 -classpath /home/lxu/ICDM/fk/bin:/home/lxu/ICDM/lib/weka.jar:/home/lxu/ICDM/lib/commons-math3-3.2.jar classif.ExperimentsLauncher $dataset">> ./run/run-$dataset.sh
